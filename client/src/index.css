@@ -5,18 +5,6 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-*, *::before, *::after {
-  box-sizing: inherit;
-}
-
 h1, h2, p, a {
   font-family: 'Alike Angular', serif;
 }
@@ -24,11 +12,15 @@ h1, h2, p, a {
 .home-h1, .home-h2 {
   text-align: center;
   font-family: 'Alike Angular', serif;
-  margin-top: 80px; /* Push the home-h1 and home-h2 below the navbar */
 }
 
 .home-h1 {
-  font-size: 48px;
+  font-size: 80px;
+  margin-top: 40px;
+}
+
+.home-h2 {
+  margin-top: 3px;
 }
 
 .center-text {
@@ -38,18 +30,14 @@ h1, h2, p, a {
 .center-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;  /* Align children to the top */
+  justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
   text-align: center;
-  padding-top: 150px; /* This ensures content starts below navbar */
+  padding-top: 50px; 
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-}
-
-.center-container h1, .center-container h2, .center-container p {
-  text-align: center;
 }
 
 nav {
