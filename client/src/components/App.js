@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import NavBar from "./NavBar";
+import Homepage from "./Homepage";
+import About from "./About";
 
 function App() {
-  return <h1>Project Client</h1>;
+  return (
+    <>
+      <NavBar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Navigate to="/homepage" replace />} />
+          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/about" element={<About />}/>
+        </Routes>
+      </main>
+    </>
+  );
 }
-
 export default App;
+

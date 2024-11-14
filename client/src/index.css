@@ -5,3 +5,90 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+h1, h2, p, a {
+  font-family: 'Alike Angular', serif;
+}
+
+.home-h1, .home-h2 {
+  text-align: center;
+  font-family: 'Alike Angular', serif;
+  margin-top: 80px; /* Push the home-h1 and home-h2 below the navbar */
+}
+
+.home-h1 {
+  font-size: 48px;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.center-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;  /* Align children to the top */
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding-top: 150px; /* This ensures content starts below navbar */
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.center-container h1, .center-container h2, .center-container p {
+  text-align: center;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgb(106, 36, 36);
+  color: var(--link);
+  padding: 10px 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 20px;
+}
+
+nav li {
+  display: inline;
+}
+
+nav a,
+nav button {
+  color: var(--link);
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+nav a:hover,
+nav button:hover {
+  color: #ff8b8b;
+}
