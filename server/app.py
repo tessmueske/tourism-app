@@ -1,22 +1,46 @@
 #!/usr/bin/env python3
 
-# Standard library imports
-
-# Remote library imports
-from flask import request
+from flask import Flask, request, session, jsonify, render_template
+from flask_cors import CORS
+from flask_migrate import Migrate
 from flask_restful import Resource
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
-# Local imports
 from config import app, db, api
-# Add your model imports
+from models import Traveler, LocalExpert, Advertiser, Island, Activity
 
+bcrypt = Bcrypt()
 
-# Views go here!
+class Signup(Resource):
+    def post(self):
+        return ''
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
+class Login(Resource):
+    def post(self):
+        return ''
 
+class CheckSession(Resource):
+    def get(self):
+        for key, model in {'traveler_id': Traveler, 'advertiser_id': Advertiser, 'localexpert_id': LocalExpert}.items():
+            user_id = session.get(key)
+            if user_id:
+                user = db.session.get(model, user_id)
+                if user:
+                    return user.to_dict(), 200
+        return {"error": "Unauthorized"}, 401
+
+class Logout(Resource):
+    def delete(self):
+        session.pop('traveler_id', None)
+        session.pop('advertiser_id', None)
+        session.pop('localexpert_id', None)
+        return '', 204
+
+api.add_resource(Signup, '/signup', endpoint='signup')
+api.add_resource(CheckSession, '/check_session', endpoint='check_session')
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

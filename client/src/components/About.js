@@ -10,6 +10,7 @@ function About(){
         <p>have you been wanting to visit the canary islands but want to ensure you are not contributing to the growing number of those in poverty, foreign hotel conglomerates paying their canarian employees below minimum wage, and ecological disasters?</p>
         <p>we are working to solve the tourism crisis in the canary islands. </p>
         <p>click here for more research</p>
+        <h2>⋇⊶⊰❣⊱⊷⋇⋇⊶⊰❣⊱⊷⋇⋇⊶⊰❣⊱⊷⋇</h2>
     </div>
   );
 };
