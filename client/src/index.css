@@ -6,40 +6,74 @@
 }
 
 body {
-  background: var(--gradient-bg); /* Radial gradient with warm tones */
+  background: var(--gradient-bg);
   color: #2e2e2e;
   font-family: 'Alike Angular', serif;
   margin: 0;
   padding: 0;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
 h1, h2, p, a {
   font-family: 'Alike Angular', serif;
+}
+
+h1 {
+  font-size: 50px;
 }
 
 .home-header {
   text-align: center; 
 }
 
-.home-h1, .home-h2 {
+.home-h1 {
   text-align: center;
   font-family: 'Alike Angular', serif;
   line-height: 1.2;
 }
 
 .home-h1 {
-  font-size: 140px;
+  font-size: 120px;
   margin-top: 40px;
   margin-bottom: 10px;
-}
-
-.home-h2 {
-  margin: 0;
 }
 
 .center-text {
   text-align: center;
 }
+
+.about-center-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding-top: 50px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.account-center-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  text-align: center;
+  padding-top: 50px;
+  width: 100%;
+  height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 
 .center-container {
   display: flex;
@@ -57,7 +91,7 @@ nav {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: rgb(120, 82, 82);
+  background-color: rgb(145, 66, 10);
   color: var(--link);
   padding: 10px 0;
   z-index: 1000;
