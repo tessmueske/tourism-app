@@ -1,6 +1,6 @@
 :root {
   --header: #fff;
-  --link: #61dafb;
+  --link: #dceefc;
   --text: hsla(0, 0%, 100%, 0.88);
   --gradient-bg: radial-gradient(circle, #dceefc, #95d3ff);
 }
@@ -57,7 +57,7 @@ nav {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: rgb(106, 36, 36);
+  background-color: rgb(120, 82, 82);
   color: var(--link);
   padding: 10px 0;
   z-index: 1000;
@@ -91,5 +91,5 @@ nav button {
 
 nav a:hover,
 nav button:hover {
-  color: #ff8b8b;
+  color: #95d3ff;
 }
