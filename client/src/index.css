@@ -9,18 +9,24 @@ h1, h2, p, a {
   font-family: 'Alike Angular', serif;
 }
 
+.home-header {
+  text-align: center; 
+}
+
 .home-h1, .home-h2 {
   text-align: center;
   font-family: 'Alike Angular', serif;
+  line-height: 1.2;
 }
 
 .home-h1 {
-  font-size: 80px;
+  font-size: 140px;
   margin-top: 40px;
+  margin-bottom: 10px;
 }
 
 .home-h2 {
-  margin-top: 3px;
+  margin: 0;
 }
 
 .center-text {
@@ -30,11 +36,10 @@ h1, h2, p, a {
 .center-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  min-height: 100vh;
+  justify-content: flex-start;
   text-align: center;
-  padding-top: 50px; 
+  padding-top: 50px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
