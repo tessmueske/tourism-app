@@ -1,8 +1,16 @@
 :root {
-  --bg: #282c34;
   --header: #fff;
   --link: #61dafb;
   --text: hsla(0, 0%, 100%, 0.88);
+  --gradient-bg: radial-gradient(circle, #dceefc, #95d3ff);
+}
+
+body {
+  background: var(--gradient-bg); /* Radial gradient with warm tones */
+  color: #2e2e2e;
+  font-family: 'Alike Angular', serif;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, p, a {
