@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import '../index.css'; 
 
 function Homepage() {
@@ -9,7 +10,7 @@ function Homepage() {
       </div>
       <div className="center-container">
         <h2>we are an independent organization that promotes culturally and ecologically sensitive tourism in the canary islands.</h2>
-        <p>click here to learn more about magwa.</p>
+        <p><Link to="/about">click here to learn more about magwa</Link>.</p> 
       </div>
     </div>
   );

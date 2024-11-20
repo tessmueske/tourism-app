@@ -1,6 +1,7 @@
 :root {
   --header: #fff;
   --link: #dceefc;
+  --dark-sea-blue: #257f80;
   --text: hsla(0, 0%, 100%, 0.88);
   --gradient-bg: radial-gradient(circle, #dceefc, #95d3ff);
 }
@@ -87,6 +88,28 @@ h1 {
   margin: 0 auto;
 }
 
+a, button {
+  color: var(--dark-sea-blue); 
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a:hover, button:hover {
+  color: var(--link); 
+}
+
+a:focus, button:focus {
+  color: var(--link); 
+}
+
+a:active, button:active {
+  color: var(--dark-sea-blue);
+}
+
 nav {
   position: fixed;
   top: 0;
@@ -125,5 +148,5 @@ nav button {
 
 nav a:hover,
 nav button:hover {
-  color: #95d3ff;
+  color: var(--dark-sea-blue);
 }

@@ -11,7 +11,7 @@ function Signup() {
             <p>a traveler</p>
             <p>a local expert</p>
             <p>an advertiser</p>
-            <p>Don't know? <Link to="/about">Click here</Link>.</p> 
+            <p>don't know? <Link to="/about">click here</Link>.</p> 
         </div>
     )
 }

@@ -51,6 +51,7 @@ function Login({ onLogin }) {
     <div className="account-center-container">
       <div className="mainContainer">
         <div className="titleContainer">
+          <p>⋇⊶⊰❣⊱⊷⋇</p>
           <div>log in to magwa</div>
           <br></br>
         </div>
