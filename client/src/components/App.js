@@ -6,6 +6,11 @@ import About from "./About";
 import Login from "./Login";
 import Signup from "./Signup";
 import Contact from "./Contact";
+import AdvertiserSignup from "./AdvertiserSignup";
+import LocalExpertSignup from "./LocalExpertSignup";
+import TravelerSignup from "./TravelerSignup";
+import Welcome from "./Welcome";
+import Thanks from "./Thanks";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,6 +34,11 @@ function App() {
           <Route path="/login" element={<Login onLogin={setUser} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/signup/advertiser" element={<AdvertiserSignup />}/>
+          <Route path="/signup/localexpert" element={<LocalExpertSignup />}/>
+          <Route path="/signup/traveler" element={<TravelerSignup />}/>
+          <Route path="/welcome/home" element={<Welcome />}/>
+          <Route path="/thanks" element={<Thanks />}/>
         </Routes>
       </main>
     </>

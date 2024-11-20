@@ -12,10 +12,6 @@ from models import Traveler, LocalExpert, Advertiser, Island, Activity
 
 bcrypt = Bcrypt()
 
-class Signup(Resource):
-    def post(self):
-        return ''
-
 class Login(Resource):
     def post(self):
         return ''
@@ -30,6 +26,18 @@ class CheckSession(Resource):
                     return user.to_dict(), 200
         return {"error": "Unauthorized"}, 401
 
+class TravelerSignup(Resource):
+    def post(self):
+        return ''
+
+class LocalExpertSignup(Resource):
+    def post(self):
+        return ''
+
+class AdvertiserSignup(Resource):
+    def post(self):
+        return ''
+
 class Logout(Resource):
     def delete(self):
         session.pop('traveler_id', None)
@@ -37,9 +45,11 @@ class Logout(Resource):
         session.pop('localexpert_id', None)
         return '', 204
 
-api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(TravelerSignup, '/signup/traveler', endpoint='signup_traveler')
+api.add_resource(LocalExpertSignup, '/signup/localexpert', endpoint='signup_localexpert')
+api.add_resource(AdvertiserSignup, '/signup/advertiser', endpoint='signup_advertiser')
 api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':

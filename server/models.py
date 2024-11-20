@@ -40,6 +40,7 @@ class LocalExpert(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     bio = db.Column(db.String, nullable=False)
     areas_of_expertise = db.Column(db.String, nullable=False)
+    status = db.Column(db.String, default="pending") #pending, approved, or rejected
 
     islands = db.relationship('Island', secondary=localexpert_island, back_populates='localexperts')
     travelers = db.relationship('Traveler', secondary=localexpert_traveler, back_populates='localexperts')
@@ -53,6 +54,7 @@ class Advertiser(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
+    status = db.Column(db.String, default="pending")
 
     islands = db.relationship('Island', secondary=advertiser_island, back_populates='advertisers')
     travelers = db.relationship('Traveler', secondary=advertiser_traveler, back_populates='advertisers')

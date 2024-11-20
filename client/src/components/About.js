@@ -13,7 +13,7 @@ function About(){
         <h2>⋇⊶⊰❣⊱⊷⋇ so, what's this app? ⋇⊶⊰❣⊱⊷⋇</h2>
         <p>the functionality of magwa is twofold: it serves as a personal travel planning application, and it's a community hub for Q&A, discussion, events, and businesses and services.</p>
         <p>to use magwa, you can sign up as a traveler, a local expert, or an advertiser. you cannot sign up as more than one type of user.</p>
-        <h2>⋇⊶⊰❣⊱⊷⋇ which one am i? ⋇⊶⊰❣⊱⊷⋇</h2>
+        <h2>⋇⊶⊰❣⊱⊷⋇ am i a traveler, local expert, or advertiser? ⋇⊶⊰❣⊱⊷⋇</h2>
         <p>you are a <span class="italic">traveler</span> if you are visiting the island and want to browse local businesses, events, and connect with locals. you are a <span class="italic">local expert</span> if you live in or are from the canary islands and want to meet travelers, post your events, or engage in community discussion. you are an <span class="italic">advertiser</span> if you are from or live in the canary islands and have a business or service you want to promote.</p>
         <p>every person who signs up as a local expert or advertiser will be vetted by our board to ensure the application stays local.</p>
         <p>click on the 'sign up' button above to make an account and start investing in local businesses!</p>
