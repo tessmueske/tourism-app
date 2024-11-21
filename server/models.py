@@ -6,6 +6,38 @@ from config import db
 
 bcrypt = Bcrypt()
 
+traveler_advertiser = db.Table('traveler_advertiser',
+    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True))
+
+traveler_island = db.Table('traveler_island',
+    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
+    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
+
+traveler_localexpert = db.Table('traveler_localexpert',
+    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
+
+traveler_activity = db.Table('traveler_activity',
+    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
+    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
+
+localexpert_island = db.Table('localexpert_island',
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
+    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
+
+localexpert_activity = db.Table('localexpert_activity',
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
+    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
+
+advertiser_island = db.Table('advertiser_island',
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
+    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
+
+advertiser_activity = db.Table('advertiser_activity',
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
+    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
+
 class Traveler(db.Model, SerializerMixin):
     __tablename__ = 'travelers'
 
@@ -37,16 +69,28 @@ class LocalExpert(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
+    _password_hash = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
     bio = db.Column(db.String, nullable=False)
     areas_of_expertise = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="pending") #pending, approved, or rejected
 
     islands = db.relationship('Island', secondary=localexpert_island, back_populates='localexperts')
-    travelers = db.relationship('Traveler', secondary=localexpert_traveler, back_populates='localexperts')
+    travelers = db.relationship('Traveler', secondary=traveler_localexpert, back_populates='localexperts')
     activities = db.relationship ('Activity', secondary=localexpert_activity, back_populates='localexperts')
 
     serialize_rules = ('-islands.localexperts', '-travelers.localexperts', '-activities.localexperts')
+
+    @hybrid_property
+    def password_hash(self):
+        raise AttributeError("Password is not a readable attribute.")
+
+    @password_hash.setter
+    def password_hash(self, password):
+        self._password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(self._password_hash, password)
 
 class Advertiser(db.Model, SerializerMixin):
     __tablename__ = 'advertisers'
@@ -54,13 +98,25 @@ class Advertiser(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
+    _password_hash = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="pending")
 
     islands = db.relationship('Island', secondary=advertiser_island, back_populates='advertisers')
-    travelers = db.relationship('Traveler', secondary=advertiser_traveler, back_populates='advertisers')
+    travelers = db.relationship('Traveler', secondary=traveler_advertiser, back_populates='advertisers')
     activities = db.relationship ('Activity', secondary=advertiser_activity, back_populates='advertisers')
 
     serialize_rules = ('-islands.advertisers', '-travelers.advertisers', '-activities.advertisers')
+
+    @hybrid_property
+    def password_hash(self):
+        raise AttributeError("Password is not a readable attribute.")
+
+    @password_hash.setter
+    def password_hash(self, password):
+        self._password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(self._password_hash, password)
 
 class Activity(db.Model, SerializerMixin): #this is a joins table
     __tablename__ = 'activities'
@@ -69,7 +125,13 @@ class Activity(db.Model, SerializerMixin): #this is a joins table
     name = db.Column(db.String)
     price = db.Column(db.Integer)
 
-    islands = db.relationship('Island', back_populates='activities')
+    islands = db.relationship(
+        'Island',
+        secondary=advertiser_island,
+        back_populates='activities',
+        primaryjoin='advertiser_island.c.activity_id == Activity.id',
+        secondaryjoin='advertiser_island.c.island_id == Island.id'
+    )
     localexperts = db.relationship('LocalExpert', secondary=localexpert_activity, back_populates='activities')
     travelers = db.relationship('Traveler', secondary=traveler_activity, back_populates='activities')
     advertisers = db.relationship('Advertiser', secondary=advertiser_activity, back_populates='activities')
@@ -85,34 +147,6 @@ class Island(db.Model, SerializerMixin): #this is also a joins table
     localexperts = db.relationship('LocalExpert', secondary=localexpert_island, back_populates='islands')
     advertisers = db.relationship('Advertiser', secondary=advertiser_island, back_populates='islands')
     travelers = db.relationship('Traveler', secondary=traveler_island, back_populates='islands')
-    activities = db.relationship ('Activity', back_populates='islands')
+    activities = db.relationship('Activity', secondary=advertiser_island, back_populates='islands')
 
     serialize_rules = ('-localexperts.islands', '-advertisers.islands', '-travelers.islands', '-activities.islands')
-
-traveler_advertiser = db.Table('traveler_advertiser',
-    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True))
-
-traveler_localexpert = db.Table('traveler_localexpert',
-    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
-
-traveler_activity = db.Table('traveler_activity',
-    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
-
-localexpert_island = db.Table('localexpert_island',
-    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
-    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
-
-localexpert_activity = db.Table('localexpert_activity',
-    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
-    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
-
-advertiser_island = db.Table('advertiser_island',
-    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
-    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
-
-advertiser_activity = db.Table('advertiser_activity',
-    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
-    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))

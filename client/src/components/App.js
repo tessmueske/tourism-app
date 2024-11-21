@@ -11,6 +11,9 @@ import LocalExpertSignup from "./LocalExpertSignup";
 import TravelerSignup from "./TravelerSignup";
 import Welcome from "./Welcome";
 import Thanks from "./Thanks";
+import TravelerLogin from "./TravelerLogin"
+import LocalExpertLogin from "./LocalExpertLogin";
+import AdvertiserLogin from "./AdvertiserLogin";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,6 +42,9 @@ function App() {
           <Route path="/signup/traveler" element={<TravelerSignup />}/>
           <Route path="/welcome/home" element={<Welcome />}/>
           <Route path="/thanks" element={<Thanks />}/>
+          <Route path="/login/traveler" element={<TravelerLogin />}/>
+          <Route path="/login/advertiser" element={<AdvertiserLogin />}/>
+          <Route path="/login/localexpert" element={<LocalExpertLogin />}/>
         </Routes>
       </main>
     </>
