@@ -52,7 +52,7 @@ function TravelerLogin({ onLogin }) {
       <div className="mainContainer">
         <div className="titleContainer">
           <p>⋇⊶⊰❣⊱⊷⋇</p>
-          <div>log in to magwa</div>
+          <div>traveler log in to magwa</div>
           <br></br>
         </div>
         <Formik
