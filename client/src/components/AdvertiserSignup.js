@@ -28,7 +28,7 @@ function AdvertiserSignup() {
     });
 
     const handleSignup = ({ email, password, notes }) => {
-        fetch("http://localhost:5555/signup/advertiser", {
+        fetch("/signup/advertiser", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

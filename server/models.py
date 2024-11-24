@@ -18,10 +18,11 @@ traveler_localexpert = db.Table('traveler_localexpert',
     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
 
-traveler_activity = db.Table('traveler_activity',
+traveler_activity = db.Table(
+    'traveler_activity',
     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
     db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
-
+    
 localexpert_island = db.Table('localexpert_island',
     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
     db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))

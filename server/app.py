@@ -54,7 +54,7 @@ class AdvertiserLogin(Resource):
         if errors:
             return {"errors": errors}, 400
 
-        Advertiser.query.filter_by(email=email).first()
+        user = Advertiser.query.filter_by(email=email).first()
 
         if user and user.authenticate(password):
             session['user_id'] = user.id
@@ -81,7 +81,7 @@ class LocalExpertLogin(Resource):
         if errors:
             return {"errors": errors}, 400
 
-        LocalExpert.query.filter_by(email=email).first()
+        user = LocalExpert.query.filter_by(email=email).first()
 
         if user and user.authenticate(password):
             session['user_id'] = user.id
@@ -95,9 +95,9 @@ class LocalExpertLogin(Resource):
 
 class CheckSession(Resource):
     def get(self):
-        for key, model in {'traveler_id': Traveler, 'advertiser_id': Advertiser, 'localexpert_id': LocalExpert}.items():
-            user_id = session.get(key)
-            if user_id:
+        user_id = session.get('user_id')
+        if user_id:
+            for model in [Traveler, Advertiser, LocalExpert]:
                 user = db.session.get(model, user_id)
                 if user:
                     return user.to_dict(), 200
@@ -121,7 +121,8 @@ class TravelerSignup(Resource):
         if errors:
             return {"errors": errors}, 400 
 
-        user = User.query.filter_by(email=email).first()
+        user = Traveler.query.filter_by(email=email).first()
+
         if user:
             return {"errors": ["email already registered. please log in."]}, 400
         
@@ -155,7 +156,7 @@ class Logout(Resource):
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
 api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
-api.add_resource(LocalExpert, '/login/localexpert', endpoint='login_localexpert')
+api.add_resource(LocalExpertLogin, '/login/localexpert', endpoint='login_localexpert')
 api.add_resource(TravelerSignup, '/signup/traveler', endpoint='signup_traveler')
 api.add_resource(LocalExpertSignup, '/signup/localexpert', endpoint='signup_localexpert')
 api.add_resource(AdvertiserSignup, '/signup/advertiser', endpoint='signup_advertiser')

@@ -28,7 +28,7 @@ function LocalExpertSignup() {
     });
 
     const handleSignup = ({ email, password, notes }) => {
-        fetch("http://localhost:5555/signup/localexpert", {
+        fetch("/signup/localexpert", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

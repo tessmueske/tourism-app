@@ -27,7 +27,7 @@ function TravelerSignup() {
   });
 
   const handleSignup = ({ email, password }) => {
-    fetch("http://localhost:5555/signup/traveler", {
+    fetch("/signup/traveler", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
