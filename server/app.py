@@ -109,24 +109,30 @@ class TravelerSignup(Resource):
 
         print(request.data)
 
+        username = data.get('username')
         email = data.get('email')
         password = data.get('password')
 
         errors = []
 
+        if not username:
+            errors.append("Username is required.")
         if not email:
-            errors.append("email is required.")
+            errors.append("Email is required.")
         if not password: 
-            errors.append("password is required.")
+            errors.append("Password is required.")
         if errors:
             return {"errors": errors}, 400 
 
         user = Traveler.query.filter_by(email=email).first()
 
         if user:
-            return {"errors": ["email already registered. please log in."]}, 400
+            return {"errors": ["Email already registered. Please log in."]}, 400
         
-        new_user = User(email=email)
+        new_user = Traveler(
+            email=email
+            username=username
+        )
         new_user.password_hash = password 
 
         try:
