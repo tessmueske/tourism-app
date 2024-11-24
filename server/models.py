@@ -39,6 +39,10 @@ advertiser_activity = db.Table('advertiser_activity',
     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
     db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
 
+island_activity = db.Table('island_activity',
+    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True),
+    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
+
 class Traveler(db.Model, SerializerMixin):
     __tablename__ = 'travelers'
 
@@ -126,13 +130,7 @@ class Activity(db.Model, SerializerMixin): #this is a joins table
     name = db.Column(db.String)
     price = db.Column(db.Integer)
 
-    islands = db.relationship(
-        'Island',
-        secondary=advertiser_island,
-        back_populates='activities',
-        primaryjoin='advertiser_island.c.activity_id == Activity.id',
-        secondaryjoin='advertiser_island.c.island_id == Island.id'
-    )
+    islands = db.relationship('Island', secondary=island_activity, back_populates='activities')
     localexperts = db.relationship('LocalExpert', secondary=localexpert_activity, back_populates='activities')
     travelers = db.relationship('Traveler', secondary=traveler_activity, back_populates='activities')
     advertisers = db.relationship('Advertiser', secondary=advertiser_activity, back_populates='activities')
@@ -148,6 +146,6 @@ class Island(db.Model, SerializerMixin): #this is also a joins table
     localexperts = db.relationship('LocalExpert', secondary=localexpert_island, back_populates='islands')
     advertisers = db.relationship('Advertiser', secondary=advertiser_island, back_populates='islands')
     travelers = db.relationship('Traveler', secondary=traveler_island, back_populates='islands')
-    activities = db.relationship('Activity', secondary=advertiser_island, back_populates='islands')
+    activities = db.relationship('Activity', secondary=island_activity, back_populates='islands')
 
     serialize_rules = ('-localexperts.islands', '-advertisers.islands', '-travelers.islands', '-activities.islands')

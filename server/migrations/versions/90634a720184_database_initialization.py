@@ -1,8 +1,8 @@
 """database initialization
 
-Revision ID: b34191e7c946
+Revision ID: 90634a720184
 Revises: 
-Create Date: 2024-11-24 16:56:18.258988
+Create Date: 2024-11-24 17:06:26.727706
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b34191e7c946'
+revision = '90634a720184'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -72,6 +72,13 @@ def upgrade():
     sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_advertiser_island_island_id_islands')),
     sa.PrimaryKeyConstraint('advertiser_id', 'island_id')
     )
+    op.create_table('island_activity',
+    sa.Column('island_id', sa.Integer(), nullable=False),
+    sa.Column('activity_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], name=op.f('fk_island_activity_activity_id_activities')),
+    sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_island_activity_island_id_islands')),
+    sa.PrimaryKeyConstraint('island_id', 'activity_id')
+    )
     op.create_table('localexpert_activity',
     sa.Column('localexpert_id', sa.Integer(), nullable=False),
     sa.Column('activity_id', sa.Integer(), nullable=False),
@@ -125,6 +132,7 @@ def downgrade():
     op.drop_table('traveler_activity')
     op.drop_table('localexpert_island')
     op.drop_table('localexpert_activity')
+    op.drop_table('island_activity')
     op.drop_table('advertiser_island')
     op.drop_table('advertiser_activity')
     op.drop_table('travelers')
