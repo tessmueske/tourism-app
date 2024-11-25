@@ -224,7 +224,7 @@ class LocalExpertSignup(Resource):
                 sender="verification@magwa.com",
                 recipients=[admin_email],
             )
-            msg.body = f"A new local expert has signed up:\n\nUsername: {username}\nEmail: {email}\n\n Notes: {notes} Please review and verify or reject their account by sending a PUT request to /verify/localexpert/<int:advertiser_id> on Postman (or /reject/localexpert/<int:advertiser_id>). You can locate their id in the database in VSC. Then you can send them an email letting them know they've been verified."
+            msg.body = f"A new local expert has signed up:\n\nUsername: {username}\nEmail: {email}\n\n Notes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/localexpert/<int:advertiser_id> on Postman (or /reject/localexpert/<int:advertiser_id>). You can locate their id in the database in VSC. Then you can send them an email letting them know they've been verified."
 
             try:
                 mail.send(msg)
@@ -288,7 +288,7 @@ class AdvertiserSignup(Resource):
                 sender="verification@magwa.com",
                 recipients=[admin_email],
             )
-            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nNotes: {notes} Please review and verify or reject their account by sending a PUT request to /verify/advertiser/<int:advertiser_id> on Postman (or /reject/advertiser/<int:advertiser_id>). Then you can send them an email letting them know they've been verified."
+            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nNotes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/advertiser/<int:advertiser_id> on Postman (or /reject/advertiser/<int:advertiser_id>). Then you can send them an email letting them know they've been verified."
 
             try:
                 mail.send(msg)
