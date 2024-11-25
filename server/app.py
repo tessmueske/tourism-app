@@ -40,7 +40,7 @@ class TravelerLogin(Resource):
             traveler = Traveler.query.filter_by(username=username).first()
 
         if traveler and traveler.authenticate(password):
-            session['traveler_id'] = traveler.id
+            session['user_id'] = traveler.id
             return {
                 'id': traveler.id,
                 'email': traveler.email,
@@ -78,7 +78,7 @@ class AdvertiserLogin(Resource):
             return {"Error": "Your account has not been approved yet."}, 403
 
         if advertiser and advertiser.authenticate(password):
-            session['advertiser_id'] = advertiser.id
+            session['user_id'] = advertiser.id
             return {
                 'id': advertiser.id,
                 'email': advertiser.email,
@@ -93,6 +93,7 @@ class LocalExpertLogin(Resource):
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
+        username = data.get('username')
 
         errors = []
         if not email:
@@ -103,21 +104,31 @@ class LocalExpertLogin(Resource):
         if errors:
             return {"errors": errors}, 400
 
-        user = LocalExpert.query.filter_by(email=email).first()
+        localexpert = None
+        if email:
+            localexpert = LocalExpert.query.filter_by(email=email).first()
+        elif username:
+            localexpert = LocalExpert.query.filter_by(username=username).first()
 
-        if user and user.authenticate(password):
-            session['user_id'] = user.id
+        if not localexpert:
+            return {"Error": "Invalid email or username."}, 401
+
+        if localexpert.status != 'approved':
+            return {"Error": "Your account has not been approved yet."}, 403
+
+        if localexpert and localexpert.authenticate(password):
+            session['user_id'] = localexpert.id
             return {
-                'id': user.id,
-                'email': user.email
+                'id': localexpert.id,
+                'email': localexpert.email,
+                'username': localexpert.username
             }, 200
 
-        return {'Error': 'Invalid email or password'}, 401
-
+        return {'Error': 'Invalid email, username, or password'}, 401
 
 class CheckSession(Resource):
     def get(self):
-        user_id = session.get('user_id')
+        user_id = session.get('traveler_id') or session.get('advertiser_id') or session.get('localexpert_id')
         if user_id:
             for model in [Traveler, Advertiser, LocalExpert]:
                 user = db.session.get(model, user_id)
@@ -175,6 +186,7 @@ class LocalExpertSignup(Resource):
         username = data.get('username')
         email = data.get('email')
         password = data.get('password')
+        notes = data.get('notes')
 
         errors = []
 
@@ -187,7 +199,7 @@ class LocalExpertSignup(Resource):
         if errors:
             return {"errors": errors}, 400 
 
-        user = Advertiser.query.filter((Advertiser.email == email) | (Advertiser.username == username)).first()
+        user = LocalExpert.query.filter((LocalExpert.email == email) | (LocalExpert.username == username)).first()
 
         if user:
             if user.email == email:
@@ -196,7 +208,7 @@ class LocalExpertSignup(Resource):
                 errors.append("Username already taken.")
             return {"errors": errors}, 400
         
-        new_user = Advertiser(
+        new_user = LocalExpert(
             email=email,
             username=username,
         )
@@ -208,11 +220,11 @@ class LocalExpertSignup(Resource):
 
             admin_email = "tessmueske@gmail.com"  
             msg = Message(
-                "New Advertiser Signup Pending Verification",
+                "New Local Expert Signup Pending Verification",
                 sender="verification@magwa.com",
                 recipients=[admin_email],
             )
-            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nPlease review and verify their account."
+            msg.body = f"A new local expert has signed up:\n\nUsername: {username}\nEmail: {email}\n\n Notes: {notes} Please review and verify or reject their account by sending a PUT request to /verify/localexpert/<int:advertiser_id> on Postman (or /reject/localexpert/<int:advertiser_id>). You can locate their id in the database in VSC. Then you can send them an email letting them know they've been verified."
 
             try:
                 mail.send(msg)
@@ -320,7 +332,7 @@ class RejectAdvertiser(Resource):
             return {"error": f"Failed to verify advertiser: {str(e)}"}, 422
 
 class VerifyLocalExpert(Resource):
-    def put(self, advertiser_id):
+    def put(self, localexpert_id):
         localexpert = LocalExpert.query.get(localexpert_id)
         if not local_expert:
             return {"error": "Local expert not found"}, 404
@@ -334,12 +346,12 @@ class VerifyLocalExpert(Resource):
             return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
 class RejectLocalExpert(Resource):
-    def put(self, advertiser_id):
+    def put(self, localexpert_id):
         localexpert = LocalExpert.query.get(localexpert_id)
         if not localexpert:
             return {"error": "Local expert not found"}, 404
 
-        advertiser.status = 'rejected'
+        localexpert.status = 'rejected'
 
         try:
             db.session.commit()
