@@ -71,14 +71,21 @@ class AdvertiserLogin(Resource):
         elif username:
             advertiser = Advertiser.query.filter_by(username=username).first()
 
-        if user and user.authenticate(password):
-            session['user_id'] = user.id
+        if not advertiser:
+            return {"Error": "Invalid email or username."}, 401
+
+        if advertiser.status != 'approved':
+            return {"Error": "Your account has not been approved yet."}, 403
+
+        if advertiser and advertiser.authenticate(password):
+            session['advertiser_id'] = advertiser.id
             return {
-                'id': user.id,
-                'email': user.email
+                'id': advertiser.id,
+                'email': advertiser.email,
+                'username': advertiser.username
             }, 200
 
-        return {'Error': 'Invalid email or password'}, 401
+        return {'Error': 'Invalid email, username, or password'}, 401
 
 
 class LocalExpertLogin(Resource):

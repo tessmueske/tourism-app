@@ -8,6 +8,7 @@ function AdvertiserSignup() {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
+        username: Yup.string().required("Username is required"),
         email: Yup.string()
             .email("Invalid email format")
             .required("Email is required"), 
@@ -17,6 +18,7 @@ function AdvertiserSignup() {
 
     const formik = useFormik({
         initialValues: {
+            username: "",
             email: "",
             password: "",
             notes: "",
@@ -27,13 +29,13 @@ function AdvertiserSignup() {
         },
     });
 
-    const handleSignup = ({ email, password, notes }) => {
+    const handleSignup = ({ username, email, password, notes }) => {
         fetch("/signup/advertiser", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, notes }),
+          body: JSON.stringify({ username, email, password, notes }),
         })
           .then((r) => {
             if (r.ok) {
@@ -57,6 +59,7 @@ function AdvertiserSignup() {
             our team. please fill out the form below with your email, password, a bit about yourself, and why you'd like to advertise with magwa.</p>
           <br />
           <form onSubmit={formik.handleSubmit}>
+            <p>email</p>
             <input
               type="email"
               name="email" 
@@ -66,7 +69,17 @@ function AdvertiserSignup() {
               required
             />
             <br />
+          <p>username</p>
+          <input
+            type="text"
+            name="username" 
+            onChange={formik.handleChange}
+            value={formik.values.username}
+            placeholder="Username"
+            required
+            />
             <br />
+            <p>password</p>
             <input
               type="password"
               name="password" 

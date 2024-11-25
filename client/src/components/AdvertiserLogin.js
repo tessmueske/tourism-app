@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import '../index.css'; 
@@ -8,102 +8,103 @@ function AdvertiserLogin({ onLogin }) {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
-      email: Yup.string()
-        .email("invalid email format")
-        .required("email is required"),
-      password: Yup.string()
-        .required("password is required")
-    });
-  
-    const handleSubmit = (values, { setSubmitting, setErrors }) => {
-      fetch("/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      })
-        .then((r) => {
-          setSubmitting(false);
-          if (r.ok) {
-            r.json().then((user) => {
-              onLogin(user);
-              navigate("/homepage");
-            });
-          } else {
-            r.json().then((err) => {
-              if (r.status === 404) {
-                setErrors({ email: "Email not registered. Please sign up." });
-              } else {
-                setErrors({ password: "Invalid login credentials. Try again?" });
-              }
-            });
-          }
+      username: Yup.string(),
+      email: Yup.string().email("Invalid email format"),
+      password: Yup.string().required("Password is required"),
+    }).test({
+      name: "username-or-email-required",
+      message: "Either username or email is required",
+      test: function (value) {
+        return value.username || value.email;
+      },
+    });  
+
+    const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+        fetch("/login/advertiser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, email, password }),
+        })
+        .then((r) => r.json().then((data) => ({ status: r.ok, data })))
+        .then(({ status, data }) => {
+            setSubmitting(false);
+            if (status) {
+                navigate("/landing");
+            } else {
+                setErrors({ api: data.errors || ["Signup failed"] });
+            }
         })
         .catch(() => {
-          setSubmitting(false);
-          setErrors({ general: "Something went wrong. Please try again." });
+            setSubmitting(false);
+            setErrors({ api: ["Something went wrong. Please try again."] });
         });
     };
-  
+
     return (
       <div className="account-center-container">
-        <div className="mainContainer">
-          <div className="titleContainer">
-            <p>⋇⊶⊰❣⊱⊷⋇</p>
-            <div>advertiser log in to magwa</div>
-            <br></br>
-          </div>
-          <Formik
-            initialValues={{ email: "", password: "" }}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting, errors }) => (
-              <Form>
-                <div className="inputContainer">
-                  <Field
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    className="inputBox"
-                  />
-                  <ErrorMessage name="email" component="div" className="errorLabel" />
-                </div>
+        <h2>advertiser login for Magwa</h2>
+        <p>⋇⊶⊰❣⊱⊷⋇</p>
+        <p>please sign in with your username, email, and password</p>
+        <br />
   
-                <br />
+        <Formik
+          initialValues={{ email: "", username: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={handleLogin}
+        >
+          {({ isSubmitting, errors }) => (
+            <Form>
+              <div className="inputContainer">
+                <p>email</p>
+                <Field
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  className="inputBox"
+                />
+                <ErrorMessage name="email" component="div" className="errorLabel" />
+              </div>
+              <br></br>
   
-                <div className="inputContainer">
-                  <Field
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    className="inputBox"
-                  />
-                  <ErrorMessage name="password" component="div" className="errorLabel" />
-                </div>
+              <div className="inputContainer">
+                <p>username</p>
+                <Field
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  className="inputBox"
+                />
+                <ErrorMessage name="username" component="div" className="errorLabel" />
+              </div>
+              <br></br>
   
-                <br />
+              <div className="inputContainer">
+                <p>password</p>
+                <Field
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  className="inputBox"
+                />
+                <ErrorMessage name="password" component="div" className="errorLabel" />
+              </div>
+              <br></br>
   
-                <div className="inputContainer">
-                  <button type="submit" className="button" disabled={isSubmitting}>
-                    {isSubmitting ? "Logging in..." : "Log in"}
-                  </button>
-                </div>
-                <br></br>
+              <button type="submit" className="button" disabled={isSubmitting}>
+                {isSubmitting ? "Logging in..." : "Log in now"}
+              </button>
   
-                {errors.general && (
-                  <div className="errorContainer">
-                    <p className="errorText">{errors.general}</p>
-                  </div>
-                )}
-              </Form>
-            )}
-          </Formik>
-        </div>
+              {errors.api && (
+                <p style={{ color: "red" }}>{errors.api.join(", ")}</p>
+              )}
+            </Form>
+          )}
+        </Formik>
       </div>
     );
   }
-
-export default AdvertiserLogin;
+  
+  export default AdvertiserLogin;
+  

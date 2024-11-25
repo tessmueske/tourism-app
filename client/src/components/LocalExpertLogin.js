@@ -16,7 +16,7 @@ function LocalExpertLogin({ onLogin }) {
     });
   
     const handleSubmit = (values, { setSubmitting, setErrors }) => {
-      fetch("/login", {
+      fetch("/login/localexpert", {
         method: "POST",
         credentials: "include",
         headers: {
