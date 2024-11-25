@@ -14,6 +14,7 @@ import Thanks from "./Thanks";
 import TravelerLogin from "./TravelerLogin"
 import LocalExpertLogin from "./LocalExpertLogin";
 import AdvertiserLogin from "./AdvertiserLogin";
+import Landing from "./Landing"
 
 function App() {
   const [user, setUser] = useState(null);
@@ -33,6 +34,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/homepage" replace />} />
           <Route path="/homepage" element={<Homepage />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/about" element={<About />}/>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

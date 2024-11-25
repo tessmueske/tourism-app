@@ -13,21 +13,20 @@ from models import Traveler, LocalExpert, Advertiser, Island, Activity
 bcrypt = Bcrypt()
 CORS(app, supports_credentials=True)
 
+app.secret_key = '12346jkkkkkffff'
+
 class TravelerLogin(Resource):
     def post(self):
         data = request.get_json()
         email = data.get('email')
-        password = data.get('password')
         username = data.get('username')
+        password = data.get('password')
 
-        errors = []
-        if not (email or username):
-            errors.append("Email is required.")
         if not password:
-            errors.append("Password is required.")
-        
-        if errors:
-            return {"errors": errors}, 400
+            return {"errors": ["Password is required"]}, 400
+
+        if not (username or email):
+            return {"errors": ["Either username or email is required"]}, 400
 
         traveler = None
         if email:
@@ -43,7 +42,7 @@ class TravelerLogin(Resource):
                 'username': traveler.username,
             }, 200
 
-        return {'Error': 'Invalid email, username, or password'}, 401
+        return {'errors': ['Invalid username/email or password']}, 401
 
 class AdvertiserLogin(Resource):
     def post(self):
