@@ -1,8 +1,8 @@
 """database initialization
 
-Revision ID: 90634a720184
+Revision ID: 9d22b6d820ea
 Revises: 
-Create Date: 2024-11-24 17:06:26.727706
+Create Date: 2024-11-25 18:17:58.641701
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '90634a720184'
+revision = '9d22b6d820ea'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,12 +26,14 @@ def upgrade():
     )
     op.create_table('advertisers',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
+    sa.Column('notes', sa.String(), nullable=True),
     sa.Column('status', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
     )
     op.create_table('islands',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -41,13 +43,12 @@ def upgrade():
     op.create_table('localexperts',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('bio', sa.String(), nullable=False),
-    sa.Column('areas_of_expertise', sa.String(), nullable=False),
     sa.Column('status', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
     )
     op.create_table('travelers',
     sa.Column('id', sa.Integer(), nullable=False),

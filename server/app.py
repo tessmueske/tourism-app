@@ -6,14 +6,19 @@ from flask_migrate import Migrate
 from flask_restful import Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail, Message
+from dotenv import load_dotenv
+import os
 
 from config import app, db, api
 from models import Traveler, LocalExpert, Advertiser, Island, Activity
 
-bcrypt = Bcrypt()
-CORS(app, supports_credentials=True)
+load_dotenv()  
+app.secret_key = os.getenv('SECRET_KEY')
 
-app.secret_key = '12346jkkkkkffff'
+bcrypt = Bcrypt()
+mail = Mail(app)
+CORS(app, supports_credentials=True)
 
 class TravelerLogin(Resource):
     def post(self):
@@ -49,17 +54,22 @@ class AdvertiserLogin(Resource):
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
+        username = data.get('username')
 
         errors = []
-        if not email:
-            errors.append("Email is required.")
+        if not (email or username):
+            errors.append("Email or username is required.")
         if not password:
             errors.append("Password is required.")
         
         if errors:
             return {"errors": errors}, 400
 
-        user = Advertiser.query.filter_by(email=email).first()
+        advertiser = None
+        if email:
+            advertiser = Advertiser.query.filter_by(email=email).first()
+        elif username:
+            advertiser = Advertiser.query.filter_by(username=username).first()
 
         if user and user.authenticate(password):
             session['user_id'] = user.id
@@ -151,11 +161,184 @@ class TravelerSignup(Resource):
 
 class LocalExpertSignup(Resource):
     def post(self):
-        return ''
+        data = request.get_json()
+
+        print(request.data)
+
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+
+        errors = []
+
+        if not username:
+            errors.append("Username is required.")
+        if not email:
+            errors.append("Email is required.")
+        if not password: 
+            errors.append("Password is required.")
+        if errors:
+            return {"errors": errors}, 400 
+
+        user = Advertiser.query.filter((Advertiser.email == email) | (Advertiser.username == username)).first()
+
+        if user:
+            if user.email == email:
+                errors.append("Email already registered. Please log in.")
+            if user.username == username:
+                errors.append("Username already taken.")
+            return {"errors": errors}, 400
+        
+        new_user = Advertiser(
+            email=email,
+            username=username,
+        )
+        new_user.password_hash = password 
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+
+            admin_email = "tessmueske@gmail.com"  
+            msg = Message(
+                "New Advertiser Signup Pending Verification",
+                sender="verification@magwa.com",
+                recipients=[admin_email],
+            )
+            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nPlease review and verify their account."
+
+            try:
+                mail.send(msg)
+            except Exception as email_error:
+                print(f"Failed to send email: {str(email_error)}")
+
+            return {
+                "message": "Signup successful. Your account is pending verification.",
+                "user": new_user.to_dict()
+            }, 201
+
+        except Exception as e:
+            print(f"Database error: {str(e)}")
+            return {"error": f"Failed to create user: {str(e)}"}, 422
 
 class AdvertiserSignup(Resource):
     def post(self):
-        return ''
+        data = request.get_json()
+
+        print(request.data)
+
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        notes = data.get('notes')
+
+        errors = []
+
+        if not username:
+            errors.append("Username is required.")
+        if not email:
+            errors.append("Email is required.")
+        if not password: 
+            errors.append("Password is required.")
+        if errors:
+            return {"errors": errors}, 400 
+
+        user = Advertiser.query.filter((Advertiser.email == email) | (Advertiser.username == username)).first()
+
+        if user:
+            if user.email == email:
+                errors.append("Email already registered. Please log in.")
+            if user.username == username:
+                errors.append("Username already taken.")
+            return {"errors": errors}, 400
+        
+        new_user = Advertiser(
+            email=email,
+            username=username,
+            notes=notes
+        )
+        new_user.password_hash = password 
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+
+            admin_email = "tessmueske@gmail.com"  
+            msg = Message(
+                "New Advertiser Signup Pending Verification",
+                sender="verification@magwa.com",
+                recipients=[admin_email],
+            )
+            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nNotes: {notes} Please review and verify or reject their account by sending a PUT request to /verify/advertiser/<int:advertiser_id> on Postman (or /reject/advertiser/<int:advertiser_id>). Then you can send them an email letting them know they've been verified."
+
+            try:
+                mail.send(msg)
+            except Exception as email_error:
+                print(f"Failed to send email: {str(email_error)}")
+
+            return {
+                "user": new_user.to_dict()
+            }, 201
+
+        except Exception as e:
+            print(f"Database error: {str(e)}")
+            return {"error": f"Failed to create user: {str(e)}"}, 422
+
+class VerifyAdvertiser(Resource):
+    def put(self, advertiser_id):
+        advertiser = Advertiser.query.get(advertiser_id)
+        if not advertiser:
+            return {"error": "Advertiser not found"}, 404
+
+        advertiser.status = 'approved'
+
+        try:
+            db.session.commit()
+            return {"message": "Advertiser verified successfully"}, 200
+        except Exception as e:
+            return {"error": f"Failed to verify advertiser: {str(e)}"}, 422
+
+class RejectAdvertiser(Resource):
+    def put(self, advertiser_id):
+        advertiser = Advertiser.query.get(advertiser_id)
+        if not advertiser:
+            return {"error": "Advertiser not found"}, 404
+
+        advertiser.status = 'rejected'
+
+        try:
+            db.session.commit()
+            return {"message": "Advertiser rejected successfully"}, 200
+        except Exception as e:
+            return {"error": f"Failed to verify advertiser: {str(e)}"}, 422
+
+class VerifyLocalExpert(Resource):
+    def put(self, advertiser_id):
+        localexpert = LocalExpert.query.get(localexpert_id)
+        if not local_expert:
+            return {"error": "Local expert not found"}, 404
+
+        localexpert.status = 'approved'
+
+        try:
+            db.session.commit()
+            return {"message": "Local expert verified successfully"}, 200
+        except Exception as e:
+            return {"error": f"Failed to verify local expert: {str(e)}"}, 422
+
+class RejectLocalExpert(Resource):
+    def put(self, advertiser_id):
+        localexpert = LocalExpert.query.get(localexpert_id)
+        if not localexpert:
+            return {"error": "Local expert not found"}, 404
+
+        advertiser.status = 'rejected'
+
+        try:
+            db.session.commit()
+            return {"message": "Local expert rejected successfully"}, 200
+        except Exception as e:
+            return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
 class Logout(Resource):
     def delete(self):
@@ -171,6 +354,10 @@ api.add_resource(LocalExpertLogin, '/login/localexpert', endpoint='login_localex
 api.add_resource(TravelerSignup, '/signup/traveler', endpoint='signup_traveler')
 api.add_resource(LocalExpertSignup, '/signup/localexpert', endpoint='signup_localexpert')
 api.add_resource(AdvertiserSignup, '/signup/advertiser', endpoint='signup_advertiser')
+api.add_resource(VerifyAdvertiser, '/verify/advertiser/<int:advertiser_id>', endpoint='verify_advertiser')
+api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', endpoint='reject_advertiser')
+api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
+api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
 api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':

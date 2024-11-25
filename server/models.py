@@ -3,6 +3,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_bcrypt import Bcrypt
 from config import db
+from flask_mail import Message
 
 bcrypt = Bcrypt()
 
@@ -74,10 +75,8 @@ class LocalExpert(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
+    username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    bio = db.Column(db.String, nullable=False)
-    areas_of_expertise = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="pending") #pending, approved, or rejected
 
     islands = db.relationship('Island', secondary=localexpert_island, back_populates='localexperts')
@@ -101,10 +100,11 @@ class Advertiser(db.Model, SerializerMixin):
     __tablename__ = 'advertisers'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
+    username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
-    status = db.Column(db.String, default="pending")
+    notes = db.Column(db.String, nullable=True) #for signup
+    status = db.Column(db.String, default="pending") #pending, approved, or rejected
 
     islands = db.relationship('Island', secondary=advertiser_island, back_populates='advertisers')
     travelers = db.relationship('Traveler', secondary=traveler_advertiser, back_populates='advertisers')
