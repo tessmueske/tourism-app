@@ -18,9 +18,10 @@ class TravelerLogin(Resource):
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
+        username = data.get('username')
 
         errors = []
-        if not email:
+        if not (email or username):
             errors.append("Email is required.")
         if not password:
             errors.append("Password is required.")
@@ -28,16 +29,21 @@ class TravelerLogin(Resource):
         if errors:
             return {"errors": errors}, 400
 
-        user = Traveler.query.filter_by(email=email).first()
+        traveler = None
+        if email:
+            traveler = Traveler.query.filter_by(email=email).first()
+        elif username:
+            traveler = Traveler.query.filter_by(username=username).first()
 
-        if user and user.authenticate(password):
-            session['user_id'] = user.id
+        if traveler and traveler.authenticate(password):
+            session['traveler_id'] = traveler.id
             return {
-                'id': user.id,
-                'email': user.email
+                'id': traveler.id,
+                'email': traveler.email,
+                'username': traveler.username,
             }, 200
 
-        return {'Error': 'Invalid email or password'}, 401
+        return {'Error': 'Invalid email, username, or password'}, 401
 
 class AdvertiserLogin(Resource):
     def post(self):
@@ -124,14 +130,14 @@ class TravelerSignup(Resource):
         if errors:
             return {"errors": errors}, 400 
 
-        user = Traveler.query.filter_by(email=email).first()
+        user = Traveler.query.filter((Traveler.email == email) | (Traveler.username == username)).first()
 
         if user:
             return {"errors": ["Email already registered. Please log in."]}, 400
         
         new_user = Traveler(
-            email=email
-            username=username
+            email=email,
+            username=username,
         )
         new_user.password_hash = password 
 
