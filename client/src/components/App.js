@@ -16,6 +16,7 @@ import AdvertiserLogin from "./AdvertiserLogin";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
     fetch("/check_session").then((r) => {
@@ -67,6 +68,7 @@ function App() {
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />}/>
+              <Route path="/profile/user/:user_id" element={<MyProfile username={username}/>}/>
             </>
           )}
           
