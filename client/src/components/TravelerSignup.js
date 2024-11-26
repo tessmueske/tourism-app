@@ -27,7 +27,7 @@ function TravelerSignup() {
       },
     });
 
-    const handleSignup = ({ username, email, password }) => {
+    const handleSignup = ({ username, email, password }, setUser) => {
       fetch("/signup/traveler", {
         method: "POST",
         headers: {
@@ -37,10 +37,13 @@ function TravelerSignup() {
       })
         .then((r) => {
           if (r.ok) {
-            navigate("/welcome/home");
+            r.json().then((userData) => {
+              setUser(userData); 
+              navigate("/welcome/home");
+            });
           } else {
             r.json().then((err) => {
-              formik.setErrors({ api: err.errors || ["Signup failed"] }); 
+              formik.setErrors({ api: err.errors || ["Signup failed"] });
             });
           }
         })

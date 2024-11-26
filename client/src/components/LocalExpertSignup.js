@@ -8,46 +8,49 @@ function LocalExpertSignup() {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
-        email: Yup.string()
-            .email("Invalid email format")
-            .required("Email is required"), 
-        password: Yup.string()
-            .required("Password is required")
-    });
+      username: Yup.string().required("Username is required"),
+      email: Yup.string()
+          .email("Invalid email format")
+          .required("Email is required"), 
+      password: Yup.string()
+          .required("Password is required")
+  });
 
     const formik = useFormik({
-        initialValues: {
-            email: "",
-            password: "",
-            notes: "",
-        },
-        validationSchema,
-        onSubmit: (values) => {
-            handleSignup(values);
-        },
+      initialValues: {
+          username: "",
+          email: "",
+          password: "",
+          notes: "",
+      },
+      validationSchema,
+      onSubmit: (values) => {
+          handleSignup(values);
+      },
     });
 
-    const handleSignup = ({ email, password, notes }) => {
-        fetch("/signup/localexpert", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password, notes }),
+    const handleSignup = ({ username, email, password, notes }) => {
+      fetch("/signup/localexpert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password, notes }),
+      })
+        .then((r) => {
+          console.log("Form data being sent:", { username, email, password, notes });
+          if (r.ok) {
+              navigate("/verification/pending");
+          } else {
+            r.json().then((err) => {
+              formik.setErrors({ api: err.errors || ["Signup failed"] }); 
+            });
+          }
         })
-          .then((r) => {
-            if (r.ok) {
-                navigate("/verification/pending");
-            } else {
-              r.json().then((err) => {
-                formik.setErrors({ api: err.errors || ["Signup failed"] }); 
-              });
-            }
-          })
-          .catch(() => {
-            formik.setErrors({ api: ["Something went wrong. Please try again."] });
-          });
-      };
+        .catch(() => {
+          formik.setErrors({ api: ["Something went wrong. Please try again."] });
+        });
+    };
 
       return (
         <div className="account-center-container">
@@ -57,22 +60,33 @@ function LocalExpertSignup() {
             our team. we want to make sure that we keep our community local! please fill out the form below with your email, password, and a bit about yourself.</p>
           <br />
           <form onSubmit={formik.handleSubmit}>
+            <p>email</p>
             <input
               type="email"
               name="email" 
               onChange={formik.handleChange}
               value={formik.values.email}
-              placeholder="Email"
+              placeholder="email"
               required
             />
             <br />
+            <p>username</p>
+          <input
+            type="text"
+            name="username" 
+            onChange={formik.handleChange}
+            value={formik.values.username}
+            placeholder="username"
+            required
+            />
             <br />
+            <p>password</p>
             <input
               type="password"
               name="password" 
               onChange={formik.handleChange}
               value={formik.values.password}
-              placeholder="Password"
+              placeholder="password"
               required
             />
             <br />
@@ -84,13 +98,13 @@ function LocalExpertSignup() {
               name="notes" 
               onChange={formik.handleChange}
               value={formik.values.notes}
-              placeholder="Write here..."
+              placeholder="write here..."
               required
             />
             <br></br>
             <br></br>
             <button type="submit" className="button" disabled={formik.isSubmitting}>
-              {formik.isSubmitting ? "Submitting..." : "Submit for verification"}
+              {formik.isSubmitting ? "Submitting... (this may take a few moments!)" : "Submit for verification"}
             </button>
             <br />
             {formik.errors.api && (

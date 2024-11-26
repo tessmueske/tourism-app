@@ -63,7 +63,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/signup/advertiser" element={<AdvertiserSignup />} />
               <Route path="/signup/localexpert" element={<LocalExpertSignup />} />
-              <Route path="/signup/traveler" element={<TravelerSignup />} />
+              <Route path="/signup/traveler" element={<TravelerSignup setUser={setUser}/>} />
               <Route path="/login/traveler" element={<TravelerLogin setUser={setUser} />} />
               <Route path="/login/advertiser" element={<AdvertiserLogin setUser={setUser} />} />
               <Route path="/login/localexpert" element={<LocalExpertLogin setUser={setUser} />} />

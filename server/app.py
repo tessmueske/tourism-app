@@ -196,6 +196,8 @@ class LocalExpertSignup(Resource):
             errors.append("Email is required.")
         if not password: 
             errors.append("Password is required.")
+        if not notes:
+            errors.append("Notes is required.")
         if errors:
             return {"errors": errors}, 400 
 
@@ -211,6 +213,7 @@ class LocalExpertSignup(Resource):
         new_user = LocalExpert(
             email=email,
             username=username,
+            notes=notes
         )
         new_user.password_hash = password 
 
@@ -224,7 +227,7 @@ class LocalExpertSignup(Resource):
                 sender="verification@magwa.com",
                 recipients=[admin_email],
             )
-            msg.body = f"A new local expert has signed up:\n\nUsername: {username}\nEmail: {email}\n\n Notes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/localexpert/<int:advertiser_id> on Postman (or /reject/localexpert/<int:advertiser_id>). You can locate their id in the database in VSC. Then you can send them an email letting them know they've been verified."
+            msg.body = f"A new local expert has signed up:\n\nUsername: {username}\nEmail: {email}\n\n Notes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/localexpert/<int:localexpert_id> on Postman (or /reject/localexpert/<int:advertiser_id>). You can locate their id in the database in VSC. Then you can send them an email letting them know they've been verified."
 
             try:
                 mail.send(msg)
@@ -288,7 +291,7 @@ class AdvertiserSignup(Resource):
                 sender="verification@magwa.com",
                 recipients=[admin_email],
             )
-            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nNotes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/advertiser/<int:advertiser_id> on Postman (or /reject/advertiser/<int:advertiser_id>). Then you can send them an email letting them know they've been verified."
+            msg.body = f"A new advertiser has signed up:\n\nUsername: {username}\nEmail: {email}\n\nNotes: {notes} \n\n Please review and verify or reject their account by sending a PUT request to /verify/advertiser/<int:localexpert_id> on Postman (or /reject/advertiser/<int:advertiser_id>). Then you can send them an email letting them know they've been verified."
 
             try:
                 mail.send(msg)
@@ -334,7 +337,7 @@ class RejectAdvertiser(Resource):
 class VerifyLocalExpert(Resource):
     def put(self, localexpert_id):
         localexpert = LocalExpert.query.get(localexpert_id)
-        if not local_expert:
+        if not localexpert:
             return {"error": "Local expert not found"}, 404
 
         localexpert.status = 'approved'

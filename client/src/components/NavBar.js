@@ -19,7 +19,7 @@ function NavBar({ user, handleLogout }) {
         {!user ? (
           <>
             <li>
-              <Link to="/homepage">home</Link>
+              <Link to="/">home</Link>
             </li>
             <li>
               <Link to="/about">about us</Link>

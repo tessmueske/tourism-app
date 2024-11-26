@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import '../index.css'; 
 
-function AdvertiserLogin() {
+function AdvertiserLogin({ setUser }) {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
@@ -20,25 +20,29 @@ function AdvertiserLogin() {
     });  
 
     const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-        fetch("/login/advertiser", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, email, password }),
-        })
-        .then((r) => r.json().then((data) => ({ status: r.ok, data })))
-        .then(({ status, data }) => {
-            setSubmitting(false);
-            if (status) {
-                navigate("/welcome/home");
-            } else {
-                setErrors({ api: data.errors || ["Signup failed"] });
-            }
+      fetch("/login/traveler", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      })
+        .then((r) => {
+          setSubmitting(false);
+          if (r.ok) {
+            r.json().then((userData) => {
+              setUser(userData); 
+              navigate("/welcome/home");
+            });
+          } else {
+            r.json().then((err) => {
+              setErrors({ api: err.errors || ["Signup failed"] });
+            });
+          }
         })
         .catch(() => {
-            setSubmitting(false);
-            setErrors({ api: ["Something went wrong. Please try again."] });
+          setSubmitting(false);
+          setErrors({ api: ["Something went wrong. Please try again."] });
         });
     };
 
