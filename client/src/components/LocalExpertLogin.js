@@ -16,7 +16,7 @@ function LocalExpertLogin({ setUser }) {
   });
 
   const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-    fetch("/login/traveler", {
+    fetch("/login/localexpert", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

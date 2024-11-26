@@ -20,7 +20,7 @@ function AdvertiserLogin({ setUser }) {
     });  
 
     const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-      fetch("/login/traveler", {
+      fetch("/login/advertiser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
