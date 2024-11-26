@@ -1,12 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../index.css'; 
 
 function NavBar({ user, handleLogout }) { 
+  const navigate = useNavigate();
 
   const confirmLogout = () => {
     if (window.confirm("Are you sure you want to log out?")) {
       handleLogout();
+      navigate("/");
     }
   };
 
@@ -35,10 +37,10 @@ function NavBar({ user, handleLogout }) {
         ) : (
           <>
             <li>
-              <Link to="/homepage">home</Link>
+              <Link to="/welcome/home">home</Link>
             </li>
             <li>
-              <Link to="/profile">my profile</Link>
+              <Link to="/profile/user/:user_id">my profile</Link>
             </li>
               <Link to="/community">community discussion</Link>
             <li>

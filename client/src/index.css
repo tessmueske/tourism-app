@@ -2,7 +2,7 @@
   --header: #fff;
   --link: #dceefc;
   --dark-sea-blue: #257f80;
-  --text: hsla(0, 0%, 100%, 0.88);
+  --text: hsla(0, 0%, 20%, 0.88);
   --gradient-bg: radial-gradient(circle, #dceefc, #95d3ff);
 }
 
@@ -114,8 +114,8 @@ nav {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: rgb(145, 66, 10);
-  color: var(--link);
+  background-color: transparent;
+  color: var(--text);
   padding: 10px 0;
   z-index: 1000;
   display: flex;
@@ -137,7 +137,7 @@ nav li {
 
 nav a,
 nav button {
-  color: var(--link);
+  color: var(--text);
   text-decoration: none;
   font-size: 18px;
   transition: color 0.3s ease;

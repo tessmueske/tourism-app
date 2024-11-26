@@ -4,7 +4,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import '../index.css'; 
 
-function TravelerLogin() {
+function TravelerLogin({ setUser }) { 
+
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
@@ -30,7 +31,10 @@ function TravelerLogin() {
       .then((r) => {
         setSubmitting(false);
         if (r.ok) {
-          navigate("/welcome/home");
+          r.json().then((userData) => {
+            setUser(userData); 
+            navigate("/welcome/home");
+          });
         } else {
           r.json().then((err) => {
             setErrors({ api: err.errors || ["Signup failed"] });
@@ -47,7 +51,7 @@ function TravelerLogin() {
     <div className="account-center-container">
       <h2>traveler login for Magwa</h2>
       <p>⋇⊶⊰❣⊱⊷⋇</p>
-      <p>please sign in with your username, email, and password</p>
+      <p>please sign in with your username or email and your password</p>
       <br />
 
       <Formik
@@ -62,36 +66,36 @@ function TravelerLogin() {
               <Field
                 type="email"
                 name="email"
-                placeholder="Email"
+                placeholder="email"
                 className="inputBox"
               />
               <ErrorMessage name="email" component="div" className="errorLabel" />
             </div>
-            <br></br>
+            <br />
 
             <div className="inputContainer">
               <p>username</p>
               <Field
                 type="text"
                 name="username"
-                placeholder="Username"
+                placeholder="username"
                 className="inputBox"
               />
               <ErrorMessage name="username" component="div" className="errorLabel" />
             </div>
-            <br></br>
+            <br />
 
             <div className="inputContainer">
               <p>password</p>
               <Field
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder="password"
                 className="inputBox"
               />
               <ErrorMessage name="password" component="div" className="errorLabel" />
             </div>
-            <br></br>
+            <br />
 
             <button type="submit" className="button" disabled={isSubmitting}>
               {isSubmitting ? "Logging in..." : "Log in now"}

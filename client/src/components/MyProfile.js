@@ -3,7 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "../index.css";
 
-function MyProfile({ username }) {
+function MyProfile() {
+    const [username, setUsername] = useState(null);
     const [profile, setProfile] = useState({
         name: "",
         bio: "",

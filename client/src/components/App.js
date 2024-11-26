@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 import Homepage from "./Homepage";
 import About from "./About";
@@ -13,10 +13,13 @@ import Welcome from "./Welcome";
 import TravelerLogin from "./TravelerLogin"
 import LocalExpertLogin from "./LocalExpertLogin";
 import AdvertiserLogin from "./AdvertiserLogin";
+import MyProfile from "./MyProfile";
+import Pending from "./Pending";
+import CommunityDiscussion from "./CommunityDiscussion"
 
 function App() {
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/check_session").then((r) => {
@@ -42,39 +45,41 @@ function App() {
     .catch((error) => {
       console.error("Logout failed:", error);
     });
-  }
+  };
 
   return (
     <>
-      {user && <NavBar user={user} setUser={setUser} handleLogout={handleLogout} />}
+      <NavBar user={user} setUser={setUser} handleLogout={handleLogout} />
+    
       <main>
         <Routes>
-          <Route path="/" element={<Navigate to="/homepage" replace />} />
-          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/" element={<Homepage />} />
+          
           {!user ? (
             <>
-              <Route path="/about" element={<About />}/>
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/signup/advertiser" element={<AdvertiserSignup />}/>
-              <Route path="/signup/localexpert" element={<LocalExpertSignup />}/>
-              <Route path="/signup/traveler" element={<TravelerSignup />}/>
-              <Route path="/login/traveler" element={<TravelerLogin onLogin={setUser} />}/>
-              <Route path="/login/advertiser" element={<AdvertiserLogin onLogin={setUser} />}/>
-              <Route path="/login/localexpert" element={<LocalExpertLogin onLogin={setUser} />}/>
+              <Route path="/signup/advertiser" element={<AdvertiserSignup />} />
+              <Route path="/signup/localexpert" element={<LocalExpertSignup />} />
+              <Route path="/signup/traveler" element={<TravelerSignup />} />
+              <Route path="/login/traveler" element={<TravelerLogin setUser={setUser} />} />
+              <Route path="/login/advertiser" element={<AdvertiserLogin setUser={setUser} />} />
+              <Route path="/login/localexpert" element={<LocalExpertLogin setUser={setUser} />} />
               <Route path="/verification/pending" element={<Pending />} />
             </>
           ) : (
             <>
-              <Route path="/welcome/home" element={<Welcome />}/>
-              <Route path="/profile/user/:user_id" element={<MyProfile username={username}/>}/>
+              <Route path="/welcome/home" element={<Welcome />} />
+              <Route path="/profile/user/:user_id" element={<MyProfile />} />
+              <Route path="/community" element={<CommunityDiscussion />} />
             </>
           )}
-          
         </Routes>
       </main>
     </>
   );
 }
+
 export default App;
