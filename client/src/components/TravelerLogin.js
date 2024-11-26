@@ -30,7 +30,7 @@ function TravelerLogin() {
       .then((r) => {
         setSubmitting(false);
         if (r.ok) {
-          navigate("/landing");
+          navigate("/welcome/home");
         } else {
           r.json().then((err) => {
             setErrors({ api: err.errors || ["Signup failed"] });

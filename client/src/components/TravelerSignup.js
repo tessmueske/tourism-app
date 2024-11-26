@@ -37,7 +37,7 @@ function TravelerSignup() {
       })
         .then((r) => {
           if (r.ok) {
-            navigate("/landing");
+            navigate("/welcome/home");
           } else {
             r.json().then((err) => {
               formik.setErrors({ api: err.errors || ["Signup failed"] }); 

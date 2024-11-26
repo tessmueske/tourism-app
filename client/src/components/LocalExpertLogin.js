@@ -29,7 +29,7 @@ function LocalExpertLogin({ onLogin }) {
           if (r.ok) {
             r.json().then((user) => {
               onLogin(user);
-              navigate("/homepage");
+              navigate("/welcome/home");
             });
           } else {
             r.json().then((err) => {

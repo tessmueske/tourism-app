@@ -31,7 +31,7 @@ function AdvertiserLogin({ onLogin }) {
         .then(({ status, data }) => {
             setSubmitting(false);
             if (status) {
-                navigate("/landing");
+                navigate("/welcome/home");
             } else {
                 setErrors({ api: data.errors || ["Signup failed"] });
             }

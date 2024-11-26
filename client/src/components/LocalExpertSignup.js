@@ -37,7 +37,7 @@ function LocalExpertSignup() {
         })
           .then((r) => {
             if (r.ok) {
-                navigate("/thanks");
+                navigate("/verification/pending");
             } else {
               r.json().then((err) => {
                 formik.setErrors({ api: err.errors || ["Signup failed"] }); 
