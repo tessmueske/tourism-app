@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import '../index.css'; 
 
-function AdvertiserLogin({ onLogin }) {
+function AdvertiserLogin() {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
