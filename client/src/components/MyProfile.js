@@ -12,7 +12,7 @@ function MyProfile() {
     });
 
     useEffect(() => {
-        fetch(`/profile/user/${email}`, { method: "GET" }) 
+        fetch(`/profile/user?email=${email}&username=${username}`, { method: "GET" }) 
           .then((response) => {
             if (response.ok) {
               return response.json();
@@ -21,7 +21,7 @@ function MyProfile() {
           })
           .then((data) => setProfile(data))
           .catch((error) => console.error("Error fetching profile:", error));
-      }, [email]); 
+      }, [email, username]); 
 
   return (
     <div className="account-center-container">

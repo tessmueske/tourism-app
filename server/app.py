@@ -373,7 +373,11 @@ class MyProfile(Resource):
         if user:
             return {
                 "username": user.username,
-                "email": user.email
+                "email": user.email,
+                "name": user.name,
+                "bio": user.bio, 
+                "age": user.age, 
+                "gender": user.gender 
             }, 200
         return {"error": "User not found"}, 404
 
@@ -407,7 +411,7 @@ api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', end
 api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
 
-api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
+api.add_resource(MyProfile, '/profile/user', endpoint='user_profile')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
