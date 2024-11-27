@@ -1,24 +1,28 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useUserContext } from "./UserContext";
 import * as Yup from 'yup';
-import '../index.css'; 
+import '../index.css';
 
-function TravelerLogin({ setUser }) { 
-
+function TravelerLogin({ setUser }) {
+  const { setEmail, setUsername } = useUserContext();
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
-    username: Yup.string(),
-    email: Yup.string().email("Invalid email format"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .notRequired(),
+    username: Yup.string()
+      .notRequired(),
     password: Yup.string().required("Password is required"),
-  }).test({
-    name: "username-or-email-required",
-    message: "Either username or email is required",
-    test: function (value) {
-      return value.username || value.email;
-    },
-  });  
+  }).test(
+    "email-or-username",
+    "Either email or username is required",
+    (value) => {
+      return value.email || value.username;
+    }
+  );
 
   const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
     fetch("/login/traveler", {
@@ -49,9 +53,9 @@ function TravelerLogin({ setUser }) {
 
   return (
     <div className="account-center-container">
-      <h2>traveler login for Magwa</h2>
+      <h2>Traveler Login for Magwa</h2>
       <p>⋇⊶⊰❣⊱⊷⋇</p>
-      <p>please sign in with your username or email and your password</p>
+      <p>Please sign in with your username or email and your password.</p>
       <br />
 
       <Formik
@@ -62,11 +66,11 @@ function TravelerLogin({ setUser }) {
         {({ isSubmitting, errors }) => (
           <Form>
             <div className="inputContainer">
-              <p>email</p>
+              <p>Email</p>
               <Field
                 type="email"
                 name="email"
-                placeholder="email"
+                placeholder="Email"
                 className="inputBox"
               />
               <ErrorMessage name="email" component="div" className="errorLabel" />
@@ -74,11 +78,11 @@ function TravelerLogin({ setUser }) {
             <br />
 
             <div className="inputContainer">
-              <p>username</p>
+              <p>Username</p>
               <Field
                 type="text"
                 name="username"
-                placeholder="username"
+                placeholder="Username"
                 className="inputBox"
               />
               <ErrorMessage name="username" component="div" className="errorLabel" />
@@ -86,11 +90,11 @@ function TravelerLogin({ setUser }) {
             <br />
 
             <div className="inputContainer">
-              <p>password</p>
+              <p>Password</p>
               <Field
                 type="password"
                 name="password"
-                placeholder="password"
+                placeholder="Password"
                 className="inputBox"
               />
               <ErrorMessage name="password" component="div" className="errorLabel" />
@@ -102,7 +106,7 @@ function TravelerLogin({ setUser }) {
             </button>
 
             {errors.api && (
-              <p style={{ color: "red" }}>{errors.api.join(", ")}</p>
+              <p style={{ color: "red" }}>{errors.api}</p>
             )}
           </Form>
         )}

@@ -27,7 +27,7 @@ function LocalExpertLogin({ setUser }) {
         setSubmitting(false);
         if (r.ok) {
           r.json().then((userData) => {
-            setUser(userData);
+            setUser({ username: userData.username, email: userData.email });
             navigate("/welcome/home");
           });
         } else {

@@ -363,11 +363,18 @@ class RejectLocalExpert(Resource):
             return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
 class MyProfile(Resource):
-    def get(self, email):
+    def get(self):
+        email = request.args.get('email')
+
+        print("Received email:", email)
+        
+        if not email:
+            return {"error": "Email is required"}, 400
+
         user = (
-            Traveler.query.get(email=email).first()
-            or LocalExpert.query.get(email=email).first()
-            or Advertiser.query.get(email=email).first()
+            Traveler.query.filter_by(email=email).first() or
+            LocalExpert.query.filter_by(email=email).first() or
+            Advertiser.query.filter_by(email=email).first()
         )
         
         if user:
@@ -411,7 +418,8 @@ api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', end
 api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
 
-api.add_resource(MyProfile, '/profile/user', endpoint='user_profile')
+api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
+api.add_resource(MyProfile, '/profile/user/<string:email>/update', endpoint='user_profile_update')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

@@ -41,3 +41,4 @@ https://canariaseagota.com/
 
 # Community calendar
 # Trip planner
+# Friendship capabilities

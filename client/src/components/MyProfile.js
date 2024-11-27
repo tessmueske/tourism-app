@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "./UserContext";
+import { useNavigate } from "react-router-dom";
 import "../index.css";
+import "../card.css"
 
 function MyProfile() {
+    const navigate = useNavigate();
     const { email, username } = useUserContext();
     const [profile, setProfile] = useState({
         name: "",
@@ -12,7 +15,9 @@ function MyProfile() {
     });
 
     useEffect(() => {
-        fetch(`/profile/user?email=${email}&username=${username}`, { method: "GET" }) 
+        console.log("Email:", email); 
+        console.log("Username:", username);
+        fetch(`/profile/user?email=${email}`, { method: "GET" }) 
           .then((response) => {
             if (response.ok) {
               return response.json();
@@ -23,18 +28,23 @@ function MyProfile() {
           .catch((error) => console.error("Error fetching profile:", error));
       }, [email, username]); 
 
-  return (
-    <div className="account-center-container">
-      <p>welcome to your profile, {username}!</p>
+      console.log("Username from context:", username);
 
-      <div className="profile-display">
-        <p><strong>name:</strong> {profile.name || "N/A"}</p>
-        <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
-        <p><strong>age:</strong> {profile.age || "N/A"}</p>
-        <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
-      </div>
-    </div>
-  );
+      const handleClick = () => {
+        navigate(`/profile/user/${email}/update`);
+      };
+
+      return (
+        <div className="profile-display card">
+          <p>welcome to your profile, {username}!</p>
+          <p>⋇⊶⊰❣⊱⊷⋇</p>
+          <p><strong>name:</strong> {profile.name || "N/A"}</p>
+          <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
+          <p><strong>age:</strong> {profile.age || "N/A"}</p>
+          <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
+          <button onClick={handleClick}>edit my profile</button>
+        </div>
+      );
 }
 
 export default MyProfile;

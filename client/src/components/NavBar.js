@@ -12,7 +12,6 @@ function NavBar({ user, handleLogout }) {
     }
   };
 
-
   return (
     <nav>
       <ul>
@@ -42,7 +41,12 @@ function NavBar({ user, handleLogout }) {
             <li>
               <Link to="/profile/user/:user_id">my profile</Link>
             </li>
+            <li>
               <Link to="/community">community discussion</Link>
+            </li>
+            <li>
+              <Link to="/contact">contact us</Link>
+            </li>
             <li>
               <button onClick={confirmLogout}>log out</button>
             </li>
@@ -54,3 +58,4 @@ function NavBar({ user, handleLogout }) {
 }
 
 export default NavBar;
+

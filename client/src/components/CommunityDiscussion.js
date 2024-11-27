@@ -3,7 +3,7 @@ import '../index.css';
 
 function CommunityDiscussion() {
   return (
-    <div>
+    <div className="profile-display card">
       <p>community discussion page</p>
     </div>
   );

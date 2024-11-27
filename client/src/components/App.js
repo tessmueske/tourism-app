@@ -76,6 +76,7 @@ function App() {
               <Route path="/profile/user/:email" element={<MyProfile />} />
               <Route path="/profile/user/:email/update" element={<UpdateProfile />} />
               <Route path="/community" element={<CommunityDiscussion />} />
+              <Route path="/contact" element={<Contact />} />
             </>
           )}
         </Routes>
