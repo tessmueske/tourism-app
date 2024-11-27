@@ -40,13 +40,14 @@ function Contact() {
         <div>
           <label htmlFor="name">name</label>
           <br></br>
+          <br></br>
           <input
             type="text"
             id="name"
             name="name"
             onChange={formik.handleChange}
             value={formik.values.name}
-            placeholder="Your Name"
+            placeholder="your name"
           />
           {formik.errors.name && formik.touched.name && (
             <div className="error">{formik.errors.name}</div>
@@ -57,13 +58,14 @@ function Contact() {
         <div>
           <label htmlFor="email">email</label>
           <br></br>
+          <br></br>
           <input
             type="email"
             id="email"
             name="email"
             onChange={formik.handleChange}
             value={formik.values.email}
-            placeholder="Your Email"
+            placeholder="your email"
           />
           {formik.errors.email && formik.touched.email && (
             <div className="error">{formik.errors.email}</div>
@@ -74,12 +76,13 @@ function Contact() {
         <div>
           <label htmlFor="message">message</label>
           <br></br>
+          <br></br>
           <textarea
             id="message"
             name="message"
             onChange={formik.handleChange}
             value={formik.values.message}
-            placeholder="Your message..."
+            placeholder="your message..."
             rows="6"
           />
           {formik.errors.message && formik.touched.message && (
@@ -89,7 +92,7 @@ function Contact() {
         <br></br>
 
         <button type="submit" className="submit-button">
-          Submit
+          submit
         </button>
       </form>
     </div>

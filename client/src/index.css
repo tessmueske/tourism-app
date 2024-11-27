@@ -1,7 +1,7 @@
 :root {
   --header: #fff;
-  --link: #153751;
-  --dark-sea-blue: #257f80;
+  --link: #257f80;
+  --dark-sea-blue: #033a65;
   --text: hsla(0, 0%, 20%, 0.88);
   --gradient-bg: radial-gradient(circle, #dceefc, #95d3ff);
 }
@@ -102,7 +102,7 @@ h1 {
 }
 
 a, button {
-  color: var(--dark-sea-blue); 
+  color: var(--link); 
   text-decoration: none;
   font-size: 18px;
   transition: color 0.3s ease;
@@ -121,7 +121,7 @@ a:focus, button:focus {
 }
 
 a:active, button:active {
-  color: var(--dark-sea-blue);
+  color: var(--link);
 }
 
 nav {
@@ -129,7 +129,7 @@ nav {
   top: 0;
   width: 100%;
   background-color: transparent;
-  color: var(--text);
+  color: var(--link);
   padding: 10px 0;
   z-index: 1000;
   display: flex;
@@ -151,7 +151,7 @@ nav li {
 }
 
 nav a, nav button {
-  color: var(--text);
+  color: var(--link);
   text-decoration: none;
   font-size: 18px;
   transition: color 0.3s ease;
@@ -171,5 +171,28 @@ nav a:focus, nav button:focus {
 }
 
 nav a:active, nav button:active {
+  color: var(--dark-sea-blue);
+}
+
+.nav-link {
+  color: var(--link); 
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-link:hover {
+  color: var(--dark-sea-blue);
+}
+
+.nav-link:focus {
+  color: var(--link);
+}
+
+.nav-link:active {
   color: var(--dark-sea-blue);
 }
