@@ -53,9 +53,9 @@ function TravelerLogin({ setUser }) {
 
   return (
     <div className="account-center-container">
-      <h2>Traveler Login for Magwa</h2>
+      <h2>traveler login for magwa</h2>
       <p>⋇⊶⊰❣⊱⊷⋇</p>
-      <p>Please sign in with your username or email and your password.</p>
+      <p>please sign in with your username or email and your password.</p>
       <br />
 
       <Formik
@@ -66,11 +66,11 @@ function TravelerLogin({ setUser }) {
         {({ isSubmitting, errors }) => (
           <Form>
             <div className="inputContainer">
-              <p>Email</p>
+              <p>email</p>
               <Field
                 type="email"
                 name="email"
-                placeholder="Email"
+                placeholder="email"
                 className="inputBox"
               />
               <ErrorMessage name="email" component="div" className="errorLabel" />
@@ -78,11 +78,11 @@ function TravelerLogin({ setUser }) {
             <br />
 
             <div className="inputContainer">
-              <p>Username</p>
+              <p>username</p>
               <Field
                 type="text"
                 name="username"
-                placeholder="Username"
+                placeholder="username"
                 className="inputBox"
               />
               <ErrorMessage name="username" component="div" className="errorLabel" />
@@ -90,11 +90,11 @@ function TravelerLogin({ setUser }) {
             <br />
 
             <div className="inputContainer">
-              <p>Password</p>
+              <p>password</p>
               <Field
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder="password"
                 className="inputBox"
               />
               <ErrorMessage name="password" component="div" className="errorLabel" />
@@ -102,7 +102,7 @@ function TravelerLogin({ setUser }) {
             <br />
 
             <button type="submit" className="button" disabled={isSubmitting}>
-              {isSubmitting ? "Logging in..." : "Log in now"}
+              {isSubmitting ? "logging in..." : "log in now"}
             </button>
 
             {errors.api && (

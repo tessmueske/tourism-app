@@ -1,9 +1,13 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useUserContext } from "./UserContext";
 import "../index.css";
+import "../card.css"
 
 function UpdateProfile({ onUpdate }) {
+    const { email, username } = useUserContext();
+
   return (
     <Formik
       initialValues={{ name: "", bio: "", age: "", gender: "" }}
@@ -13,7 +17,7 @@ function UpdateProfile({ onUpdate }) {
           .integer("Age must be an integer"),
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {
-        fetch("/profile/user/${email}", {
+        fetch(`/profile/user/${email}/update`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

@@ -363,7 +363,7 @@ class RejectLocalExpert(Resource):
             return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
 class MyProfile(Resource):
-    def get(self):
+    def get(self, email):
         email = request.args.get('email')
 
         print("Received email:", email)
@@ -388,7 +388,7 @@ class MyProfile(Resource):
             }, 200
         return {"error": "User not found"}, 404
 
-    def patch(self, email):
+    def put(self, email):
         data = request.get_json()
         user = (
             Traveler.query.get(email=email).first()

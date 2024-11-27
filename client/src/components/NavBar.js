@@ -39,7 +39,7 @@ function NavBar({ user, handleLogout }) {
               <Link to="/welcome/home">home</Link>
             </li>
             <li>
-              <Link to="/profile/user/:user_id">my profile</Link>
+              <Link to="/profile/user/:email">my profile</Link>
             </li>
             <li>
               <Link to="/community">community discussion</Link>

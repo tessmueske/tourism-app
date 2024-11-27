@@ -6,7 +6,7 @@ import "../card.css"
 
 function MyProfile() {
     const navigate = useNavigate();
-    const { email, username } = useUserContext();
+    const { username, email } = useContext(useUserContext);
     const [profile, setProfile] = useState({
         name: "",
         bio: "",
@@ -15,9 +15,7 @@ function MyProfile() {
     });
 
     useEffect(() => {
-        console.log("Email:", email); 
-        console.log("Username:", username);
-        fetch(`/profile/user?email=${email}`, { method: "GET" }) 
+        fetch(`/profile/user/${email}`, { method: "GET" }) 
           .then((response) => {
             if (response.ok) {
               return response.json();
