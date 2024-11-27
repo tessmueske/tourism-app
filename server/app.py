@@ -362,6 +362,32 @@ class RejectLocalExpert(Resource):
         except Exception as e:
             return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
+class MyProfile(Resource):
+    def get(self, email):
+        user = (
+            Traveler.query.get(email=email).first()
+            or LocalExpert.query.get(email=email).first()
+            or Advertiser.query.get(email=email).first()
+        )
+        
+        if user:
+            return {
+                "username": user.username,
+                "email": user.email
+            }, 200
+        return {"error": "User not found"} 404
+
+    def patch(self, email):
+        data = request.get_json()
+        user = (
+            Traveler.query.get(email=email).first()
+            or LocalExpert.query.get(email=email).first()
+            or Advertiser.query.get(email=email).first()
+        )
+        if not user:
+            return {"error": "User not found"}, 404
+            
+
 class Logout(Resource):
     def delete(self):
         session.pop('traveler_id', None)
@@ -380,8 +406,13 @@ api.add_resource(VerifyAdvertiser, '/verify/advertiser/<int:advertiser_id>', end
 api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', endpoint='reject_advertiser')
 api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
+
+api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
+
 api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+
 

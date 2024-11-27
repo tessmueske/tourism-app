@@ -1,105 +1,38 @@
-import React, { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useState } from "react";
+import { useUserContext } from "./UserContext";
 import "../index.css";
 
 function MyProfile() {
-    const [username, setUsername] = useState(null);
+    const { email, username } = useUserContext();
     const [profile, setProfile] = useState({
         name: "",
         bio: "",
         age: "",
         gender: "",
-      });
+    });
+
+    useEffect(() => {
+        fetch(`/profile/user/${email}`, { method: "GET" }) 
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error("Failed to fetch profile data");
+          })
+          .then((data) => setProfile(data))
+          .catch((error) => console.error("Error fetching profile:", error));
+      }, [email]); 
 
   return (
     <div className="account-center-container">
       <p>welcome to your profile, {username}!</p>
-      
+
       <div className="profile-display">
-        <p><strong>name:</strong> {profile.name || ""}</p>
-        <p><strong>bio:</strong> {profile.bio || ""}</p>
-        <p><strong>age:</strong> {profile.age || ""}</p>
-        <p><strong>gender:</strong> {profile.gender || ""}</p>
+        <p><strong>name:</strong> {profile.name || "N/A"}</p>
+        <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
+        <p><strong>age:</strong> {profile.age || "N/A"}</p>
+        <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
       </div>
-      
-      <Formik
-        initialValues={{ name: "", bio: "", age: "", gender: "" }}
-        validationSchema={Yup.object({
-          age: Yup.number()
-            .positive("Age must be a positive number")
-            .integer("Age must be an integer")
-        })}
-        onSubmit={(values, { setSubmitting }) => {
-            setProfile(values);
-            setSubmitting(false);
-        }}
-      >
-        {({ isSubmitting, errors }) => (
-          <Form>
-            <div className="inputContainer">
-              <Field
-                type="text"
-                name="name"
-                placeholder="Name"
-                className="inputBox"
-              />
-              <ErrorMessage name="name" component="div" className="errorLabel" />
-            </div>
-            <br />
-
-            <div className="inputContainer">
-              <Field
-                type="text"
-                name="bio"
-                placeholder="Bio"
-                className="inputBox"
-              />
-              <ErrorMessage name="bio" component="div" className="errorLabel" />
-            </div>
-            <br />
-
-            <div className="inputContainer">
-              <Field
-                type="number"
-                name="age"
-                placeholder="Age"
-                className="inputBox"
-              />
-              <ErrorMessage name="age" component="div" className="errorLabel" />
-            </div>
-            <br />
-
-            <div className="inputContainer">
-              <Field
-                type="text"
-                name="gender"
-                placeholder="Gender"
-                className="inputBox"
-              />
-              <ErrorMessage
-                name="gender"
-                component="div"
-                className="errorLabel"
-              />
-            </div>
-            <br />
-
-            <div className="inputContainer">
-              <button type="submit" className="button" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </button>
-            </div>
-            <br />
-
-            {errors.general && (
-              <div className="errorContainer">
-                <p className="errorText">{errors.general}</p>
-              </div>
-            )}
-          </Form>
-        )}
-      </Formik>
     </div>
   );
 }

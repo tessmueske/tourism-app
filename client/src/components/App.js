@@ -16,6 +16,7 @@ import AdvertiserLogin from "./AdvertiserLogin";
 import MyProfile from "./MyProfile";
 import Pending from "./Pending";
 import CommunityDiscussion from "./CommunityDiscussion"
+import UpdateProfile from "./UpdateProfile";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -72,7 +73,8 @@ function App() {
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />} />
-              <Route path="/profile/user/:user_id" element={<MyProfile />} />
+              <Route path="/profile/user/:email" element={<MyProfile />} />
+              <Route path="/profile/user/:email/update" element={<UpdateProfile />} />
               <Route path="/community" element={<CommunityDiscussion />} />
             </>
           )}
