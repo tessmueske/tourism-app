@@ -51,6 +51,10 @@ class Traveler(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=True, unique=False)
+    age = db.Column(db.Integer, nullable=True, unique=False)
+    bio = db.Column(db.String, nullable=True, unique=False)
+    gender = db.Column(db.String, nullable=True, unique=False)
 
     islands = db.relationship('Island', secondary=traveler_island, back_populates ='travelers')
     localexperts = db.relationship('LocalExpert', secondary=traveler_localexpert, back_populates='travelers')
@@ -79,6 +83,10 @@ class LocalExpert(db.Model, SerializerMixin):
     _password_hash = db.Column(db.String, nullable=False)
     notes = db.Column(db.String, nullable=False)
     status = db.Column(db.String, default="pending") #pending, approved, or rejected
+    name = db.Column(db.String, nullable=True, unique=False)
+    age = db.Column(db.Integer, nullable=True, unique=False)
+    bio = db.Column(db.String, nullable=True, unique=False)
+    gender = db.Column(db.String, nullable=True, unique=False)
 
     islands = db.relationship('Island', secondary=localexpert_island, back_populates='localexperts')
     travelers = db.relationship('Traveler', secondary=traveler_localexpert, back_populates='localexperts')
@@ -106,6 +114,10 @@ class Advertiser(db.Model, SerializerMixin):
     _password_hash = db.Column(db.String, nullable=False)
     notes = db.Column(db.String, nullable=True) #for signup
     status = db.Column(db.String, default="pending") #pending, approved, or rejected
+    name = db.Column(db.String, nullable=True, unique=False)
+    age = db.Column(db.Integer, nullable=True, unique=False)
+    bio = db.Column(db.String, nullable=True, unique=False)
+    gender = db.Column(db.String, nullable=True, unique=False)
 
     islands = db.relationship('Island', secondary=advertiser_island, back_populates='advertisers')
     travelers = db.relationship('Traveler', secondary=traveler_advertiser, back_populates='advertisers')

@@ -375,7 +375,7 @@ class MyProfile(Resource):
                 "username": user.username,
                 "email": user.email
             }, 200
-        return {"error": "User not found"} 404
+        return {"error": "User not found"}, 404
 
     def patch(self, email):
         data = request.get_json()

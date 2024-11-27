@@ -4,7 +4,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [email, setEmail] = useState("user@example.com");
-  const [username, setUsername] = useState("user1");
+  const [username, setUsername] = useState("exampleuser");
 
   return (
     <UserContext.Provider value={{ email, setEmail, username, setUsername }}>
