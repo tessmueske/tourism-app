@@ -9,6 +9,7 @@ function UpdateProfile({ onUpdate }) {
     const { email, username } = useUserContext();
 
   return (
+    <div className="profile-display card">
     <Formik
       initialValues={{ name: "", bio: "", age: "", gender: "" }}
       validationSchema={Yup.object({
@@ -46,7 +47,7 @@ function UpdateProfile({ onUpdate }) {
             <Field
               type="text"
               name="name"
-              placeholder="Name"
+              placeholder="name"
               className="inputBox"
             />
             <ErrorMessage name="name" component="div" className="errorLabel" />
@@ -57,7 +58,7 @@ function UpdateProfile({ onUpdate }) {
             <Field
               type="text"
               name="bio"
-              placeholder="Bio"
+              placeholder="bio"
               className="inputBox"
             />
             <ErrorMessage name="bio" component="div" className="errorLabel" />
@@ -68,7 +69,7 @@ function UpdateProfile({ onUpdate }) {
             <Field
               type="number"
               name="age"
-              placeholder="Age"
+              placeholder="age"
               className="inputBox"
             />
             <ErrorMessage name="age" component="div" className="errorLabel" />
@@ -79,7 +80,7 @@ function UpdateProfile({ onUpdate }) {
             <Field
               type="text"
               name="gender"
-              placeholder="Gender"
+              placeholder="gender"
               className="inputBox"
             />
             <ErrorMessage
@@ -92,7 +93,7 @@ function UpdateProfile({ onUpdate }) {
 
           <div className="inputContainer">
             <button type="submit" className="button" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isSubmitting ? "submitting..." : "update"}
             </button>
           </div>
           <br />
@@ -105,6 +106,7 @@ function UpdateProfile({ onUpdate }) {
         </Form>
       )}
     </Formik>
+    </div>
   );
 }
 

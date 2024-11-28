@@ -6,7 +6,7 @@ import "../card.css"
 
 function MyProfile() {
     const navigate = useNavigate();
-    const { username, email } = useContext(useUserContext);
+    const { username, email } = useUserContext();
     const [profile, setProfile] = useState({
         name: "",
         bio: "",
