@@ -20,6 +20,30 @@ bcrypt = Bcrypt()
 mail = Mail(app)
 CORS(app, supports_credentials=True)
 
+class CurrentUser(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+
+        if not user_id:
+            return {"message": "User not logged in"}, 401
+
+        user = (
+            Traveler.query.filter_by(id=user_id).first() or
+            LocalExpert.query.filter_by(id=user_id).first() or
+            Advertiser.query.filter_by(id=user_id).first()
+        )
+
+        if not user:
+            return {"message": "User not found"}, 404
+
+        user_data = {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+        }
+
+        return user_data
+
 class TravelerLogin(Resource):
     def post(self):
         data = request.get_json()
@@ -406,6 +430,8 @@ class Logout(Resource):
         session.pop('localexpert_id', None)
         return '', 204
 
+api.add_resource(CurrentUser, '/api/current-user', endpoint='current_user')
+
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
 api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
@@ -425,6 +451,3 @@ api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-
-
