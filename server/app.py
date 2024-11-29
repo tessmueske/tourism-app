@@ -20,33 +20,39 @@ bcrypt = Bcrypt()
 mail = Mail(app)
 CORS(app, supports_credentials=True)
 
+def logged_in_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+
+    user = (
+        Traveler.query.get(user_id) or
+        LocalExpert.query.get(user_id) or
+        Advertiser.query.get(user_id)
+    )
+    return user
+
 class CurrentUser(Resource):
     def get(self):
-        user_id = session.get('user_id')
-
-        if not user_id:
-            return {"message": "User not logged in"}, 401
-
-        user = (
-            Traveler.query.filter_by(id=user_id).first() or
-            LocalExpert.query.filter_by(id=user_id).first() or
-            Advertiser.query.filter_by(id=user_id).first()
-        )
+        user = logged_in_user()
 
         if not user:
-            return {"message": "User not found"}, 404
+            return {"message": "User not logged in"}, 401
 
-        user_data = {
+        return {
             "id": user.id,
             "email": user.email,
             "username": user.username,
         }
 
-        return user_data
-
 class TravelerLogin(Resource):
     def post(self):
+
+        session.clear()
+
         data = request.get_json()
+        user = None
+
         email = data.get('email')
         username = data.get('username')
         password = data.get('password')
@@ -75,7 +81,12 @@ class TravelerLogin(Resource):
 
 class AdvertiserLogin(Resource):
     def post(self):
+
+        session.clear()
+
         data = request.get_json()
+        user = None
+
         email = data.get('email')
         password = data.get('password')
         username = data.get('username')
@@ -114,7 +125,12 @@ class AdvertiserLogin(Resource):
 
 class LocalExpertLogin(Resource):
     def post(self):
+
+        session.clear()
+
         data = request.get_json()
+        user = None
+
         email = data.get('email')
         password = data.get('password')
         username = data.get('username')
@@ -129,10 +145,7 @@ class LocalExpertLogin(Resource):
             return {"errors": errors}, 400
 
         localexpert = None
-        if email:
-            localexpert = LocalExpert.query.filter_by(email=email).first()
-        elif username:
-            localexpert = LocalExpert.query.filter_by(username=username).first()
+        localexpert = LocalExpert.query.filter((LocalExpert.email == email) | (LocalExpert.username == username)).first()
 
         if not localexpert:
             return {"Error": "Invalid email or username."}, 401
@@ -152,16 +165,21 @@ class LocalExpertLogin(Resource):
 
 class CheckSession(Resource):
     def get(self):
-        user_id = session.get('traveler_id') or session.get('advertiser_id') or session.get('localexpert_id')
-        if user_id:
-            for model in [Traveler, Advertiser, LocalExpert]:
-                user = db.session.get(model, user_id)
-                if user:
-                    return user.to_dict(), 200
-        return {"error": "Unauthorized"}, 401
+        user = logged_in_user()
+
+        if not user:
+            return {'error': 'No user logged in'}, 401
+
+        return {
+            'id': user.id,
+            'email': user.email,
+            'username': user.username,
+        }
 
 class TravelerSignup(Resource):
     def post(self):
+        session.clear()
+
         data = request.get_json()
 
         print(request.data)
@@ -203,6 +221,8 @@ class TravelerSignup(Resource):
 
 class LocalExpertSignup(Resource):
     def post(self):
+        session.clear()
+
         data = request.get_json()
 
         print(request.data)
@@ -269,6 +289,8 @@ class LocalExpertSignup(Resource):
 
 class AdvertiserSignup(Resource):
     def post(self):
+        session.clear()
+
         data = request.get_json()
 
         print(request.data)
@@ -440,13 +462,49 @@ class MyProfile(Resource):
             }, 200
         except Exception as e:
             return {"error": f"An error occurred: {str(e)}"}, 500
+
+class Community(Resource):
+    def get(self):
+        posts = Post.query.all()
+        if posts:
+            return [post.to_dict() for post in posts], 200
+        else:
+            return {"error"}, 400
+
+    def post(self):
+        data = request.get_json()
+        
+        try:
+            subject = data.get('subject')
+            text = data.get('text')
+            hashtag = data.get('hashtag')
             
+            post = Post(
+                subject=subject,
+                text=text,
+                hashtag=hashtag
+            )
+            db.session.add(post)
+            db.session.commit()
+
+            return {
+                'id': post.id,
+                'subject': post.subject,
+                'text': post.text,
+                'hashtag': post.hashtag
+            }, 201
+
+        except Exception:
+            db.session.rollback() 
+            return {'error': 'Internal server error'}, 500
+
 
 class Logout(Resource):
     def delete(self):
         session.pop('traveler_id', None)
         session.pop('advertiser_id', None)
         session.pop('localexpert_id', None)
+        session.pop('user_id', None)
         return '', 204
 
 api.add_resource(CurrentUser, '/api/current-user', endpoint='current_user')
@@ -465,6 +523,9 @@ api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', 
 
 api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
 api.add_resource(MyProfile, '/profile/user/<string:email>/update', endpoint='user_profile_update')
+
+api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
+api.add_resource(Community, '/community/post/new', endpoint='new_post')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
