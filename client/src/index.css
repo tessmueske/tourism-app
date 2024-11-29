@@ -101,6 +101,17 @@ h1 {
   margin: 0 auto;
 }
 
+.textBox {
+  width: 80%; 
+  height: 50px; 
+  padding: 5px; 
+  font-size: 14px; 
+  border: 1px solid #ccc; 
+  border-radius: 3px; 
+  resize: vertical;
+  box-sizing: border-box; 
+}
+
 a, button {
   color: var(--link); 
   text-decoration: none;

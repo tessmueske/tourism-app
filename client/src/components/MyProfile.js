@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
+import UpdateProfile from "./UpdateProfile";
 import "../index.css";
 import "../card.css"
 
@@ -15,7 +16,7 @@ function MyProfile() {
     });
 
     useEffect(() => {
-        fetch(`/profile/user/${email}`, { method: "GET" }) 
+        fetch(`/profile/user/${email}`, { method: "GET" })
           .then((response) => {
             if (response.ok) {
               return response.json();
@@ -24,23 +25,17 @@ function MyProfile() {
           })
           .then((data) => setProfile(data))
           .catch((error) => console.error("Error fetching profile:", error));
-      }, [email, username]); 
-
-      console.log("Username from context:", username);
-
-      const handleClick = () => {
-        navigate(`/profile/user/${email}/update`);
-      };
+      }, [email, username]);
 
       return (
         <div className="profile-display card">
+            <p>⋇⊶⊰❣⊱⊷⋇</p>
           <p>welcome to your profile, {username}!</p>
-          <p>⋇⊶⊰❣⊱⊷⋇</p>
           <p><strong>name:</strong> {profile.name || "N/A"}</p>
-          <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
           <p><strong>age:</strong> {profile.age || "N/A"}</p>
           <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
-          <button onClick={handleClick}>edit my profile</button>
+          <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
+          <button onClick={() => navigate(`/profile/user/${email}/update`)}>edit my profile</button>
         </div>
       );
 }

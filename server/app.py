@@ -388,10 +388,6 @@ class RejectLocalExpert(Resource):
 
 class MyProfile(Resource):
     def get(self, email):
-        email = request.args.get('email')
-
-        print("Received email:", email)
-        
         if not email:
             return {"error": "Email is required"}, 400
 
@@ -413,14 +409,37 @@ class MyProfile(Resource):
         return {"error": "User not found"}, 404
 
     def put(self, email):
-        data = request.get_json()
         user = (
-            Traveler.query.get(email=email).first()
-            or LocalExpert.query.get(email=email).first()
-            or Advertiser.query.get(email=email).first()
+            Traveler.query.filter_by(email=email).first()
+            or LocalExpert.query.filter_by(email=email).first()
+            or Advertiser.query.filter_by(email=email).first()
         )
+
         if not user:
             return {"error": "User not found"}, 404
+
+        data = request.get_json()
+
+        name = data.get('name')
+        age = data.get('age')
+        gender = data.get('gender')
+        bio = data.get('bio')
+
+        try:
+            user.name = name
+            user.age = age
+            user.gender = gender
+            user.bio = bio
+            db.session.commit()
+
+            return {
+                "name": user.name,
+                "age": user.age,
+                "gender": user.gender,
+                "bio": user.bio,
+            }, 200
+        except Exception as e:
+            return {"error": f"An error occurred: {str(e)}"}, 500
             
 
 class Logout(Resource):

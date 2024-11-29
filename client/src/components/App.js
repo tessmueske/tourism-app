@@ -30,6 +30,9 @@ function App() {
     });
   }, []);
 
+  const onUpdate = (updatedProfile) => {};
+  
+
   const handleLogout = () => {
     fetch("/logout", { 
       method: "DELETE",
@@ -74,7 +77,7 @@ function App() {
             <>
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile />} />
-              <Route path="/profile/user/:email/update" element={<UpdateProfile />} />
+              <Route path="/profile/user/:email/update" element={<UpdateProfile onUpdate={onUpdate}/>} />
               <Route path="/community" element={<CommunityDiscussion />} />
               <Route path="/contact" element={<Contact />} />
             </>
