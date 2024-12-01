@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../index.css'; 
 import "../communitycard.css"
 
@@ -37,9 +37,13 @@ function CommunityDiscussion() {
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post.id} className="post-card">
-              <h3>{post.subject}</h3>
+              <h3>
+                <Link to={`/community/post/${post.id}`}>
+                  {post.subject}
+                </Link>
+              </h3>
               <p>{post.text}</p>
-              <p>posted by {post.author} on {post.date}</p>
+              <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
               <p className="hashtag">{post.hashtag}</p>
             </div>
           ))

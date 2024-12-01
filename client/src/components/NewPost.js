@@ -6,6 +6,8 @@ import "../post.css";
 
 function NewPost() {
   const { username } = useUserContext();
+  const today = new Date().toISOString().split("T")[0];
+  const europeanDate = new Date().toLocaleDateString('es-ES');
 
   return (
     <div className="communitycard-display">
@@ -13,6 +15,7 @@ function NewPost() {
       <Formik
         initialValues={{
           author: username,
+          date: today,
           subject: "",
           body: "",
           hashtag: "",
@@ -47,6 +50,17 @@ function NewPost() {
                 name="author"
                 value={username}
                 readOnly
+                className="inputBox"
+              />
+            </div>
+            <div className="inputContainer">
+              <p>date (in Spanish format):</p>
+              <p>{europeanDate}</p>
+              <p>date:</p>
+              <Field
+                type="date"
+                name="date"
+                value={today}
                 className="inputBox"
               />
             </div>

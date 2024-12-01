@@ -7,6 +7,7 @@ from flask_restful import Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
+from datetime import datetime
 from dotenv import load_dotenv
 import os
 
@@ -476,12 +477,19 @@ class Community(Resource):
         
         try:
             author = data.get('author')
+            date_str = data.get('date')
+            print(f"Received date: {date_str}")
+            try:
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return {"error": "Invalid date format. Expected YYYY-MM-DD."}, 400
             subject = data.get('subject')
             body = data.get('body')
             hashtag = data.get('hashtag')
             
             post = Post(
                 author=author,
+                date=date_obj,
                 subject=subject,
                 body=body,
                 hashtag=hashtag
@@ -492,18 +500,20 @@ class Community(Resource):
             return {
                 'id': post.id,
                 'author': post.author,
+                'date': post.date.strftime('%Y-%m-%d'),
                 'subject': post.subject,
-                'text': post.text,
+                'body': post.body,
                 'hashtag': post.hashtag
             }, 201
 
-        except Exception:
-            db.session.rollback() 
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error: {str(e)}")  
             return {'error': 'Internal server error'}, 500
 
 class MyPost(Resource):
     def get(self, post_id):
-        post = Post.query.filter_by(id=id).first()
+        post = Post.query.filter_by(id=post_id).first()
         if post:
             return post.to_dict(), 200
         else:
