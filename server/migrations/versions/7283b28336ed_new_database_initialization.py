@@ -1,8 +1,8 @@
-"""database initialization
+"""New database initialization
 
-Revision ID: 9d22b6d820ea
+Revision ID: 7283b28336ed
 Revises: 
-Create Date: 2024-11-25 18:17:58.641701
+Create Date: 2024-12-01 15:19:50.069077
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9d22b6d820ea'
+revision = '7283b28336ed'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,6 +31,10 @@ def upgrade():
     sa.Column('_password_hash', sa.String(), nullable=False),
     sa.Column('notes', sa.String(), nullable=True),
     sa.Column('status', sa.String(), nullable=True),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('bio', sa.String(), nullable=True),
+    sa.Column('gender', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -45,19 +49,44 @@ def upgrade():
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
+    sa.Column('notes', sa.String(), nullable=False),
     sa.Column('status', sa.String(), nullable=True),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('bio', sa.String(), nullable=True),
+    sa.Column('gender', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('posts',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('author', sa.String(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('subject', sa.String(), nullable=True),
+    sa.Column('text', sa.String(), nullable=True),
+    sa.Column('hashtag', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('travelers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('bio', sa.String(), nullable=True),
+    sa.Column('gender', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('activity_post',
+    sa.Column('activity_id', sa.Integer(), nullable=False),
+    sa.Column('post_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], name=op.f('fk_activity_post_activity_id_activities')),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_activity_post_post_id_posts')),
+    sa.PrimaryKeyConstraint('activity_id', 'post_id')
     )
     op.create_table('advertiser_activity',
     sa.Column('advertiser_id', sa.Integer(), nullable=False),
@@ -73,12 +102,33 @@ def upgrade():
     sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_advertiser_island_island_id_islands')),
     sa.PrimaryKeyConstraint('advertiser_id', 'island_id')
     )
+    op.create_table('advertiser_localexpert',
+    sa.Column('advertiser_id', sa.Integer(), nullable=False),
+    sa.Column('localexpert_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['advertiser_id'], ['advertisers.id'], name=op.f('fk_advertiser_localexpert_advertiser_id_advertisers')),
+    sa.ForeignKeyConstraint(['localexpert_id'], ['localexperts.id'], name=op.f('fk_advertiser_localexpert_localexpert_id_localexperts')),
+    sa.PrimaryKeyConstraint('advertiser_id', 'localexpert_id')
+    )
+    op.create_table('advertiser_post',
+    sa.Column('advertiser_id', sa.Integer(), nullable=False),
+    sa.Column('post_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['advertiser_id'], ['advertisers.id'], name=op.f('fk_advertiser_post_advertiser_id_advertisers')),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_advertiser_post_post_id_posts')),
+    sa.PrimaryKeyConstraint('advertiser_id', 'post_id')
+    )
     op.create_table('island_activity',
     sa.Column('island_id', sa.Integer(), nullable=False),
     sa.Column('activity_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], name=op.f('fk_island_activity_activity_id_activities')),
     sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_island_activity_island_id_islands')),
     sa.PrimaryKeyConstraint('island_id', 'activity_id')
+    )
+    op.create_table('island_post',
+    sa.Column('island_id', sa.Integer(), nullable=False),
+    sa.Column('post_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_island_post_island_id_islands')),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_island_post_post_id_posts')),
+    sa.PrimaryKeyConstraint('island_id', 'post_id')
     )
     op.create_table('localexpert_activity',
     sa.Column('localexpert_id', sa.Integer(), nullable=False),
@@ -93,6 +143,13 @@ def upgrade():
     sa.ForeignKeyConstraint(['island_id'], ['islands.id'], name=op.f('fk_localexpert_island_island_id_islands')),
     sa.ForeignKeyConstraint(['localexpert_id'], ['localexperts.id'], name=op.f('fk_localexpert_island_localexpert_id_localexperts')),
     sa.PrimaryKeyConstraint('localexpert_id', 'island_id')
+    )
+    op.create_table('localexpert_post',
+    sa.Column('localexpert_id', sa.Integer(), nullable=False),
+    sa.Column('post_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['localexpert_id'], ['localexperts.id'], name=op.f('fk_localexpert_post_localexpert_id_localexperts')),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_localexpert_post_post_id_posts')),
+    sa.PrimaryKeyConstraint('localexpert_id', 'post_id')
     )
     op.create_table('traveler_activity',
     sa.Column('traveler_id', sa.Integer(), nullable=False),
@@ -122,21 +179,35 @@ def upgrade():
     sa.ForeignKeyConstraint(['traveler_id'], ['travelers.id'], name=op.f('fk_traveler_localexpert_traveler_id_travelers')),
     sa.PrimaryKeyConstraint('traveler_id', 'localexpert_id')
     )
+    op.create_table('traveler_post',
+    sa.Column('traveler_id', sa.Integer(), nullable=False),
+    sa.Column('post_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_traveler_post_post_id_posts')),
+    sa.ForeignKeyConstraint(['traveler_id'], ['travelers.id'], name=op.f('fk_traveler_post_traveler_id_travelers')),
+    sa.PrimaryKeyConstraint('traveler_id', 'post_id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('traveler_post')
     op.drop_table('traveler_localexpert')
     op.drop_table('traveler_island')
     op.drop_table('traveler_advertiser')
     op.drop_table('traveler_activity')
+    op.drop_table('localexpert_post')
     op.drop_table('localexpert_island')
     op.drop_table('localexpert_activity')
+    op.drop_table('island_post')
     op.drop_table('island_activity')
+    op.drop_table('advertiser_post')
+    op.drop_table('advertiser_localexpert')
     op.drop_table('advertiser_island')
     op.drop_table('advertiser_activity')
+    op.drop_table('activity_post')
     op.drop_table('travelers')
+    op.drop_table('posts')
     op.drop_table('localexperts')
     op.drop_table('islands')
     op.drop_table('advertisers')

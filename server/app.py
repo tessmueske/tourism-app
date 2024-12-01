@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 import os
 
 from config import app, db, api
-from models import Traveler, LocalExpert, Advertiser, Island, Activity
+from models import Traveler, LocalExpert, Advertiser, Island, Activity, Post
 
 load_dotenv()  
 app.secret_key = os.getenv('SECRET_KEY')
@@ -498,6 +498,13 @@ class Community(Resource):
             db.session.rollback() 
             return {'error': 'Internal server error'}, 500
 
+class MyPost(Resource):
+    def get(self, post_id):
+        post = Post.query.filter_by(id=id).first()
+        if post:
+            return post.to_dict(), 200
+        else:
+            return {"error"}, 400
 
 class Logout(Resource):
     def delete(self):
@@ -526,6 +533,8 @@ api.add_resource(MyProfile, '/profile/user/<string:email>/update', endpoint='use
 
 api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')
+
+api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

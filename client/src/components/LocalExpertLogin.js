@@ -9,11 +9,18 @@ function LocalExpertLogin({ setUser }) {
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
-      .email("invalid email format")
-      .required("email is required"),
-    password: Yup.string()
-      .required("password is required")
-  });
+      .email("Invalid email format")
+      .notRequired(),
+    username: Yup.string()
+      .notRequired(),
+    password: Yup.string().required("Password is required"),
+  }).test(
+    "email-or-username",
+    "Either email or username is required",
+    (value) => {
+      return value.email || value.username;
+    }
+  );
 
   const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
     fetch("/login/localexpert", {

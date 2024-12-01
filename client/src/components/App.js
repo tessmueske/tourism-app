@@ -17,6 +17,7 @@ import MyProfile from "./MyProfile";
 import Pending from "./Pending";
 import CommunityDiscussion from "./CommunityDiscussion"
 import UpdateProfile from "./UpdateProfile";
+import NewPost from "./NewPost";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,14 +26,16 @@ function App() {
   useEffect(() => {
     fetch("/check_session").then((r) => {
       if (r.ok) {
-        r.json().then((user) => setUser(user));
+        r.json().then((user) => {
+          console.log(user);
+          setUser(user);
+        });
       }
     });
   }, []);
 
   const onUpdate = (updatedProfile) => {};
   
-
   const handleLogout = () => {
     fetch("/logout", { 
       method: "DELETE",
@@ -41,6 +44,7 @@ function App() {
     .then((response) => {
       if (response.status === 204) {
         setUser(null);
+        localStorage.removeItem("authToken");
         navigate("/");
       } else {
         console.error("Logout failed:", response);
@@ -65,9 +69,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/signup/advertiser" element={<AdvertiserSignup />} />
-              <Route path="/signup/localexpert" element={<LocalExpertSignup />} />
-              <Route path="/signup/traveler" element={<TravelerSignup setUser={setUser}/>} />
+              <Route path="/signup/advertiser" element={<AdvertiserSignup setUser={setUser} />} />
+              <Route path="/signup/localexpert" element={<LocalExpertSignup setUser={setUser} />} />
+              <Route path="/signup/traveler" element={<TravelerSignup setUser={setUser} />} />
               <Route path="/login/traveler" element={<TravelerLogin setUser={setUser} />} />
               <Route path="/login/advertiser" element={<AdvertiserLogin setUser={setUser} />} />
               <Route path="/login/localexpert" element={<LocalExpertLogin setUser={setUser} />} />
@@ -78,7 +82,8 @@ function App() {
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile />} />
               <Route path="/profile/user/:email/update" element={<UpdateProfile onUpdate={onUpdate}/>} />
-              <Route path="/community" element={<CommunityDiscussion />} />
+              <Route path="/community/posts/all" element={<CommunityDiscussion />} />
+              <Route path="/community/post/new" element={<NewPost />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

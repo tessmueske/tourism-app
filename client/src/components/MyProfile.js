@@ -35,7 +35,7 @@ function MyProfile() {
           <p><strong>age:</strong> {profile.age || "N/A"}</p>
           <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
           <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
-          <button onClick={() => navigate(`/profile/user/${email}/update`)}>edit my profile</button>
+          <button className="button" onClick={() => navigate(`/profile/user/${email}/update`)}>edit my profile</button>
         </div>
       );
 }

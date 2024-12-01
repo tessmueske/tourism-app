@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import '../index.css'; 
 
-function TravelerSignup() {
+function TravelerSignup({ setUser }) {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
@@ -91,7 +91,7 @@ function TravelerSignup() {
           <br />
           <br></br>
           <button type="submit" className="button" disabled={formik.isSubmitting}>
-            {formik.isSubmitting ? "Signing up..." : "Sign up now"}
+            {formik.isSubmitting ? "signing up..." : "sign up now"}
           </button>
           <br />
           {formik.errors.api && (

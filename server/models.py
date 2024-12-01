@@ -33,8 +33,8 @@ localexpert_activity = db.Table('localexpert_activity',
     db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
 
 advertiser_localexpert = db.Table('advertiser_localexpert',
-    db.Column('advertiser_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
-    db.Column('localexpert_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True))
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
 
 advertiser_island = db.Table('advertiser_island',
     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
@@ -53,20 +53,20 @@ traveler_post = db.Table('traveler_post',
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
 localexpert_post = db.Table('localexpert_post',
-    db.Column('localexpert_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
 advertiser_post = db.Table('advertiser_post',
-    db.Column('advertiser_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True))
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
 island_post = db.Table('island_post',
-    db.Column('island_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True))
+    db.Column('island_id', db.Integer, db.ForeignKey('islands.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
 activity_post = db.Table('activity_post',
-    db.Column('activity_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True))
+    db.Column('activity_id', db.Integer, db.ForeignKey('activities.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
 class Traveler(db.Model, SerializerMixin):
     __tablename__ = 'travelers'
@@ -149,7 +149,7 @@ class Advertiser(db.Model, SerializerMixin):
     islands = db.relationship('Island', secondary=advertiser_island, back_populates='advertisers')
     travelers = db.relationship('Traveler', secondary=traveler_advertiser, back_populates='advertisers')
     activities = db.relationship ('Activity', secondary=advertiser_activity, back_populates='advertisers')
-    localexpert = db.relationship('LocalExpert', secondary=advertiser_localexpert, back_populates='advertisers')
+    localexperts = db.relationship('LocalExpert', secondary=advertiser_localexpert, back_populates='advertisers')
     posts = db.relationship('Post', secondary=advertiser_post, back_populates='advertisers')
 
     serialize_rules = ('-islands.advertisers', '-travelers.advertisers', '-activities.advertisers')
@@ -168,7 +168,9 @@ class Advertiser(db.Model, SerializerMixin):
 class Post(db.Model, SerializerMixin):
     __tablename__ = 'posts'
 
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     subject = db.Column(db.String)
     text = db.Column(db.String)
     hashtag = db.Column(db.String)

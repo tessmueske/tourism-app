@@ -97,7 +97,7 @@ function AdvertiserLogin({ setUser }) {
               <br></br>
   
               <button type="submit" className="button" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in..." : "Log in now"}
+                {isSubmitting ? "logging in..." : "log in now"}
               </button>
   
               {errors.api && (

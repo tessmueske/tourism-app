@@ -65,7 +65,7 @@ function UpdateProfile({ onUpdate }) {
               })
               .then((updatedProfile) => {
                 onUpdate(updatedProfile);
-                navigate("/profile/user/:email"); 
+                navigate(`/profile/user/${email}`); 
               })
               .catch((error) => {
                 console.error("Error updating profile:", error);

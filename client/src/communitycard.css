@@ -1,38 +1,19 @@
 .card {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 900px;
-    margin: auto;
-    text-align: center;
-    margin-top: 100px;
-    background-color: #f2f9ff; 
-    border-radius: 10px; 
-    padding: 20px;  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+  max-width: 600px; /* Reduced width for better focus */
+  margin: 20px auto; /* Consistent vertical and horizontal centering */
+  text-align: center;
+  margin-top: 50px; /* Reduced top margin for a cleaner layout */
+  background-color: #ffffff; /* A pure white background for a modern look */
+  border-radius: 15px; /* Slightly increased radius for smoother corners */
+  padding: 30px; /* Increased padding for better spacing */
+  border: 1px solid #e6e6e6; /* Subtle border for card definition */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
 }
 
-  .title {
-    color: grey;
-    font-size: 18px;
-  }
-  
-  button {
-    border: none;
-    outline: 0;
-    display: inline-block;
-    padding: 8px;
-    color: white;
-    background-color: #000;
-    text-align: center;
-    cursor: pointer;
-    width: 100%;
-    font-size: 18px;
-  }
-  
-  a {
-    text-decoration: none;
-    font-size: 22px;
-    color: black;
-  }
-  
-  button:hover, a:hover {
-    opacity: 0.7;
-  }
+.title {
+  color: #555; /* Slightly darker grey for better readability */
+  font-size: 20px; /* Increased font size for emphasis */
+  font-weight: 500; /* Added weight for prominence */
+  margin-bottom: 10px; /* Spacing below the title */
+}
