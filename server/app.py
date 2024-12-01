@@ -469,19 +469,21 @@ class Community(Resource):
         if posts:
             return [post.to_dict() for post in posts], 200
         else:
-            return {"error"}, 400
+            return {"error": "No posts found"}, 400
 
     def post(self):
         data = request.get_json()
         
         try:
+            author = data.get('author')
             subject = data.get('subject')
-            text = data.get('text')
+            body = data.get('body')
             hashtag = data.get('hashtag')
             
             post = Post(
+                author=author,
                 subject=subject,
-                text=text,
+                body=body,
                 hashtag=hashtag
             )
             db.session.add(post)
@@ -489,6 +491,7 @@ class Community(Resource):
 
             return {
                 'id': post.id,
+                'author': post.author,
                 'subject': post.subject,
                 'text': post.text,
                 'hashtag': post.hashtag

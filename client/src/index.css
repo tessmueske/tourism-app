@@ -113,18 +113,17 @@ h1 {
 }
 
 .button {
-  background-color: black; /* Black background */
-  color: white; /* White text */
-  padding: 10px 20px; /* Add some padding */
-  border: none; /* Remove border */
-  border-radius: 5px; /* Slightly rounded corners */
-  font-size: 16px; /* Text size */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Smooth background transition */
+  background-color: black;
+  color: white;
+  padding: 10px 20px; 
+  border: none; 
+  border-radius: 5px;
+  font-size: 16px; 
+  transition: background-color 0.3s ease; 
 }
 
 .button:hover {
-  background-color: #333; /* Darker shade of black on hover */
+  background-color: #333; 
 }
 
 a, button {

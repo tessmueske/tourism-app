@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "./UserContext";
 import "../index.css";
-import "../card.css";
+import "../profilecard.css";
 
 function UpdateProfile({ onUpdate }) {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ function UpdateProfile({ onUpdate }) {
   }, [email]);
 
   if (!profile) {
-    return <p>Error loading profile. Please try again later.</p>;
+    return <p>error loading profile. please try again later.</p>;
   }
 
   return (

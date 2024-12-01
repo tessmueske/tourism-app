@@ -29,7 +29,8 @@ function CommunityDiscussion() {
   }, []);
 
   return (
-    <div className="communitycard-display card">
+    <div className="communitycard-displaycard-center">
+      <div className="card">
       <h2>community discussion</h2>
       <button onClick={handleNavigate} className="button">make a post</button>
       <div className="post-list">
@@ -45,6 +46,7 @@ function CommunityDiscussion() {
         ) : (
           <p>no posts available. be the first one!</p>
         )}
+      </div>
       </div>
     </div>
   );

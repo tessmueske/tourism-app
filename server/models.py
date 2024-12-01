@@ -172,7 +172,7 @@ class Post(db.Model, SerializerMixin):
     author = db.Column(db.String, nullable=False)
     date = db.Column(db.Date, nullable=False)
     subject = db.Column(db.String)
-    text = db.Column(db.String)
+    body = db.Column(db.String)
     hashtag = db.Column(db.String)
 
     localexperts = db.relationship('LocalExpert', secondary=localexpert_post, back_populates='posts')

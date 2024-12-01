@@ -3,7 +3,7 @@ import { useUserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import UpdateProfile from "./UpdateProfile";
 import "../index.css";
-import "../card.css"
+import "../profilecard.css"
 
 function MyProfile() {
     const navigate = useNavigate();

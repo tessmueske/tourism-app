@@ -1,19 +1,65 @@
+/* Styling for the card */
 .card {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-  max-width: 600px; /* Reduced width for better focus */
-  margin: 20px auto; /* Consistent vertical and horizontal centering */
-  text-align: center;
-  margin-top: 50px; /* Reduced top margin for a cleaner layout */
-  background-color: #ffffff; /* A pure white background for a modern look */
-  border-radius: 15px; /* Slightly increased radius for smoother corners */
-  padding: 30px; /* Increased padding for better spacing */
-  border: 1px solid #e6e6e6; /* Subtle border for card definition */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
-}
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    max-width: 600px; /* Adjusted max-width for a larger card */
+    margin: 20px auto;
+    text-align: center;
+    background-color: #f2f9ff;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  /* Flexbox centering for the container */
+  .communitycard-displaycard-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    height: 100vh; /* Ensure the full viewport height is used for vertical centering */
+  }
+  
+  /* Additional card styling inside the display container */
+  .communitycard-display {
+    width: 100%;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-align: left;
+  }
+  
+  /* Input and textarea styling */
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  textarea {
+    height: 150px;
+    resize: vertical;
+  }
+  
+  /* Container for input fields */
+  .inputContainer {
+    margin-bottom: 20px;
+  }
+  
+  /* Input labels */
+  .inputContainer p {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+  }
+  
+  /* Error message styling */
+  .errorLabel {
+    color: rgb(98, 0, 0);
+    font-size: 12px;
+  }
 
-.title {
-  color: #555; /* Slightly darker grey for better readability */
-  font-size: 20px; /* Increased font size for emphasis */
-  font-weight: 500; /* Added weight for prominence */
-  margin-bottom: 10px; /* Spacing below the title */
-}
+  
