@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
+import { useUserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Homepage from "./Homepage";
 import About from "./About";
@@ -28,6 +29,7 @@ function App() {
   const [post, setPost] = useState(null);
   const navigate = useNavigate();
   const { postId } = useParams(); 
+  const { email } = useUserContext();
  
   useEffect(() => {
     fetch("/check_session").then((r) => {
@@ -108,8 +110,8 @@ function App() {
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />} />
-              <Route path="/profile/user/:email" element={<MyProfile />} />
-              <Route path="/profile/user/:email/update" element={<UpdateProfile onUpdate={onUpdate}/>} />
+              <Route path="/profile/user/:email" element={<MyProfile/>} />
+              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} email={email} />} />
               <Route path="/community/posts/all" element={<CommunityDiscussion handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
               <Route path="/community/post/new" element={<NewPost />} />
               <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
@@ -124,3 +126,9 @@ function App() {
 }
 
 export default App;
+
+// fix edit and delete post actions
+// comment on post actions
+// view others' profiles
+// useContext functionality
+// LOG IN WITH EMAIL ONLY

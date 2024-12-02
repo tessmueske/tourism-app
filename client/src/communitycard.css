@@ -24,6 +24,11 @@
     text-align: center; 
   }
 
+ .centered-elements h2 {
+    margin: 0;
+    line-height: 1; 
+}
+
 .communitycard-display {
     width: 100%;
     padding: 30px;

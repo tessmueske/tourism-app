@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "./UserContext";
 import "../index.css";
 import "../profilecard.css";
 
-function UpdateProfile({ onUpdate }) {
+function UpdateProfile({ onUpdate, email }) {
     const navigate = useNavigate();
-    const { email } = useUserContext();
     const [profile, setProfile] = useState(null);
+
+    console.log(email)
 
   useEffect(() => {
     fetch(`/profile/user/${email}`)
@@ -48,7 +48,7 @@ function UpdateProfile({ onUpdate }) {
         onSubmit={(values, { setSubmitting, setErrors }) => {
             const updatedProfile = { ...profile, ...values };
           
-            fetch(`/profile/user/${email}/update`, {
+            fetch(`/profile/user/update/${email}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",

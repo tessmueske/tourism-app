@@ -69,7 +69,7 @@ function TravelerSignup({ setUser }) {
             required
           />
           <br />
-          <p>username</p>
+          <p>create a username (others will see this)</p>
           <input
             type="text"
             name="username" 

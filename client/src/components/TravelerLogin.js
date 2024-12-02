@@ -9,20 +9,12 @@ function TravelerLogin({ setUser }) {
   const { setEmail, setUsername } = useUserContext();
   const navigate = useNavigate();
 
+  // LOG IN WITH EMAIL ONLY
   const validationSchema = Yup.object().shape({
     email: Yup.string()
-      .email("Invalid email format")
-      .notRequired(),
-    username: Yup.string()
-      .notRequired(),
+      .email("Invalid email format"),
     password: Yup.string().required("Password is required"),
-  }).test(
-    "email-or-username",
-    "Either email or username is required",
-    (value) => {
-      return value.email || value.username;
-    }
-  );
+  });
 
   const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
     fetch("/login/traveler", {
@@ -37,6 +29,8 @@ function TravelerLogin({ setUser }) {
         if (r.ok) {
           r.json().then((userData) => {
             setUser(userData); 
+            setEmail(email);
+            setUsername(username);
             navigate("/welcome/home");
           });
         } else {
@@ -55,7 +49,7 @@ function TravelerLogin({ setUser }) {
     <div className="account-center-container">
       <h2>traveler login for magwa</h2>
       <p>⋇⊶⊰❣⊱⊷⋇</p>
-      <p>please sign in with your username or email and your password.</p>
+      <p>please sign in with your email and password.</p>
       <br />
 
       <Formik
@@ -74,18 +68,6 @@ function TravelerLogin({ setUser }) {
                 className="inputBox"
               />
               <ErrorMessage name="email" component="div" className="errorLabel" />
-            </div>
-            <br />
-
-            <div className="inputContainer">
-              <p>username</p>
-              <Field
-                type="text"
-                name="username"
-                placeholder="username"
-                className="inputBox"
-              />
-              <ErrorMessage name="username" component="div" className="errorLabel" />
             </div>
             <br />
 

@@ -2,25 +2,19 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
+import { useUserContext } from "./UserContext";
 import '../index.css';
 
 function LocalExpertLogin({ setUser }) {
   const navigate = useNavigate();
+  const { setEmail, setUsername } = useUserContext();
 
+  // LOG IN WITH EMAIL ONLY
   const validationSchema = Yup.object().shape({
     email: Yup.string()
-      .email("Invalid email format")
-      .notRequired(),
-    username: Yup.string()
-      .notRequired(),
+      .email("Invalid email format"),
     password: Yup.string().required("Password is required"),
-  }).test(
-    "email-or-username",
-    "Either email or username is required",
-    (value) => {
-      return value.email || value.username;
-    }
-  );
+  });
 
   const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
     fetch("/login/localexpert", {
@@ -35,6 +29,8 @@ function LocalExpertLogin({ setUser }) {
         if (r.ok) {
           r.json().then((userData) => {
             setUser({ username: userData.username, email: userData.email });
+            setEmail(email);
+            setUsername(username);
             navigate("/welcome/home");
           });
         } else {
@@ -55,7 +51,7 @@ function LocalExpertLogin({ setUser }) {
         <div className="titleContainer">
           <h2>local expert log in to magwa</h2>
           <p>⋇⊶⊰❣⊱⊷⋇</p>
-          <p>please sign in with your username or email and password</p>
+          <p>please sign in with your email and password</p>
           <br />
 
           <Formik
@@ -76,19 +72,6 @@ function LocalExpertLogin({ setUser }) {
                   <ErrorMessage name="email" component="div" className="errorLabel" />
                 </div>
                 <br />
-
-                <div className="inputContainer">
-                  <p>username</p>
-                  <Field
-                    type="text"
-                    name="username"
-                    placeholder="username"
-                    className="inputBox"
-                  />
-                  <ErrorMessage name="username" component="div" className="errorLabel" />
-                </div>
-                <br />
-
                 <div className="inputContainer">
                   <p>password</p>
                   <Field

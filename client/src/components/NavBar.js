@@ -15,6 +15,8 @@ function NavBar({ user, handleLogout }) {
 
   const email = user?.email;
 
+  console.log(email)
+
   return (
     <nav>
       <ul>

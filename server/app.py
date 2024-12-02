@@ -21,21 +21,14 @@ bcrypt = Bcrypt()
 mail = Mail(app)
 CORS(app, supports_credentials=True)
 
-def logged_in_user():
-    user_id = session.get('user_id')
-    if not user_id:
-        return None
-
-    user = (
-        Traveler.query.get(user_id) or
-        LocalExpert.query.get(user_id) or
-        Advertiser.query.get(user_id)
-    )
-    return user
-
 class CurrentUser(Resource):
-    def get(self):
-        user = logged_in_user()
+    def get(self, email):
+
+        user = (
+            Traveler.query.filter_by(email=email).first() or
+            LocalExpert.query.filter_by(email=email).first() or
+            Advertiser.query.filter_by(email=email).first()
+        )
 
         if not user:
             return {"message": "User not logged in"}, 401
@@ -165,9 +158,12 @@ class LocalExpertLogin(Resource):
         return {'Error': 'Invalid email, username, or password'}, 401
 
 class CheckSession(Resource):
-    def get(self):
-        user = logged_in_user()
-
+    def get(self, email):
+        user = (
+            Traveler.query.filter_by(email=email).first() or
+            LocalExpert.query.filter_by(email=email).first() or
+            Advertiser.query.filter_by(email=email).first()
+        )
         if not user:
             return {'error': 'No user logged in'}, 401
 
@@ -411,14 +407,17 @@ class RejectLocalExpert(Resource):
 
 class MyProfile(Resource):
     def get(self, email):
-        if not email:
-            return {"error": "Email is required"}, 400
 
         user = (
             Traveler.query.filter_by(email=email).first() or
             LocalExpert.query.filter_by(email=email).first() or
             Advertiser.query.filter_by(email=email).first()
         )
+
+        print(email)
+
+        if not email:
+            return {"error": "Email is required"}, 400
         
         if user:
             return {
@@ -429,6 +428,7 @@ class MyProfile(Resource):
                 "age": user.age, 
                 "gender": user.gender 
             }, 200
+
         return {"error": "User not found"}, 404
 
     def put(self, email):
@@ -595,7 +595,7 @@ class Logout(Resource):
         session.pop('user_id', None)
         return '', 204
 
-api.add_resource(CurrentUser, '/api/current-user', endpoint='current_user')
+api.add_resource(CurrentUser, '/current-user/<string:email>', endpoint='current_user')
 
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
@@ -610,7 +610,7 @@ api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', 
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
 
 api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
-api.add_resource(MyProfile, '/profile/user/<string:email>/update', endpoint='user_profile_update')
+api.add_resource(MyProfile, '/profile/user/update/<string:email>')
 
 api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')

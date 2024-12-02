@@ -34,7 +34,7 @@ function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash }) {
       <div className="card">
         <div className="centered-elements">
           <h2>community discussion</h2>
-          <p>keep it nice and respectful</p>
+          <p>keep it nice and respectful, please!</p>
           <button onClick={handleNavigate} className="button">make a post</button>
         </div>
         

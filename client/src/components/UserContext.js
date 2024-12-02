@@ -9,9 +9,9 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch("/api/current-user");
+        const response = await fetch(`/current-user/${email}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error - status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
     };
 
     fetchCurrentUser();
-  }, []);
+  }, [email, username]);
 
 
   return (

@@ -15,6 +15,9 @@ function MyProfile() {
         gender: "",
     });
 
+    console.log(email)
+    console.log(username)
+
     useEffect(() => {
         fetch(`/profile/user/${email}`, { method: "GET" })
           .then((response) => {
@@ -25,7 +28,7 @@ function MyProfile() {
           })
           .then((data) => setProfile(data))
           .catch((error) => console.error("Error fetching profile:", error));
-      }, [email, username]);
+      });
 
       return (
         <div className="profile-card">
@@ -35,7 +38,7 @@ function MyProfile() {
           <p><strong>age:</strong> {profile.age || "N/A"}</p>
           <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
           <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
-          <button className="button" onClick={() => navigate(`/profile/user/${email}/update`)}>edit my profile</button>
+          <button className="button" onClick={() => navigate(`/profile/user/update/${email}`)}>edit my profile</button>
         </div>
       );
 }
