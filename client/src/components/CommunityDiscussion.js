@@ -30,9 +30,10 @@ function CommunityDiscussion() {
   return (
     <div className="communitycard-displaycard-center">
       <div className="card">
-      <h2>community discussion</h2>
-      <button onClick={handleNavigate} className="button">make a post</button>
-      <div>
+      <div className="centered-elements">
+        <h2>community discussion</h2>
+        <button onClick={handleNavigate} className="button">make a post</button>
+      </div>
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post.id}>
@@ -44,7 +45,7 @@ function CommunityDiscussion() {
               <p>{post.text}</p>
               <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
               <p className="hashtag">{post.hashtag}</p>
-              <p>----------------------------------------------------------</p>
+              <hr className="post-divider" />
             </div>
           ))
         ) : (
@@ -52,7 +53,6 @@ function CommunityDiscussion() {
         )}
       </div>
       </div>
-    </div>
   );
 }
 
