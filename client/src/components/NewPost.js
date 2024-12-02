@@ -44,28 +44,6 @@ function NewPost() {
         {({ isSubmitting }) => (
           <Form>
             <div className="inputContainer">
-              <p>author:</p>
-              <Field
-                type="text"
-                name="author"
-                value={username}
-                readOnly
-                className="inputBox"
-              />
-            </div>
-            <div className="inputContainer">
-              <p>date (in Spanish format):</p>
-              <p>{europeanDate}</p>
-              <p>date:</p>
-              <Field
-                type="date"
-                name="date"
-                value={today}
-                className="inputBox"
-              />
-            </div>
-
-            <div className="inputContainer">
               <p>subject:</p>
               <Field
                 type="text"
@@ -74,6 +52,16 @@ function NewPost() {
                 className="inputBox"
               />
               <ErrorMessage name="subject" component="div" className="errorLabel" />
+            </div>
+            <div className="inputContainer">
+              <p>date:</p>
+              <Field
+                type="date"
+                name="date"
+                value={today}
+                className="inputBox"
+              />
+              <p style={{ fontSize: '14px' }}>(in Spanish format): {europeanDate}</p>
             </div>
 
             <div className="inputContainer">
@@ -105,7 +93,7 @@ function NewPost() {
                 className="button"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "submitting..." : "post"}
+                {isSubmitting ? "submitting..." : "post now"}
               </button>
             </div>
           </Form>

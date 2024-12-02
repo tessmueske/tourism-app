@@ -513,11 +513,63 @@ class Community(Resource):
 
 class MyPost(Resource):
     def get(self, post_id):
+        if 'user_id' not in session:
+            return {'error': 'Unauthorized request'}, 401
+
         post = Post.query.filter_by(id=post_id).first()
         if post:
             return post.to_dict(), 200
         else:
             return {"error"}, 400
+
+    def put(self, post_id):
+        if 'user_id' not in session:
+            return {'error': 'Unauthorized request'}, 401
+
+        post = Post.query.filter_by(id=post_id).first()
+
+        data = request.get_json()
+        author = data.get('author')
+        date = data.get('date')
+        subject = data.get('subject')
+        body = data.get('body')
+        hashtag = data.get('hashtag')
+
+        try:
+            post.author = author
+            post.date = date
+            post.subject = subject
+            post.body = body
+            post.hashtag = hashtag
+            db.session.commit()
+
+            return {
+                "author": post.autor,
+                "date": post.date,
+                "subject": post.subject,
+                "body": post.body,
+                "hashtag": post.hashtag
+            }, 200
+
+        except Exception as e:
+            return {"error": f"An error occurred: {str(e)}"}, 500
+
+    def delete(self, post_id, user_id):
+        if 'user_id' not in session:
+            return {'error': 'Unauthorized request'}, 401
+
+        user = (
+            Traveler.query.get(user_id) or
+            LocalExpert.query.get(user_id) or
+            Advertiser.query.get(user_id)
+        )
+
+        if user:
+            post = Post.query.filter_by(id=post_id).first()
+            if post:
+                db.session.delete(post)
+                db.session.commit()
+                return '', 204
 
 class Logout(Resource):
     def delete(self):
@@ -548,6 +600,8 @@ api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')
 
 api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')
+api.add_resource(MyPost, '/community/post/<int:post_id>/edit', endpoint='post_id_edit')
+api.add_resource(MyPost, '/community/post/<int:post_id>/delete', endpoint='post_id_delete')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

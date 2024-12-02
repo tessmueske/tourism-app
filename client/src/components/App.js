@@ -19,6 +19,7 @@ import CommunityDiscussion from "./CommunityDiscussion"
 import UpdateProfile from "./UpdateProfile";
 import NewPost from "./NewPost";
 import ExpandedPost from "./ExpandedPost"
+import EditPost from "./EditPost";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -86,6 +87,7 @@ function App() {
               <Route path="/community/posts/all" element={<CommunityDiscussion />} />
               <Route path="/community/post/new" element={<NewPost />} />
               <Route path="/community/post/:postId" element={<ExpandedPost />} />
+              <Route path="/community/post/:postId/edit" element={<EditPost />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

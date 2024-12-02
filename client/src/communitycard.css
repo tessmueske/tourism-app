@@ -1,25 +1,22 @@
-/* Styling for the card */
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 600px; /* Adjusted max-width for a larger card */
+    max-width: 600px; 
     margin: 20px auto;
-    text-align: center;
+    text-align: left;
     background-color: #f2f9ff;
     border-radius: 10px;
     padding: 20px;
-  }
-  
-  /* Flexbox centering for the container */
-  .communitycard-displaycard-center {
+}
+
+.communitycard-displaycard-center {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center horizontally */
-    justify-content: center; /* Center vertically */
-    height: 100vh; /* Ensure the full viewport height is used for vertical centering */
-  }
-  
-  /* Additional card styling inside the display container */
-  .communitycard-display {
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh; 
+}
+
+.communitycard-display {
     width: 100%;
     padding: 30px;
     background-color: #ffffff;
@@ -27,39 +24,40 @@
     border: 1px solid #e6e6e6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     text-align: left;
-  }
-  
-  /* Input and textarea styling */
-  input, textarea {
+}
+
+input, textarea {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
     box-sizing: border-box;
     border-radius: 5px;
     border: 1px solid #ccc;
-  }
-  
-  textarea {
+    text-align: left; 
+}
+
+textarea {
     height: 150px;
     resize: vertical;
-  }
-  
-  /* Container for input fields */
-  .inputContainer {
+    text-align: left;
+}
+
+.inputContainer {
     margin-bottom: 20px;
-  }
-  
-  /* Input labels */
-  .inputContainer p {
+    text-align: left;
+}
+
+.inputContainer p {
     font-weight: 600;
     margin-bottom: 8px;
     color: #555;
-  }
-  
-  /* Error message styling */
-  .errorLabel {
+    text-align: left; 
+}
+
+.errorLabel {
     color: rgb(98, 0, 0);
     font-size: 12px;
-  }
+}
+
 
   

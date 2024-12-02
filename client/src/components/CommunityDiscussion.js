@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import '../index.css'; 
 import "../communitycard.css"
 
 function CommunityDiscussion() {
@@ -33,10 +32,10 @@ function CommunityDiscussion() {
       <div className="card">
       <h2>community discussion</h2>
       <button onClick={handleNavigate} className="button">make a post</button>
-      <div className="post-list">
+      <div>
         {posts.length > 0 ? (
           posts.map((post) => (
-            <div key={post.id} className="post-card">
+            <div key={post.id}>
               <h3>
                 <Link to={`/community/post/${post.id}`}>
                   {post.subject}
@@ -45,6 +44,7 @@ function CommunityDiscussion() {
               <p>{post.text}</p>
               <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
               <p className="hashtag">{post.hashtag}</p>
+              <p>----------------------------------------------------------</p>
             </div>
           ))
         ) : (

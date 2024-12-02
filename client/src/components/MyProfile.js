@@ -28,7 +28,7 @@ function MyProfile() {
       }, [email, username]);
 
       return (
-        <div className="profile-display card">
+        <div className="profile-card">
             <p>⋇⊶⊰❣⊱⊷⋇</p>
           <p>welcome to your profile, {username}!</p>
           <p><strong>name:</strong> {profile.name || "N/A"}</p>
