@@ -174,6 +174,9 @@ class Post(db.Model, SerializerMixin):
     subject = db.Column(db.String)
     body = db.Column(db.String)
     hashtag = db.Column(db.String)
+    traveler_id = db.Column(db.Integer, db.ForeignKey('travelers.id'), nullable=True)
+    localexpert_id = db.Column(db.Integer, db.ForeignKey('localexperts.id'), nullable=True)
+    advertiser_id = db.Column(db.Integer, db.ForeignKey('advertisers.id'), nullable=True)
 
     localexperts = db.relationship('LocalExpert', secondary=localexpert_post, back_populates='posts')
     advertisers = db.relationship('Advertiser', secondary=advertiser_post, back_populates='posts')

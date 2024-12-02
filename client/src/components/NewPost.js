@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useUserContext } from "./UserContext";
+import { useParams, useNavigate } from 'react-router-dom';
 import '../index.css'; 
 import "../post.css";
 
@@ -8,6 +9,8 @@ function NewPost() {
   const { username } = useUserContext();
   const today = new Date().toISOString().split("T")[0];
   const europeanDate = new Date().toLocaleDateString('es-ES');
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState("");
 
   return (
     <div className="communitycard-display">
@@ -31,7 +34,11 @@ function NewPost() {
             });
 
             if (response.ok) {
+              setSuccessMessage("posted successfully! redirecting to community homepage...");
               resetForm();
+              setTimeout(() => {
+                navigate(`/community/posts/all`); 
+              }, 2000);
             } else {
               console.error("Error creating post");
             }
@@ -76,7 +83,7 @@ function NewPost() {
             </div>
 
             <div className="inputContainer">
-              <p>hashtag:</p>
+              <p>hashtags:</p>
               <Field
                 type="text"
                 name="hashtag"

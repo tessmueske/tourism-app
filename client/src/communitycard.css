@@ -3,7 +3,7 @@
     max-width: 900px; 
     width: 90%;
     text-align: left;
-    background-color: #f2f9ff;
+    background-color: #ffffff;
     border-radius: 10px;
     padding: 20px;
 }
@@ -27,7 +27,7 @@
 .communitycard-display {
     width: 100%;
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #f7f7f7;
     border-radius: 15px;
     border: 1px solid #e6e6e6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -64,7 +64,7 @@ textarea {
 
 .post-divider {
     border: 0;
-    border-top: 1px solid #ccc;  
+    border-top: 1px solid #999999;  
     margin: 10px 0; 
     width: 100%; 
   }
@@ -74,5 +74,37 @@ textarea {
     font-size: 12px;
 }
 
+.button-group {
+    display: flex;
+    gap: 30px; 
+    margin-top: 10px;
+}
 
-  
+.edit-delete-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-delete-buttons button {
+    font-size: 12px; 
+    padding: 5px 10px; 
+    height: auto;
+    width: auto; 
+}
+
+.hashtag {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.button {
+    font-size: 12px;
+    padding: 6px 12px;
+    height: auto;
+    width: auto;
+}
+
+.small-image {
+    width: 10px;
+    height: auto; 
+  }

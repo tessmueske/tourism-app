@@ -104,9 +104,11 @@ function LocalExpertSignup() {
             <br></br>
             <br></br>
             <button type="submit" className="button" disabled={formik.isSubmitting}>
-              {formik.isSubmitting ? "Submitting... (this may take a few moments!)" : "Submit for verification"}
+              {formik.isSubmitting ? "submitting... (this may take a few moments!)" : "submit for verification"}
             </button>
             <br />
+            <br></br>
+            <br></br>
             {formik.errors.api && (
               <p style={{ color: "red" }}>{formik.errors.api.join(", ")}</p>
             )}

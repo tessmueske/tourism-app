@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import NavBar from "./NavBar";
 import Homepage from "./Homepage";
 import About from "./About";
@@ -20,11 +20,15 @@ import UpdateProfile from "./UpdateProfile";
 import NewPost from "./NewPost";
 import ExpandedPost from "./ExpandedPost"
 import EditPost from "./EditPost";
+import pencil from '../pencil.png';
+import trash from '../trash.png';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [post, setPost] = useState(null);
   const navigate = useNavigate();
-
+  const { postId } = useParams(); 
+ 
   useEffect(() => {
     fetch("/check_session").then((r) => {
       if (r.ok) {
@@ -37,6 +41,28 @@ function App() {
   }, []);
 
   const onUpdate = (updatedProfile) => {};
+
+  const handleEdit = () => {
+    console.log(`Editing post with ID: ${postId}`);
+    navigate(`/community/post/${postId}/edit`);
+  };
+
+  const handleDelete = () => {
+    fetch(`/community/post/${postId}/delete`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Post deleted successfully");
+          setPost(null);
+          alert("post deleted successfully");
+          navigate("/community/posts/all");
+        } else {
+          console.error("Failed to delete post");
+        }
+      })
+      .catch((error) => console.error("Error deleting post:", error));
+  };
   
   const handleLogout = () => {
     fetch("/logout", { 
@@ -84,9 +110,9 @@ function App() {
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile />} />
               <Route path="/profile/user/:email/update" element={<UpdateProfile onUpdate={onUpdate}/>} />
-              <Route path="/community/posts/all" element={<CommunityDiscussion />} />
+              <Route path="/community/posts/all" element={<CommunityDiscussion handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
               <Route path="/community/post/new" element={<NewPost />} />
-              <Route path="/community/post/:postId" element={<ExpandedPost />} />
+              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
               <Route path="/community/post/:postId/edit" element={<EditPost />} />
               <Route path="/contact" element={<Contact />} />
             </>

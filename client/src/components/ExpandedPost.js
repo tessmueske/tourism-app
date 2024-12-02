@@ -4,13 +4,10 @@ import { useUserContext } from './UserContext';
 import '../index.css'; 
 import "../communitycard.css";
 
-function ExpandedPost() {
+function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash }) {
     const navigate = useNavigate();
-    const { postId } = useParams(); 
-    const [post, setPost] = useState(null);
     const { username } = useUserContext();
-
-    const loggedInUser = "currentLoggedInUser"; 
+    const { postId } = useParams(); 
 
   useEffect(() => {
     fetch(`/community/post/${postId}`)
@@ -19,27 +16,9 @@ function ExpandedPost() {
       .catch((error) => console.error("Error fetching post details:", error));
   }, [postId]);
 
-  const handleEdit = () => {
-    console.log(`Editing post with ID: ${postId}`);
-    navigate(`/community/post/${postId}/edit`);
-  };
-
-  const handleDelete = () => {
-    fetch(`/community/post/${postId}/delete`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Post deleted successfully");
-          setPost(null);
-          alert("post deleted successfully");
-          navigate("/community/posts/all");
-        } else {
-          console.error("Failed to delete post");
-        }
-      })
-      .catch((error) => console.error("Error deleting post:", error));
-  };
+  const backNavigate = () => {
+    navigate("/community/posts/all");
+  }
 
   return (
     <div className="communitycard-displaycard-center">
@@ -50,21 +29,24 @@ function ExpandedPost() {
           <p>{post.body}</p>
           <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
           <p className="hashtag">{post.hashtag}</p>
-          {username === post.author && ( 
-              <div>
-                <button onClick={handleEdit} className="button">edit</button>
-                <br></br>
-                <br></br>
-                <button onClick={handleDelete} className="button">delete</button>
+          <div className="button-group">
+            <button onClick={backNavigate} className="button">go back</button>
+            {username === post.author && ( 
+             <div className="edit-delete-buttons">
+                <button onClick={handleEdit}>
+                    <img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} />
+                    </button>
+                <button onClick={handleDelete} ><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
               </div>
             )}
-          </>
-        ) : (
-          <p>loading post details...</p>
-        )}
-      </div>
+          </div>
+        </>
+      ) : (
+        <p>loading post details...</p>
+      )}
     </div>
-  );
+  </div>
+);
 }
 
 export default ExpandedPost;

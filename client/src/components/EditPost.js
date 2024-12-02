@@ -47,7 +47,7 @@ function EditPost() {
       };
 
       if (!initialValues) {
-        return <p>Loading form...</p>;
+        return <p>loading form...</p>;
       }
 
       return (

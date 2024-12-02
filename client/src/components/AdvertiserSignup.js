@@ -102,9 +102,11 @@ function AdvertiserSignup() {
             <br></br>
             <br></br>
             <button type="submit" className="button" disabled={formik.isSubmitting}>
-              {formik.isSubmitting ? "Submitting..." : "Submit for verification"}
+              {formik.isSubmitting ? "submitting..." : "submit for verification"}
             </button>
             <br />
+            <br></br>
+            <br></br>
             {formik.errors.api && (
               <p style={{ color: "red" }}>{formik.errors.api.join(", ")}</p>
             )}

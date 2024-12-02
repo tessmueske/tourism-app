@@ -48,7 +48,7 @@ function AdvertiserLogin({ setUser }) {
 
     return (
       <div className="account-center-container">
-        <h2>advertiser login for Magwa</h2>
+        <h2>advertiser login for magwa</h2>
         <p>⋇⊶⊰❣⊱⊷⋇</p>
         <p>please sign in with your username, email, and password</p>
         <br />

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUserContext } from './UserContext';
 import "../communitycard.css"
 
-function CommunityDiscussion() {
+function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash }) {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
+  const { username } = useUserContext();
 
   const handleNavigate = () => {
     navigate('/community/post/new');
@@ -30,10 +32,12 @@ function CommunityDiscussion() {
   return (
     <div className="communitycard-displaycard-center">
       <div className="card">
-      <div className="centered-elements">
-        <h2>community discussion</h2>
-        <button onClick={handleNavigate} className="button">make a post</button>
-      </div>
+        <div className="centered-elements">
+          <h2>community discussion</h2>
+          <p>keep it nice and respectful</p>
+          <button onClick={handleNavigate} className="button">make a post</button>
+        </div>
+        
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post.id}>
@@ -45,6 +49,14 @@ function CommunityDiscussion() {
               <p>{post.text}</p>
               <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
               <p className="hashtag">{post.hashtag}</p>
+
+              {username === post.author && (
+                <div className="edit-delete-buttons">
+                  <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
+                  <button onClick={() => handleDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
+                </div>
+              )}
+              
               <hr className="post-divider" />
             </div>
           ))
@@ -52,7 +64,7 @@ function CommunityDiscussion() {
           <p>no posts available. be the first one!</p>
         )}
       </div>
-      </div>
+    </div>
   );
 }
 

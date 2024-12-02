@@ -53,8 +53,8 @@ function LocalExpertLogin({ setUser }) {
     <div className="account-center-container">
       <div className="mainContainer">
         <div className="titleContainer">
+          <h2>local expert log in to magwa</h2>
           <p>⋇⊶⊰❣⊱⊷⋇</p>
-          <div>local expert log in to magwa</div>
           <p>please sign in with your username or email and password</p>
           <br />
 

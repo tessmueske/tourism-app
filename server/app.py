@@ -554,22 +554,38 @@ class MyPost(Resource):
         except Exception as e:
             return {"error": f"An error occurred: {str(e)}"}, 500
 
-    def delete(self, post_id, user_id):
+    def delete(self, post_id):
+        user_id = session.get('user_id')
         if 'user_id' not in session:
             return {'error': 'Unauthorized request'}, 401
 
         user = (
-            Traveler.query.get(user_id) or
-            LocalExpert.query.get(user_id) or
-            Advertiser.query.get(user_id)
+            Traveler.query.filter_by(id=user_id) or
+            LocalExpert.query.filter_by(id=user_id) or
+            Advertiser.query.filter_by(id=user_id)
         )
 
         if user:
             post = Post.query.filter_by(id=post_id).first()
             if post:
-                db.session.delete(post)
-                db.session.commit()
-                return '', 204
+                if user.__class__ == Traveler and post.traveler_id == user.id:
+                    db.session.delete(post)
+                    db.session.commit()
+                    return '', 204
+                elif user.__class__ == LocalExpert and post.localexpert_id == user.id:
+                    db.session.delete(post)
+                    db.session.commit()
+                    return '', 204
+                elif user.__class__ == Advertiser and post.advertiser_id == user.id:
+                    db.session.delete(post)
+                    db.session.commit()
+                    return '', 204
+                else:
+                    return {'error': 'You are not the author of this post'}, 403 
+            else:
+                return {'error': 'Post not found'}, 404 
+        else:
+            return {'error': 'User not found'}, 404
 
 class Logout(Resource):
     def delete(self):
