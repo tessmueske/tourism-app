@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
     };
 
     fetchCurrentUser();
-  }, [email, username]);
+  }, [email]);
 
 
   return (

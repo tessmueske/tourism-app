@@ -126,7 +126,7 @@ function App() {
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />} />
-              <Route path="/profile/user/:email" element={<MyProfile/>} />
+              <Route path="/profile/user/:email" element={<MyProfile email={email}/>} />
               <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} email={email} />} />
               <Route 
                 path="/community/posts/all" 
@@ -155,9 +155,7 @@ function App() {
 
 export default App;
 
-// fix edit post actions
 // comment on post actions
 // thumbs up or down on post actions
-// view others' profiles
 // hashtag/filter functionality
-// delete profile functionality
+// delete/edit profile functionality with conditional rendering based on currentUser

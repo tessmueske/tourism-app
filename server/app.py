@@ -677,9 +677,32 @@ class Logout(Resource):
         session.pop('user_id', None)
         return '', 204
 
+class DeleteProfile(Resource):
+    def delete(self, user_id):
+        user_id = session.get('user_id')
+        print(f"User ID from session: {user_id}")
+
+        if not user_id:
+            print("Error: User ID not found in session")
+            return {'error': 'Unauthorized request'}, 401
+
+        user = (
+            Traveler.query.filter_by(id=user_id).first() or
+            LocalExpert.query.filter_by(id=user_id).first() or
+            Advertiser.query.filter_by(id=user_id).first()
+        )
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            return '', 204
+        else: 
+            db.session.rollback()  
+            print(f"Error updating post: {str(e)}")  
+            return {"error": f"An error occurred: {str(e)}"}, 500
+
 api.add_resource(CurrentUser, '/current-user/<string:email>', endpoint='current_user')
 
-api.add_resource(CheckSession, '/check_session', endpoint='check_session')
+api.add_resource(CheckSession, '/check_session/<string:email>')
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
 api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
 api.add_resource(LocalExpertLogin, '/login/localexpert', endpoint='login_localexpert')
@@ -702,6 +725,8 @@ api.add_resource(MyPost, '/community/post/edit/<int:post_id>', endpoint='post_id
 api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_id_delete')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
+
+api.add_resource(DeleteProfile, '/profile/user/delete/<string:email>)', endpoint='user_profile_delete')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
