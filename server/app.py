@@ -572,6 +572,7 @@ class MyPost(Resource):
             return {"error": "Post not found"}, 404
 
     def put(self, post_id):
+        user_id = session.get('user_id')
         if 'user_id' not in session:
             return {'error': 'Unauthorized request'}, 401
 
@@ -579,28 +580,31 @@ class MyPost(Resource):
 
         data = request.get_json()
         author = data.get('author')
-        date = data.get('date')
+        date_str = data.get('date') 
         subject = data.get('subject')
         body = data.get('body')
         hashtag = data.get('hashtag')
 
         try:
             post.author = author
-            post.date = date
+            if date_str:
+                post.date = datetime.strptime(date_str, '%Y-%m-%d').date()
             post.subject = subject
             post.body = body
             post.hashtag = hashtag
             db.session.commit()
 
             return {
-                "author": post.autor,
-                "date": post.date,
+                "author": post.author,
+                'date': post.date.strftime('%Y-%m-%d'),
                 "subject": post.subject,
                 "body": post.body,
                 "hashtag": post.hashtag
             }, 200
 
         except Exception as e:
+            db.session.rollback()  
+            print(f"Error updating post: {str(e)}")  
             return {"error": f"An error occurred: {str(e)}"}, 500
 
     def delete(self, post_id):

@@ -47,9 +47,9 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                   {post.subject}
                 </Link>
               </h3>
-              <p>{post.text}</p>
+              <p>{post.body}</p>
               <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
-              <p className="hashtag">{post.hashtag}</p>
+              <p style={{ fontSize: '12px' }}>{post.hashtag}</p>
 
               {username === post.author && (
                 <div className="edit-delete-buttons">
