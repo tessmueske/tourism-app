@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from './UserContext';
-import { Formik, Form, Field, ErrorMessage } from "formik";import * as Yup from 'yup';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from 'yup';
 import '../index.css'; 
 
 
@@ -10,6 +11,8 @@ function EditPost() {
     const { username } = useUserContext();
     const navigate = useNavigate();
     const { postId } = useParams(); 
+
+    console.log(postId)
 
     useEffect(() => {
         fetch(`/community/post/${postId}`)
@@ -27,7 +30,7 @@ function EditPost() {
       }, [postId]);
 
       const handleSubmit = (values) => {
-        fetch(`/community/post/${postId}`, {
+        fetch(`/community/post/edit/${postId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +50,7 @@ function EditPost() {
       };
 
       if (!initialValues) {
-        return <p>loading form...</p>;
+        return <p className="communitycard-displaycard-center">loading form...</p>;
       }
 
       return (

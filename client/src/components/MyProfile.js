@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
-import UpdateProfile from "./UpdateProfile";
 import "../index.css";
 import "../profilecard.css"
 
@@ -15,9 +14,6 @@ function MyProfile() {
         gender: "",
     });
 
-    console.log(email)
-    console.log(username)
-
     useEffect(() => {
         fetch(`/profile/user/${email}`, { method: "GET" })
           .then((response) => {
@@ -28,7 +24,7 @@ function MyProfile() {
           })
           .then((data) => setProfile(data))
           .catch((error) => console.error("Error fetching profile:", error));
-      });
+      }, [email]);
 
       return (
         <div className="profile-card">

@@ -51,6 +51,16 @@ function NewPost() {
         {({ isSubmitting }) => (
           <Form>
             <div className="inputContainer">
+              <p>author:</p>
+              <Field
+                type="text"
+                name="author"
+                value={username} 
+                className="inputBox"
+                readOnly
+              />
+            </div>
+            <div className="inputContainer">
               <p>subject:</p>
               <Field
                 type="text"
@@ -106,6 +116,11 @@ function NewPost() {
           </Form>
         )}
       </Formik>
+      {successMessage && (
+        <div className="successMessage">
+          <p>{successMessage}</p>
+        </div>
+      )}
     </div>
   );
 }

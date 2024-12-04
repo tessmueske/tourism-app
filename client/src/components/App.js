@@ -27,6 +27,7 @@ import trash from '../trash.png';
 function App() {
   const [user, setUser] = useState(null);
   const [post, setPost] = useState(null);
+  const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { postId } = useParams(); 
   const { email } = useUserContext();
@@ -45,25 +46,33 @@ function App() {
   const onUpdate = (updatedProfile) => {};
 
   const handleEdit = () => {
-    console.log(`Editing post with ID: ${postId}`);
-    navigate(`/community/post/${postId}/edit`);
+    navigate(`/community/post/edit/${postId}`);
   };
 
-  const handleDelete = () => {
-    fetch(`/community/post/${postId}/delete`, {
+  const handleDelete = (postId) => {
+    fetch(`/community/post/delete/${postId}`, {
       method: "DELETE",
     })
       .then((response) => {
         if (response.ok) {
           console.log("Post deleted successfully");
-          setPost(null);
-          alert("post deleted successfully");
-          navigate("/community/posts/all");
+          alert("Post deleted successfully");
+          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+          if (post && post.id === postId) {
+            setPost(null);
+          }
         } else {
           console.error("Failed to delete post");
         }
       })
       .catch((error) => console.error("Error deleting post:", error));
+  };
+  
+
+  const confirmDelete = (postId) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      handleDelete(postId);
+    }
   };
   
   const handleLogout = () => {
@@ -112,10 +121,10 @@ function App() {
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile/>} />
               <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} email={email} />} />
-              <Route path="/community/posts/all" element={<CommunityDiscussion handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
+              <Route path="/community/posts/all" element={<CommunityDiscussion handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
               <Route path="/community/post/new" element={<NewPost />} />
-              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash}/>} />
-              <Route path="/community/post/:postId/edit" element={<EditPost />} />
+              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
+              <Route path="/community/post/edit/:postId" element={<EditPost />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}
@@ -127,8 +136,9 @@ function App() {
 
 export default App;
 
-// fix edit and delete post actions
+// fix edit post actions
 // comment on post actions
+// thumbs up or down on post actions
 // view others' profiles
-// useContext functionality
-// LOG IN WITH EMAIL ONLY
+// hashtag/filter functionality
+// delete profile functionality

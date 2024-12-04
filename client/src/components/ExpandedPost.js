@@ -4,7 +4,7 @@ import { useUserContext } from './UserContext';
 import '../index.css'; 
 import "../communitycard.css";
 
-function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash }) {
+function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash, confirmDelete, posts, setPosts }) {
     const navigate = useNavigate();
     const { username } = useUserContext();
     const { postId } = useParams(); 
@@ -14,7 +14,7 @@ function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash }
       .then((response) => response.json())
       .then((data) => setPost(data))
       .catch((error) => console.error("Error fetching post details:", error));
-  }, [postId]);
+  }, [postId, setPost]);
 
   const backNavigate = () => {
     navigate("/community/posts/all");
@@ -36,7 +36,7 @@ function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash }
                 <button onClick={handleEdit}>
                     <img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} />
                     </button>
-                <button onClick={handleDelete} ><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
+                <button onClick={() => confirmDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
               </div>
             )}
           </div>

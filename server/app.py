@@ -10,6 +10,7 @@ from flask_mail import Mail, Message
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+import traceback
 
 from config import app, db, api
 from models import Traveler, LocalExpert, Advertiser, Island, Activity, Post
@@ -474,9 +475,8 @@ class Community(Resource):
 
     def post(self):
         data = request.get_json()
-        
+    
         try:
-            author = data.get('author')
             date_str = data.get('date')
             print(f"Received date: {date_str}")
             try:
@@ -486,14 +486,48 @@ class Community(Resource):
             subject = data.get('subject')
             body = data.get('body')
             hashtag = data.get('hashtag')
-            
-            post = Post(
-                author=author,
-                date=date_obj,
-                subject=subject,
-                body=body,
-                hashtag=hashtag
+        
+            user_id = session.get('user_id')
+            if not user_id:
+                return {'error': 'Unauthorized request'}, 401
+
+            user = (
+                Traveler.query.filter_by(id=user_id).first() or
+                LocalExpert.query.filter_by(id=user_id).first() or
+                Advertiser.query.filter_by(id=user_id).first()
             )
+
+            if not user:
+                return {'error': 'User not found'}, 404
+
+            if isinstance(user, Traveler):
+                post = Post(
+                    traveler_id=user.id,
+                    author=user.username,
+                    date=date_obj,
+                    subject=subject,
+                    body=body,
+                    hashtag=hashtag
+                )
+            elif isinstance(user, LocalExpert):
+                post = Post(
+                    localexpert_id=user.id,
+                    author=user.username,
+                    date=date_obj,
+                    subject=subject,
+                    body=body,
+                    hashtag=hashtag
+                )
+            elif isinstance(user, Advertiser):
+                post = Post(
+                    advertiser_id=user.id,
+                    author=user.username,
+                    date=date_obj,
+                    subject=subject,
+                    body=body,
+                    hashtag=hashtag
+                )
+
             db.session.add(post)
             db.session.commit()
 
@@ -505,11 +539,12 @@ class Community(Resource):
                 'body': post.body,
                 'hashtag': post.hashtag
             }, 201
-
         except Exception as e:
-            db.session.rollback()
-            print(f"Error: {str(e)}")  
-            return {'error': 'Internal server error'}, 500
+            error_message = str(e)
+            error_trace = traceback.format_exc()
+            print(f"Error creating post: {error_message}")
+            print(f"Traceback: {error_trace}")
+            return {'error': error_message}, 500
 
 class MyPost(Resource):
     def get(self, post_id):
@@ -556,35 +591,64 @@ class MyPost(Resource):
 
     def delete(self, post_id):
         user_id = session.get('user_id')
-        if 'user_id' not in session:
+        print(f"User ID from session: {user_id}")
+
+        if not user_id:
+            print("Error: User ID not found in session")
             return {'error': 'Unauthorized request'}, 401
 
         user = (
-            Traveler.query.filter_by(id=user_id) or
-            LocalExpert.query.filter_by(id=user_id) or
-            Advertiser.query.filter_by(id=user_id)
+            Traveler.query.filter_by(id=user_id).first() or
+            LocalExpert.query.filter_by(id=user_id).first() or
+            Advertiser.query.filter_by(id=user_id).first()
         )
 
         if user:
+            print(f"User found: {user}")
+        else:
+            print("User not found")
+
+        if user:
+            print(f"User type: {type(user)}")
             post = Post.query.filter_by(id=post_id).first()
             if post:
-                if user.__class__ == Traveler and post.traveler_id == user.id:
-                    db.session.delete(post)
-                    db.session.commit()
-                    return '', 204
-                elif user.__class__ == LocalExpert and post.localexpert_id == user.id:
-                    db.session.delete(post)
-                    db.session.commit()
-                    return '', 204
-                elif user.__class__ == Advertiser and post.advertiser_id == user.id:
-                    db.session.delete(post)
-                    db.session.commit()
-                    return '', 204
+                print(f"Post found: {post}")
+                print(f"Post traveler_id: {post.traveler_id}, localexpert_id: {post.localexpert_id}, advertiser_id: {post.advertiser_id}")
+                if isinstance(user, Traveler):
+                    print(f"User is a Traveler with id: {user.id}")
+                    if post.traveler_id == user.id:
+                        db.session.delete(post)
+                        db.session.commit()
+                        return '', 204
+                    else:
+                        print("Error: Traveler does not have permission to delete this post")
+                        return {'error': 'You are not the author of this post'}, 403
+                elif isinstance(user, LocalExpert):
+                    print(f"User is a LocalExpert with id: {user.id}")
+                    if post.localexpert_id == user.id:
+                        db.session.delete(post)
+                        db.session.commit()
+                        return '', 204
+                    else:
+                        print("Error: Local Expert does not have permission to delete this post")
+                        return {'error': 'You are not the author of this post'}, 403
+                elif isinstance(user, Advertiser):
+                    print(f"User is an Advertiser with id: {user.id}")
+                    if post.advertiser_id == user.id:
+                        db.session.delete(post)
+                        db.session.commit()
+                        return '', 204
+                    else:
+                        print("Error: Advertiser does not have permission to delete this post")
+                        return {'error': 'You are not the author of this post'}, 403
                 else:
+                    print("Error: User type is not recognized")
                     return {'error': 'You are not the author of this post'}, 403 
             else:
+                print(f"Error: Post with ID {post_id} not found in the database")
                 return {'error': 'Post not found'}, 404 
         else:
+            print("Error: User not found in the database")
             return {'error': 'User not found'}, 404
 
 class Logout(Resource):
@@ -616,8 +680,8 @@ api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')
 
 api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')
-api.add_resource(MyPost, '/community/post/<int:post_id>/edit', endpoint='post_id_edit')
-api.add_resource(MyPost, '/community/post/<int:post_id>/delete', endpoint='post_id_delete')
+api.add_resource(MyPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit')
+api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_id_delete')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

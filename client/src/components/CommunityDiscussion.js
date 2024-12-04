@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css"
 
-function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash }) {
-  const [posts, setPosts] = useState([]);
+function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash, confirmDelete, posts, setPosts }) {
   const navigate = useNavigate();
   const { username } = useUserContext();
+
+  console.log(posts)
 
   const handleNavigate = () => {
     navigate('/community/post/new');
@@ -53,7 +54,7 @@ function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash }) {
               {username === post.author && (
                 <div className="edit-delete-buttons">
                   <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
-                  <button onClick={() => handleDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
+                  <button onClick={() => confirmDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
                 </div>
               )}
               
