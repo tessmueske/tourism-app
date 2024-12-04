@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css"
 
-function CommunityDiscussion({ handleEdit, handleDelete, pencil, trash, confirmDelete, posts, setPosts }) {
+function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts }) {
   const navigate = useNavigate();
   const { username } = useUserContext();
 

@@ -31,6 +31,9 @@ function App() {
   const navigate = useNavigate();
   const { postId } = useParams(); 
   const { email } = useUserContext();
+
+  const today = new Date().toISOString().split("T")[0];
+  const europeanDate = new Date().toLocaleDateString('es-ES');
  
   useEffect(() => {
     fetch("/check_session").then((r) => {
@@ -45,8 +48,19 @@ function App() {
 
   const onUpdate = (updatedProfile) => {};
 
-  const handleEdit = () => {
-    navigate(`/community/post/edit/${postId}`);
+  const handleEdit = (postId) => {
+    console.log("Editing post with ID:", postId);
+    if (postId) {
+      navigate(`/community/post/edit/${postId}`); 
+    } else {
+      console.error('postId is undefined');
+    }
+  };
+
+  const confirmDelete = (postId) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      handleDelete(postId);
+    }
   };
 
   const handleDelete = (postId) => {
@@ -66,13 +80,6 @@ function App() {
         }
       })
       .catch((error) => console.error("Error deleting post:", error));
-  };
-  
-
-  const confirmDelete = (postId) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      handleDelete(postId);
-    }
   };
   
   const handleLogout = () => {
@@ -121,10 +128,22 @@ function App() {
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile/>} />
               <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} email={email} />} />
-              <Route path="/community/posts/all" element={<CommunityDiscussion handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
-              <Route path="/community/post/new" element={<NewPost />} />
+              <Route 
+                path="/community/posts/all" 
+                element={
+                <CommunityDiscussion 
+                  handleEdit={handleEdit} 
+                  handleDelete={handleDelete} 
+                  pencil={pencil} 
+                  trash={trash} 
+                  confirmDelete={confirmDelete} 
+                  posts={posts} 
+                  setPosts={setPosts} 
+                  />
+                }/>
+              <Route path="/community/post/new" element={<NewPost today={today} europeanDate={europeanDate}/>} />
               <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
-              <Route path="/community/post/edit/:postId" element={<EditPost />} />
+              <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} today={today} europeanDate={europeanDate}/>} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

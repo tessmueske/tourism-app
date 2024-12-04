@@ -4,17 +4,28 @@ import { useUserContext } from './UserContext';
 import '../index.css'; 
 import "../communitycard.css";
 
-function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash, confirmDelete, posts, setPosts }) {
+function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete }) {
     const navigate = useNavigate();
     const { username } = useUserContext();
     const { postId } = useParams(); 
 
-  useEffect(() => {
-    fetch(`/community/post/${postId}`)
-      .then((response) => response.json())
-      .then((data) => setPost(data))
-      .catch((error) => console.error("Error fetching post details:", error));
-  }, [postId, setPost]);
+    console.log(postId)
+
+    useEffect(() => {    
+        fetch(`/community/post/${postId}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('Fetched post data:', data); 
+            setPost(data); 
+          })
+          .catch((error) => console.error("Error fetching post details:", error));
+      }, [postId, setPost]);
+    
 
   const backNavigate = () => {
     navigate("/community/posts/all");
@@ -31,14 +42,12 @@ function ExpandedPost({ handleEdit, handleDelete, setPost, post, pencil, trash, 
           <p className="hashtag">{post.hashtag}</p>
           <div className="button-group">
             <button onClick={backNavigate} className="button">go back</button>
-            {username === post.author && ( 
-             <div className="edit-delete-buttons">
-                <button onClick={handleEdit}>
-                    <img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} />
-                    </button>
-                <button onClick={() => confirmDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
-              </div>
-            )}
+            {username === post.author && (
+                <div className="edit-delete-buttons">
+                  <button onClick={() => handleEdit(postId)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
+                  <button onClick={() => confirmDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
+                </div>
+              )}
           </div>
         </>
       ) : (

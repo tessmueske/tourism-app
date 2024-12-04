@@ -5,10 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../index.css'; 
 import "../post.css";
 
-function NewPost() {
+function NewPost({ today, europeanDate }) {
   const { username } = useUserContext();
-  const today = new Date().toISOString().split("T")[0];
-  const europeanDate = new Date().toLocaleDateString('es-ES');
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 

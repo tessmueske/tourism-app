@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import react, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from './UserContext';
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from 'yup';
 import '../index.css'; 
 
-
-function EditPost() {
+function EditPost({ today, europeanDate }) {
     const [initialValues, setInitialValues] = useState(null);
     const { username } = useUserContext();
     const navigate = useNavigate();
@@ -16,7 +14,12 @@ function EditPost() {
 
     useEffect(() => {
         fetch(`/community/post/${postId}`)
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then((data) => {
             setInitialValues({
                 author: data.author,
@@ -50,7 +53,7 @@ function EditPost() {
       };
 
       if (!initialValues) {
-        return <p className="communitycard-displaycard-center">loading form...</p>;
+        return <p className="communitycard-displaycard-center">loading...</p>;
       }
 
       return (
@@ -63,12 +66,32 @@ function EditPost() {
             >
               {({ isSubmitting }) => (
                 <Form>
-
+                    <div className="inputContainer">
+              <p>author:</p>
+              <Field
+                type="text"
+                name="author"
+                value={username}
+                className="inputBox"
+                readOnly
+              />
+            </div>
+            <div className="inputContainer">
+              <p>date:</p>
+              <Field
+                type="date"
+                name="date"
+                value={today}
+                className="inputBox"
+              />
+              <p style={{ fontSize: '14px' }}>(in Spanish format): {europeanDate}</p>
+            </div>
                   <div>
                     <label htmlFor="subject">subject:</label>
                     <Field name="subject" type="text" />
                     <ErrorMessage name="subject" component="div" className="errorLabel" />
                   </div>
+                  <br></br>
     
                   <div>
                     <label htmlFor="body">body:</label>
@@ -81,13 +104,13 @@ function EditPost() {
                     <Field name="hashtag" type="text" />
                     <ErrorMessage name="hashtag" component="div" className="errorLabel" />
                   </div>
-                  <br></br>
+                  <br />
     
                   <button type="submit" className="button" disabled={isSubmitting}>
                     save changes
                   </button>
-                  <br></br>
-                  <br></br>
+                  <br />
+                  <br />
                   <button
                     type="button"
                     className="button"
@@ -101,6 +124,6 @@ function EditPost() {
           </div>
         </div>
       );
-    }
-    
-    export default EditPost;
+}
+
+export default EditPost;
