@@ -9,10 +9,10 @@ function LocalExpertLogin({ setUser }) {
   const navigate = useNavigate();
   const { setEmail, setUsername } = useUserContext();
 
-  // LOG IN WITH EMAIL ONLY
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format"),
+    username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
   });
 
@@ -51,7 +51,7 @@ function LocalExpertLogin({ setUser }) {
         <div className="titleContainer">
           <h2>local expert log in to magwa</h2>
           <p>⋇⊶⊰❣⊱⊷⋇</p>
-          <p>please sign in with your email and password</p>
+          <p>please sign in with your email, username, and password</p>
           <br />
 
           <Formik
@@ -71,6 +71,16 @@ function LocalExpertLogin({ setUser }) {
                   />
                   <ErrorMessage name="email" component="div" className="errorLabel" />
                 </div>
+                <div className="inputContainer">
+                <p>username</p>
+                <Field
+                  type="username"
+                  name="username"
+                  placeholder="username"
+                  className="inputBox"
+                />
+                <ErrorMessage name="email" component="div" className="errorLabel" />
+              </div>
                 <br />
                 <div className="inputContainer">
                   <p>password</p>

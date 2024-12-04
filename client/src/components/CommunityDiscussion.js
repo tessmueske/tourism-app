@@ -28,7 +28,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       })
       .then((data) => setPosts(data)) 
       .catch((error) => console.error("Error fetching posts:", error));
-  }, []);        
+  }, [setPosts]);        
 
   return (
     <div className="communitycard-displaycard-center">
@@ -47,7 +47,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                 </Link>
               </h3>
               <p>{post.body}</p>
-              <p style={{ fontSize: '10px' }}>posted by <Link to={`/profile/user/${post.author}`} style={{ fontSize: '10px' }}>{post.author}</Link> on {post.date}</p>
+              <p style={{ fontSize: '10px' }}>posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>{post.author}</Link> on {post.date}</p>
               <p style={{ fontSize: '12px' }}>{post.hashtag}</p>
 
               {username === post.author && (

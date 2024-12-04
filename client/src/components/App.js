@@ -21,6 +21,7 @@ import UpdateProfile from "./UpdateProfile";
 import NewPost from "./NewPost";
 import ExpandedPost from "./ExpandedPost"
 import EditPost from "./EditPost";
+import ThatUser from "./ThatUser";
 import pencil from '../pencil.png';
 import trash from '../trash.png';
 
@@ -36,15 +37,21 @@ function App() {
   const europeanDate = new Date().toLocaleDateString('es-ES');
  
   useEffect(() => {
-    fetch("/check_session").then((r) => {
-      if (r.ok) {
-        r.json().then((user) => {
+    if (email) { 
+      fetch(`/check_session/${email}`)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Failed to fetch session data");
+        })
+        .then((user) => {
           console.log(user);
           setUser(user);
-        });
-      }
-    });
-  }, []);
+        })
+        .catch((error) => console.error("Error fetching session:", error));
+    }
+  }, [email]);
 
   const onUpdate = (updatedProfile) => {};
 
@@ -144,6 +151,7 @@ function App() {
               <Route path="/community/post/new" element={<NewPost today={today} europeanDate={europeanDate}/>} />
               <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
               <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} today={today} europeanDate={europeanDate}/>} />
+              <Route path="/profile/user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

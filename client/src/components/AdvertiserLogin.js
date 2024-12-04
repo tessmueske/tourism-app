@@ -9,9 +9,9 @@ function AdvertiserLogin({ setUser }) {
     const navigate = useNavigate();
     const { setEmail, setUsername } = useUserContext();
 
-    // LOG IN WITH EMAIL ONLY
     const validationSchema = Yup.object().shape({
       email: Yup.string().email("Invalid email format"),
+      username: Yup.string().required("Username is required"),
       password: Yup.string().required("Password is required"),
     });
 
@@ -48,11 +48,11 @@ function AdvertiserLogin({ setUser }) {
       <div className="account-center-container">
         <h2>advertiser login for magwa</h2>
         <p>⋇⊶⊰❣⊱⊷⋇</p>
-        <p>please sign in with your email, and password</p>
+        <p>please sign in with your email, username, and password</p>
         <br />
   
         <Formik
-          initialValues={{ email: "", password: "" }}
+          initialValues={{ email: "", username: "", password: "" }}
           validationSchema={validationSchema}
           onSubmit={handleLogin}
         >
@@ -64,6 +64,17 @@ function AdvertiserLogin({ setUser }) {
                   type="email"
                   name="email"
                   placeholder="Email"
+                  className="inputBox"
+                />
+                <ErrorMessage name="email" component="div" className="errorLabel" />
+              </div>
+              <br></br>
+              <div className="inputContainer">
+                <p>username</p>
+                <Field
+                  type="username"
+                  name="username"
+                  placeholder="username"
                   className="inputBox"
                 />
                 <ErrorMessage name="email" component="div" className="errorLabel" />

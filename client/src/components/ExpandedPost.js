@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUserContext } from './UserContext';
 import '../index.css'; 
@@ -9,8 +9,6 @@ function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete 
     const { username } = useUserContext();
     const { postId } = useParams(); 
 
-    console.log(postId)
-
     useEffect(() => {    
         fetch(`/community/post/${postId}`)
           .then((response) => {
@@ -20,7 +18,6 @@ function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete 
             return response.json();
           })
           .then((data) => {
-            console.log('Fetched post data:', data); 
             setPost(data); 
           })
           .catch((error) => console.error("Error fetching post details:", error));
@@ -38,7 +35,7 @@ function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete 
         <>
           <h2>{post.subject}</h2>
           <p>{post.body}</p>
-          <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
+          <p style={{ fontSize: '10px' }}>posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>{post.author}</Link> on {post.date}</p>
           <p className="hashtag">{post.hashtag}</p>
           <div className="button-group">
             <button onClick={backNavigate} className="button">go back</button>

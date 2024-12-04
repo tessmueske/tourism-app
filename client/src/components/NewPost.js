@@ -59,16 +59,6 @@ function NewPost({ today, europeanDate }) {
               />
             </div>
             <div className="inputContainer">
-              <p>subject:</p>
-              <Field
-                type="text"
-                name="subject"
-                placeholder="subject..."
-                className="inputBox"
-              />
-              <ErrorMessage name="subject" component="div" className="errorLabel" />
-            </div>
-            <div className="inputContainer">
               <p>date:</p>
               <Field
                 type="date"
@@ -78,7 +68,16 @@ function NewPost({ today, europeanDate }) {
               />
               <p style={{ fontSize: '14px' }}>(in Spanish format): {europeanDate}</p>
             </div>
-
+            <div className="inputContainer">
+              <p>subject:</p>
+              <Field
+                type="text"
+                name="subject"
+                placeholder="subject..."
+                className="inputBox"
+              />
+              <ErrorMessage name="subject" component="div" className="errorLabel" />
+            </div>
             <div className="inputContainer">
               <p>body:</p>
               <Field

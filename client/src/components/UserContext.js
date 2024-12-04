@@ -16,14 +16,16 @@ export const UserProvider = ({ children }) => {
 
         const data = await response.json();
         setEmail(data.email);
+        console.log(email);
         setUsername(data.username);
+        console.log(username);
       } catch (error) {
         console.error("Error fetching current user:", error);
       }
     };
 
     fetchCurrentUser();
-  }, [email]);
+  }, [email, username]);
 
 
   return (

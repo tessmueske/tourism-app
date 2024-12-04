@@ -38,6 +38,10 @@ class CurrentUser(Resource):
             "id": user.id,
             "email": user.email,
             "username": user.username,
+            "name": user.name,
+            "age": user.age,
+            "gender": user.gender,
+            "bio": user.bio
         }
 
 class TravelerLogin(Resource):
@@ -70,6 +74,10 @@ class TravelerLogin(Resource):
                 'id': traveler.id,
                 'email': traveler.email,
                 'username': traveler.username,
+                "name": traveler.name,
+                "age": traveler.age,
+                "gender": traveler.gender,
+                "bio": traveler.bio
             }, 200
 
         return {'errors': ['Invalid username/email or password']}, 401
@@ -112,7 +120,11 @@ class AdvertiserLogin(Resource):
             return {
                 'id': advertiser.id,
                 'email': advertiser.email,
-                'username': advertiser.username
+                'username': advertiser.username,
+                "name": advertiser.name,
+                "age": advertiser.age,
+                "gender": advertiser.gender,
+                "bio": advertiser.bio
             }, 200
 
         return {'Error': 'Invalid email, username, or password'}, 401
@@ -153,7 +165,11 @@ class LocalExpertLogin(Resource):
             return {
                 'id': localexpert.id,
                 'email': localexpert.email,
-                'username': localexpert.username
+                'username': localexpert.username,
+                "name": localexpert.name,
+                "age": localexpert.age,
+                "gender": localexpert.gender,
+                "bio": localexpert.bio
             }, 200
 
         return {'Error': 'Invalid email, username, or password'}, 401
@@ -169,9 +185,13 @@ class CheckSession(Resource):
             return {'error': 'No user logged in'}, 401
 
         return {
-            'id': user.id,
-            'email': user.email,
-            'username': user.username,
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+            "name": user.name,
+            "age": user.age,
+            "gender": user.gender,
+            "bio": user.bio
         }
 
 class TravelerSignup(Resource):
@@ -465,6 +485,24 @@ class MyProfile(Resource):
         except Exception as e:
             return {"error": f"An error occurred: {str(e)}"}, 500
 
+class TheirProfile(Resource):
+    def get(self, username):
+        user = (
+            Traveler.query.filter_by(username=username).first() or
+            LocalExpert.query.filter_by(username=username).first() or
+            Advertiser.query.filter_by(username=username).first()
+        )
+        if not user:
+            return {"error": "User not found"}, 404
+
+        return {
+            "name": user.name,
+            "bio": user.bio,
+            "age": user.age,
+            "gender": user.gender,
+            "email": user.email,
+        }
+
 class Community(Resource):
     def get(self):
         posts = Post.query.all()
@@ -716,6 +754,8 @@ api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', 
 
 api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
 api.add_resource(MyProfile, '/profile/user/update/<string:email>')
+
+api.add_resource(TheirProfile, '/profile/user/author/<string:username>')
 
 api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')

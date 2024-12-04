@@ -9,10 +9,10 @@ function TravelerLogin({ setUser }) {
   const { setEmail, setUsername } = useUserContext();
   const navigate = useNavigate();
 
-  // LOG IN WITH EMAIL ONLY
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format"),
+    username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
   });
 
@@ -70,6 +70,16 @@ function TravelerLogin({ setUser }) {
               <ErrorMessage name="email" component="div" className="errorLabel" />
             </div>
             <br />
+            <div className="inputContainer">
+                <p>username</p>
+                <Field
+                  type="username"
+                  name="username"
+                  placeholder="username"
+                  className="inputBox"
+                />
+                <ErrorMessage name="email" component="div" className="errorLabel" />
+              </div>
 
             <div className="inputContainer">
               <p>password</p>
