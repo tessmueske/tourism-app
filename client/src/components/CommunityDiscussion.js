@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css"
 
-function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts }) {
+function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts, post, setPost }) {
   const navigate = useNavigate();
   const { username } = useUserContext();
 
@@ -28,7 +28,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       })
       .then((data) => setPosts(data)) 
       .catch((error) => console.error("Error fetching posts:", error));
-  }, []);
+  }, []);        
 
   return (
     <div className="communitycard-displaycard-center">
@@ -38,7 +38,6 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
           <p>keep it nice and respectful, please!</p>
           <button onClick={handleNavigate} className="button">make a post</button>
         </div>
-        
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post.id}>
@@ -48,7 +47,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                 </Link>
               </h3>
               <p>{post.body}</p>
-              <p style={{ fontSize: '10px' }}>posted by {post.author} on {post.date}</p>
+              <p style={{ fontSize: '10px' }}>posted by <Link to={`/profile/user/${post.author}`} style={{ fontSize: '10px' }}>{post.author}</Link> on {post.date}</p>
               <p style={{ fontSize: '12px' }}>{post.hashtag}</p>
 
               {username === post.author && (

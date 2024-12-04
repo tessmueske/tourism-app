@@ -6,7 +6,7 @@ import "../profilecard.css"
 
 function MyProfile() {
     const navigate = useNavigate();
-    const { username, email } = useUserContext();
+    const { username, email, currentUser } = useUserContext();
     const [profile, setProfile] = useState({
         name: "",
         bio: "",
@@ -29,11 +29,17 @@ function MyProfile() {
       return (
         <div className="profile-card">
             <p>⋇⊶⊰❣⊱⊷⋇</p>
-          <p>welcome to your profile, {username}!</p>
+            <p>
+              {username === currentUser ? 
+                `welcome to your profile, ${username}!` : 
+                `welcome to ${username}'s profile!`
+              }
+          </p>
           <p><strong>name:</strong> {profile.name || "N/A"}</p>
           <p><strong>age:</strong> {profile.age || "N/A"}</p>
           <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
           <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
+          <p><strong>contact email:</strong> {profile.email || "N/A"}</p>
           <button className="button" onClick={() => navigate(`/profile/user/update/${email}`)}>edit my profile</button>
         </div>
       );
