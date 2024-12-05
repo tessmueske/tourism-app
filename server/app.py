@@ -13,7 +13,7 @@ import os
 import traceback
 
 from config import app, db, api
-from models import Traveler, LocalExpert, Advertiser, Post
+from models import Traveler, LocalExpert, Advertiser, Post, Hashtag
 
 load_dotenv()  
 app.secret_key = os.getenv('SECRET_KEY')
@@ -505,7 +505,7 @@ class TheirProfile(Resource):
 
 class Community(Resource):
     def get(self):
-        posts = Post.query.all()
+        posts = Post.query.order_by(Post.date.desc()).all()
         if posts:
             return [post.to_dict() for post in posts], 200
         else:
@@ -513,7 +513,7 @@ class Community(Resource):
 
     def post(self):
         data = request.get_json()
-    
+
         try:
             date_str = data.get('date')
             try:
@@ -523,10 +523,18 @@ class Community(Resource):
 
             subject = data.get('subject')
             body = data.get('body')
-            hashtag = data.get('hashtag')
-        
+            hashtags = data.get('hashtags', [])
+            print(f"Hashtags received: {hashtags}")
+
+            hashtag_objects = []
+            for hashtag in hashtags:
+                hashtag_obj = Hashtag.query.filter_by(name=hashtag).first()
+                if not hashtag_obj:
+                    hashtag_obj = Hashtag(name=hashtag)
+                    db.session.add(hashtag_obj) 
+                hashtag_objects.append(hashtag_obj)
+
             username = data.get('author')
-            
             user = (
                 Traveler.query.filter_by(username=username).first() or
                 LocalExpert.query.filter_by(username=username).first() or
@@ -543,7 +551,7 @@ class Community(Resource):
                     date=date_obj,
                     subject=subject,
                     body=body,
-                    hashtag=hashtag
+                    hashtags=hashtag_objects 
                 )
             elif isinstance(user, LocalExpert):
                 post = Post(
@@ -552,7 +560,7 @@ class Community(Resource):
                     date=date_obj,
                     subject=subject,
                     body=body,
-                    hashtag=hashtag
+                    hashtags=hashtag_objects
                 )
             elif isinstance(user, Advertiser):
                 post = Post(
@@ -561,7 +569,7 @@ class Community(Resource):
                     date=date_obj,
                     subject=subject,
                     body=body,
-                    hashtag=hashtag
+                    hashtags=hashtag_objects
                 )
 
             db.session.add(post)
@@ -573,8 +581,9 @@ class Community(Resource):
                 'date': post.date.strftime('%Y-%m-%d'),
                 'subject': post.subject,
                 'body': post.body,
-                'hashtag': post.hashtag
+                'hashtags': [hashtag.name for hashtag in post.hashtags] 
             }, 201
+
         except Exception as e:
             error_message = str(e)
             error_trace = traceback.format_exc()
@@ -602,7 +611,7 @@ class MyPost(Resource):
                 'date': post.date.strftime('%Y-%m-%d'),
                 "subject": post.subject,
                 "body": post.body, 
-                "hashtag": post.hashtag
+                "hashtags": [hashtag.to_dict() for hashtag in post.hashtags]
             }, 200
         else:
             return {"error": "Post not found"}, 404

@@ -69,7 +69,6 @@ function TravelerLogin({ setUser }) {
               />
               <ErrorMessage name="email" component="div" className="errorLabel" />
             </div>
-            <br />
             <div className="inputContainer">
                 <p>username</p>
                 <Field
@@ -80,7 +79,6 @@ function TravelerLogin({ setUser }) {
                 />
                 <ErrorMessage name="email" component="div" className="errorLabel" />
               </div>
-
             <div className="inputContainer">
               <p>password</p>
               <Field

@@ -52,8 +52,11 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </h3>
               <p>{post.body}</p>
               <p style={{ fontSize: '10px' }}>posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>{post.author}</Link> on {post.date}</p>
-              <p style={{ fontSize: '12px' }}>{post.hashtag}</p>
-
+              <p style={{ fontSize: '12px' }}>
+                <div className='hashtag'>
+                {post.hashtags.map((hashtag, index) => (<span key={hashtag.name}>#{hashtag.name}{index < post.hashtags.length - 1 && ", "}</span>))}
+                </div>
+                </p>
               {username === post.author && (
                 <div className="edit-delete-buttons">
                   <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>

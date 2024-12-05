@@ -12,9 +12,6 @@ function ThatUser({ post, user }) {
         age: "",
         gender: "",
     });
-    console.log('Author:', author);
-
-    console.log('Post:', post);
   
     useEffect(() => {
         if (author) {

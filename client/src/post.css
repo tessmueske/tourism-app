@@ -61,3 +61,13 @@ textarea {
   color: rgb(98, 0, 0);
   font-size: 12px;
 }
+
+.hashtag {
+  color: var(--link); 
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hashtag:hover {
+  text-decoration: underline;
+}

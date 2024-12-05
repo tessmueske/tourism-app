@@ -69,8 +69,8 @@ function App() {
       handleDelete(postId);
     }
   };
-
   const handleDelete = (postId) => {
+    console.log("Post ID inside handleDelete:", postId);
     fetch(`/community/post/delete/${postId}`, {
       method: "DELETE",
     })
@@ -165,3 +165,4 @@ export default App;
 
 // comment on post actions
 // hashtag/filter functionality
+// see only posts by (travelers/local experts/advertisers)

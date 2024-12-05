@@ -22,22 +22,25 @@ function NewPost({ today, europeanDate }) {
           hashtag: "",
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
-          console.log("Sending author:", values.author);
-          console.log("Form values being submitted:", values);
-          console.log("Submitting post with username:", username);
+          const hashtagPattern = /#(\w+)/g;
+          const hashtags = [...(values.hashtag.match(hashtagPattern) || [])].map(tag => tag.slice(1));
+          const postData = {
+            ...values,
+            hashtags: hashtags, 
+          };
+          console.log(postData);
           try {
             const response = await fetch('/community/post/new', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(values), 
+              body: JSON.stringify(postData), 
             });
 
             if (response.ok) {
               setSuccessMessage("posted successfully! redirecting to community homepage...");
-              console.log("author:", values.author)
-              console.log("username:", username)
+              console.log(postData);
               resetForm();
               setTimeout(() => {
                 navigate(`/community/posts/all`); 
@@ -95,7 +98,7 @@ function NewPost({ today, europeanDate }) {
             </div>
 
             <div className="inputContainer">
-              <p>hashtags:</p>
+              <p>hashtags #typed #like #this (try #tenerife or #paella!):</p>
               <Field
                 type="text"
                 name="hashtag"
