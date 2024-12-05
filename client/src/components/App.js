@@ -110,7 +110,7 @@ function App() {
 
   return (
     <>
-      <NavBar user={user} setUser={setUser} handleLogout={handleLogout} />
+      <NavBar user={user} handleLogout={handleLogout} />
     
       <main>
         <Routes>
@@ -167,3 +167,4 @@ export default App;
 // thumbs up or down on post actions
 // hashtag/filter functionality
 // delete/edit profile functionality with conditional rendering based on currentUser
+// fix author issue

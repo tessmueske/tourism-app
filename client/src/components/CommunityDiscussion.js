@@ -7,7 +7,8 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const navigate = useNavigate();
   const { username } = useUserContext();
 
-  console.log(posts)
+  console.log('Posts:', posts)
+  console.log('Current username:', username)
 
   const handleNavigate = () => {
     navigate('/community/post/new');
@@ -26,10 +27,13 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
         }
         return response.json();
       })
-      .then((data) => setPosts(data)) 
+      .then((data) => {
+        console.log('Received post data:', data);
+        setPosts(data);
+      })
       .catch((error) => console.error("Error fetching posts:", error));
-  }, [setPosts]);        
-
+  }, [setPosts]);
+  
   return (
     <div className="communitycard-displaycard-center">
       <div className="card">

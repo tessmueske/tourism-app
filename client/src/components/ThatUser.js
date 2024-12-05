@@ -13,6 +13,8 @@ function ThatUser({ post, user }) {
         gender: "",
     });
     console.log('Author:', author);
+
+    console.log('Post:', post);
   
     useEffect(() => {
         if (author) {

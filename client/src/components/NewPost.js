@@ -10,6 +10,8 @@ function NewPost({ today, europeanDate }) {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 
+  console.log(username)
+
   return (
     <div className="communitycard-display">
       <h2>new post</h2>
@@ -22,6 +24,9 @@ function NewPost({ today, europeanDate }) {
           hashtag: "",
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
+          console.log("Sending author:", values.author);
+          console.log("Form values being submitted:", values);
+          console.log("Submitting post with username:", username);
           try {
             const response = await fetch('/community/post/new', {
               method: 'POST',
@@ -33,6 +38,8 @@ function NewPost({ today, europeanDate }) {
 
             if (response.ok) {
               setSuccessMessage("posted successfully! redirecting to community homepage...");
+              console.log("author:", values.author)
+              console.log("username:", username)
               resetForm();
               setTimeout(() => {
                 navigate(`/community/posts/all`); 

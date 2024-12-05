@@ -516,23 +516,21 @@ class Community(Resource):
     
         try:
             date_str = data.get('date')
-            print(f"Received date: {date_str}")
             try:
                 date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
             except ValueError:
                 return {"error": "Invalid date format. Expected YYYY-MM-DD."}, 400
+
             subject = data.get('subject')
             body = data.get('body')
             hashtag = data.get('hashtag')
         
-            user_id = session.get('user_id')
-            if not user_id:
-                return {'error': 'Unauthorized request'}, 401
-
+            username = data.get('author')
+            
             user = (
-                Traveler.query.filter_by(id=user_id).first() or
-                LocalExpert.query.filter_by(id=user_id).first() or
-                Advertiser.query.filter_by(id=user_id).first()
+                Traveler.query.filter_by(username=username).first() or
+                LocalExpert.query.filter_by(username=username).first() or
+                Advertiser.query.filter_by(username=username).first()
             )
 
             if not user:
@@ -541,7 +539,7 @@ class Community(Resource):
             if isinstance(user, Traveler):
                 post = Post(
                     traveler_id=user.id,
-                    author=user.username,
+                    author=username,
                     date=date_obj,
                     subject=subject,
                     body=body,
@@ -550,7 +548,7 @@ class Community(Resource):
             elif isinstance(user, LocalExpert):
                 post = Post(
                     localexpert_id=user.id,
-                    author=user.username,
+                    author=username,
                     date=date_obj,
                     subject=subject,
                     body=body,
@@ -559,7 +557,7 @@ class Community(Resource):
             elif isinstance(user, Advertiser):
                 post = Post(
                     advertiser_id=user.id,
-                    author=user.username,
+                    author=username,
                     date=date_obj,
                     subject=subject,
                     body=body,
