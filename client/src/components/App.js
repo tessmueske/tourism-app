@@ -164,7 +164,4 @@ function App() {
 export default App;
 
 // comment on post actions
-// thumbs up or down on post actions
 // hashtag/filter functionality
-// delete/edit profile functionality with conditional rendering based on currentUser
-// fix author issue

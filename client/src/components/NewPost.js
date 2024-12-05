@@ -10,8 +10,6 @@ function NewPost({ today, europeanDate }) {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 
-  console.log(username)
-
   return (
     <div className="communitycard-display">
       <h2>new post</h2>

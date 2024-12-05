@@ -13,7 +13,7 @@ import os
 import traceback
 
 from config import app, db, api
-from models import Traveler, LocalExpert, Advertiser, Island, Activity, Post
+from models import Traveler, LocalExpert, Advertiser, Post
 
 load_dotenv()  
 app.secret_key = os.getenv('SECRET_KEY')
