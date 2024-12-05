@@ -593,18 +593,7 @@ class Community(Resource):
 
 class MyPost(Resource):
     def get(self, post_id):
-        user_id = session.get('user_id')
-        if 'user_id' not in session:
-            return {'error': 'Unauthorized request'}, 401
-
-        user = (
-                Traveler.query.filter_by(id=user_id).first() or
-                LocalExpert.query.filter_by(id=user_id).first() or
-                Advertiser.query.filter_by(id=user_id).first()
-            )
-
         post = Post.query.filter_by(id=post_id).first()
-        print(post)
         if post:
             return {
                 "author": post.author,

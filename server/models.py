@@ -3,6 +3,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_bcrypt import Bcrypt
 from config import db
+from datetime import datetime
 
 bcrypt = Bcrypt()
 
@@ -145,7 +146,7 @@ class Post(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String, nullable=False)
-    date = db.Column(db.Date, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     subject = db.Column(db.String)
     body = db.Column(db.String)
 

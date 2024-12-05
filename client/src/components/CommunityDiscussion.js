@@ -39,8 +39,8 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       <div className="card">
         <div className="centered-elements">
           <h2>community discussion</h2>
-          <p>keep it nice and respectful, please!</p>
-          <button onClick={handleNavigate} className="button">make a post</button>
+          <p>keep it nice and respectful, please! click on a post to expand it and be able to comment.</p>
+          <button onClick={handleNavigate} className="button">make my own post</button>
         </div>
         {posts.length > 0 ? (
           posts.map((post) => (

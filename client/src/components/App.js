@@ -166,3 +166,4 @@ export default App;
 // comment on post actions
 // hashtag/filter functionality
 // see only posts by (travelers/local experts/advertisers)
+// make sure posts sort from most recent to oldest

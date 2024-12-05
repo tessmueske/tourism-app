@@ -45,6 +45,7 @@ function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete 
                 {post.hashtags.map((hashtag, index) => (<span key={hashtag.name}>#{hashtag.name}{index < post.hashtags.length - 1 && ", "}</span>))}
                 </div>
                 </p>
+            <p>comments:</p>
           <div className="button-group">
             <button onClick={backNavigate} className="button">go back</button>
             {username === post.author && (
