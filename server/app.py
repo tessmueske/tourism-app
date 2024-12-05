@@ -644,66 +644,42 @@ class MyPost(Resource):
             return {"error": f"An error occurred: {str(e)}"}, 500
 
     def delete(self, post_id):
-        user_id = session.get('user_id')
-        print(f"User ID from session: {user_id}")
-
-        if not user_id:
-            print("Error: User ID not found in session")
-            return {'error': 'Unauthorized request'}, 401
-
-        user = (
-            Traveler.query.filter_by(id=user_id).first() or
-            LocalExpert.query.filter_by(id=user_id).first() or
-            Advertiser.query.filter_by(id=user_id).first()
-        )
-
-        if user:
-            print(f"User found: {user}")
-        else:
-            print("User not found")
-
-        if user:
-            print(f"User type: {type(user)}")
+        try:
             post = Post.query.filter_by(id=post_id).first()
-            if post:
-                print(f"Post found: {post}")
-                print(f"Post traveler_id: {post.traveler_id}, localexpert_id: {post.localexpert_id}, advertiser_id: {post.advertiser_id}")
-                if isinstance(user, Traveler):
-                    print(f"User is a Traveler with id: {user.id}")
-                    if post.traveler_id == user.id:
-                        db.session.delete(post)
-                        db.session.commit()
-                        return '', 204
-                    else:
-                        print("Error: Traveler does not have permission to delete this post")
-                        return {'error': 'You are not the author of this post'}, 403
-                elif isinstance(user, LocalExpert):
-                    print(f"User is a LocalExpert with id: {user.id}")
-                    if post.localexpert_id == user.id:
-                        db.session.delete(post)
-                        db.session.commit()
-                        return '', 204
-                    else:
-                        print("Error: Local Expert does not have permission to delete this post")
-                        return {'error': 'You are not the author of this post'}, 403
-                elif isinstance(user, Advertiser):
-                    print(f"User is an Advertiser with id: {user.id}")
-                    if post.advertiser_id == user.id:
-                        db.session.delete(post)
-                        db.session.commit()
-                        return '', 204
-                    else:
-                        print("Error: Advertiser does not have permission to delete this post")
-                        return {'error': 'You are not the author of this post'}, 403
-                else:
-                    print("Error: User type is not recognized")
-                    return {'error': 'You are not the author of this post'}, 403 
-            else:
-                print(f"Error: Post with ID {post_id} not found in the database")
-                return {'error': 'Post not found'}, 404 
-        else:
-            print("Error: User not found in the database")
-            return {'error': 'User not found'}, 404
+            if not post:
+                return {'error': 'Post not found'}, 404
+
+            print(f"Post found: {post}")
+            print(f"Post author: {post.author}")
+
+            user = (
+                Traveler.query.filter_by(username=post.author).first() or
+                LocalExpert.query.filter_by(username=post.author).first() or
+                Advertiser.query.filter_by(username=post.author).first()
+            )
+            if not user:
+                return {'error': 'Author of the post not found'}, 404
+
+            print(f"User found: {user}, Type: {type(user)}")
+
+            user_type_to_id = {
+                Traveler: post.traveler_id,
+                LocalExpert: post.localexpert_id,
+                Advertiser: post.advertiser_id,
+            }
+
+            for user_type, post_owner_id in user_type_to_id.items():
+                if isinstance(user, user_type) and post_owner_id == user.id:
+                    db.session.delete(post)
+                    db.session.commit()
+                    return '', 204
+
+            return {'error': 'You are not the author of this post'}, 403
+
+        except Exception as e:
+            error_message = str(e)
+            print(f"Error deleting post: {error_message}")
+            return {'error': error_message}, 500
 
 class Logout(Resource):
     def delete(self):
