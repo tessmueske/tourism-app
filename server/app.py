@@ -78,9 +78,6 @@ class TravelerLogin(Resource):
 
 class AdvertiserLogin(Resource):
     def post(self):
-
-        session.clear()
-
         data = request.get_json()
         user = None
 
@@ -126,9 +123,6 @@ class AdvertiserLogin(Resource):
 
 class LocalExpertLogin(Resource):
     def post(self):
-
-        session.clear()
-
         data = request.get_json()
         user = None
 
@@ -172,8 +166,6 @@ class TravelerSignup(Resource):
     def post(self):
         data = request.get_json()
 
-        print(request.data)
-
         username = data.get('username')
         email = data.get('email')
         password = data.get('password')
@@ -215,11 +207,7 @@ class TravelerSignup(Resource):
 
 class LocalExpertSignup(Resource):
     def post(self):
-        session.clear()
-
         data = request.get_json()
-
-        print(request.data)
 
         username = data.get('username')
         email = data.get('email')
@@ -283,11 +271,7 @@ class LocalExpertSignup(Resource):
 
 class AdvertiserSignup(Resource):
     def post(self):
-        session.clear()
-
         data = request.get_json()
-
-        print(request.data)
 
         username = data.get('username')
         email = data.get('email')
@@ -484,12 +468,10 @@ class TheirProfile(Resource):
 class Community(Resource):
     def get(self):
         try:
-            # Fetch posts with a condition and order them by date
             posts = Post.query.filter(or_(Post.date != None, Post.date == None)).order_by(Post.date.desc()).all()
 
             formatted_posts = []
             for post in posts:
-                # Check relationships to determine the author and role
                 if post.traveler_id:
                     traveler = Traveler.query.get(post.traveler_id)
                     author = traveler.username
@@ -506,10 +488,9 @@ class Community(Resource):
                     author = "Unknown"
                     role = "Unknown"
 
-                # Add formatted post to the list
                 formatted_posts.append({
                     'id': post.id,
-                    'author': author,  # Use dynamically determined author
+                    'author': author, 
                     'role': role,
                     'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
                     'subject': post.subject,
@@ -517,11 +498,9 @@ class Community(Resource):
                     'hashtags': [hashtag.name for hashtag in post.hashtags]
                 })
 
-            # Return the formatted posts
             return formatted_posts, 200
 
         except Exception as e:
-            # Log the error and return a 500 response
             print(f"Error: {str(e)}")
             return {"error": "An error occurred while fetching posts"}, 500
 
@@ -532,7 +511,7 @@ class Community(Resource):
             subject = data.get('subject')
             body = data.get('body')
             hashtags = data.get('hashtags', [])
-            print(f"Hashtags received: {hashtags}")
+            comments = data.get('comments', [])
 
             hashtag_objects = []
             for hashtag in hashtags:
@@ -577,6 +556,15 @@ class Community(Resource):
                     hashtags=hashtag_objects
                 )
 
+            if comments:
+                for comment_data in comments:
+                    comment = {
+                        'author': comment_data.get('author'),
+                        'text': comment_data.get('text'),
+                        'date': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+                    }
+                    post.comments.append(comment)
+
             db.session.add(post)
             db.session.commit()
 
@@ -586,7 +574,8 @@ class Community(Resource):
                 "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                 'subject': post.subject,
                 'body': post.body,
-                'hashtags': [hashtag.name for hashtag in post.hashtags]
+                'hashtags': [hashtag.name for hashtag in post.hashtags],
+                'comments': [comment.text for comment in post.comments]
             }, 201
 
         except Exception as e:
@@ -622,7 +611,8 @@ class MyPost(Resource):
             "date": post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
             "subject": post.subject,
             "body": post.body,
-            "hashtags": [hashtag.to_dict() for hashtag in post.hashtags]
+            "hashtags": [hashtag.to_dict() for hashtag in post.hashtags],
+            'comments': [comment.to_dict() for comment in post.comments] if post.comments else []
         }, 200
 
     def put(self, post_id):
@@ -696,6 +686,35 @@ class MyPost(Resource):
             print(f"Error deleting post: {error_message}")
             return {'error': error_message}, 500
 
+class Comment(Resource):
+    def post(self, post_id):
+        data = request.get_json()
+        text = data.get('text')  
+
+        post = db.session.get(Post, post_id)
+        if not post:
+            return {'error': 'Post not found'}, 404
+
+        if post.comments is None:
+            post.comments = []
+
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'User not authenticated'}, 401
+
+        user = db.session.get(Traveler, user_id) or db.session.get(LocalExpert, user_id) or db.session.get(Advertiser, user_id)
+        
+        new_comment = {
+            'author': user.username,
+            'text': text,
+            'date': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+        }
+
+        post.comments.append(new_comment)
+        db.session.commit()
+
+        return new_comment, 201
+
 class Logout(Resource):
     def delete(self):
         session.pop('traveler_id', None)
@@ -751,6 +770,8 @@ api.add_resource(Community, '/community/post/new', endpoint='new_post')
 api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')
 api.add_resource(MyPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit')
 api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_id_delete')
+
+api.add_resource(Comment, '/community/post/<int:post_id>/comments', endpoint='post_comments')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

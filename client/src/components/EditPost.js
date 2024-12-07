@@ -21,23 +21,28 @@ function EditPost() {
             return response.json();
           })
           .then((data) => {
+            const hashtags = data.hashtag ? data.hashtag.split(' ') : [];
             setInitialValues({
-                author: data.author,
+                author: user?.username || '',
                 subject: data.subject,
                 body: data.body,
-                hashtag: data.hashtag,
+                hashtag: hashtags, 
             });
-          })
+        })
           .catch((error) => console.error("Error fetching post data:", error));
       }, [postId]);
 
       const handleSubmit = (values) => {
+        const updatedHashtags = values.hashtag.join(' ');
         fetch(`/community/post/edit/${postId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...values,
+                hashtag: updatedHashtags,
+            }),
         })
           .then((response) => {
             if (!response.ok) {
