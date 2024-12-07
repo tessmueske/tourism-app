@@ -5,8 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../index.css'; 
 import "../post.css";
 
-function NewPost({ today, europeanDate }) {
-  const { username } = useUserContext();
+function NewPost() {
+  const { user } = useUserContext();
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -15,8 +15,7 @@ function NewPost({ today, europeanDate }) {
       <h2>new post</h2>
       <Formik
         initialValues={{
-          author: username,
-          date: today,
+          author: user.username,
           subject: "",
           body: "",
           hashtag: "",
@@ -49,8 +48,8 @@ function NewPost({ today, europeanDate }) {
               console.error("Error creating post");
             }
           } catch (error) {
-            console.error("Error:", error);
-          }
+            console.error("Error:", error.message);
+          }          
           setSubmitting(false); 
         }}
       >
@@ -61,20 +60,10 @@ function NewPost({ today, europeanDate }) {
               <Field
                 type="text"
                 name="author"
-                value={username} 
+                value={user.username} 
                 className="inputBox"
                 readOnly
               />
-            </div>
-            <div className="inputContainer">
-              <p>date:</p>
-              <Field
-                type="date"
-                name="date"
-                value={today}
-                className="inputBox"
-              />
-              <p style={{ fontSize: '14px' }}>(in Spanish format): {europeanDate}</p>
             </div>
             <div className="inputContainer">
               <p>subject:</p>

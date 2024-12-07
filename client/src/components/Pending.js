@@ -4,7 +4,7 @@ import '../index.css';
 function Pending(){
   return (
     <div className='account-center-container'>
-        <p>thank you for signing up to use magwa and make the canary islands better. we'll let you know via the email your signed up with if your profile has been accepted or rejected asap!</p>
+        <p>thank you for signing up to use magwa and make the canary islands better. we'll let you know via the email you signed up with if your profile has been accepted or rejected asap!</p>
     </div>
   );
 };

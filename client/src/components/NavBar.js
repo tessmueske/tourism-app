@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "./UserContext";
 import '../index.css'; 
 
-function NavBar({ user, handleLogout }) { 
+function NavBar() { 
   const navigate = useNavigate();
+  const { user, handleLogout } = useUserContext();
 
   const confirmLogout = () => {
     if (window.confirm("Are you sure you want to log out?")) {
@@ -12,8 +13,6 @@ function NavBar({ user, handleLogout }) {
       navigate("/");
     }
   };
-
-  const email = user?.email;
 
   return (
     <nav>
@@ -42,7 +41,7 @@ function NavBar({ user, handleLogout }) {
               <Link to="/welcome/home">home</Link>
             </li>
             <li>
-              <Link to={`/profile/user/${email}`}>my profile</Link>
+              <Link to={`/profile/user/${user.email}`}>my profile</Link>
             </li>
             <li>
               <Link to="/community/posts/all">community discussion</Link>

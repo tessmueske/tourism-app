@@ -1,11 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
+import { useUserContext } from "./UserContext";
 import * as Yup from 'yup';
 import '../index.css'; 
 
-function TravelerSignup({ setUser }) {
+function TravelerSignup() {
     const navigate = useNavigate();
+    const { user, setUser } = useUserContext();
 
     const validationSchema = Yup.object().shape({
       username: Yup.string().required("Username is required"),
@@ -27,7 +29,7 @@ function TravelerSignup({ setUser }) {
       },
     });
 
-    const handleSignup = ({ username, email, password }, setUser) => {
+    const handleSignup = ({ username, email, password }) => {
       fetch("/signup/traveler", {
         method: "POST",
         headers: {

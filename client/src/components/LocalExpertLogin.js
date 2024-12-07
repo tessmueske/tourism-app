@@ -5,9 +5,9 @@ import * as Yup from 'yup';
 import { useUserContext } from "./UserContext";
 import '../index.css';
 
-function LocalExpertLogin({ setUser }) {
+function LocalExpertLogin() {
   const navigate = useNavigate();
-  const { setEmail, setUsername } = useUserContext();
+  const { setUser, handleLocalExpertLogin } = useUserContext();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -15,35 +15,6 @@ function LocalExpertLogin({ setUser }) {
     username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
   });
-
-  const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-    fetch("/login/localexpert", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, email, password }),
-    })
-      .then((r) => {
-        setSubmitting(false);
-        if (r.ok) {
-          r.json().then((userData) => {
-            setUser({ username: userData.username, email: userData.email });
-            setEmail(email);
-            setUsername(username);
-            navigate("/welcome/home");
-          });
-        } else {
-          r.json().then((err) => {
-            setErrors({ api: err.errors || ["login failed"] });
-          });
-        }
-      })
-      .catch(() => {
-        setSubmitting(false);
-        setErrors({ api: ["something went wrong. please try again."] });
-      });
-  };
 
   return (
     <div className="account-center-container">
@@ -55,10 +26,12 @@ function LocalExpertLogin({ setUser }) {
           <br />
 
           <Formik
-            initialValues={{ email: "", username: "", password: "" }}
-            validationSchema={validationSchema}
-            onSubmit={handleLogin}
-          >
+        initialValues={{ email: "", username: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { setSubmitting, setErrors }) => {
+          handleLocalExpertLogin(values, { setSubmitting, setErrors });
+        }}
+      >
             {({ isSubmitting, errors }) => (
               <Form>
                 <div className="inputContainer">

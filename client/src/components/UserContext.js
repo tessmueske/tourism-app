@@ -1,35 +1,130 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+  const [user, setUser] = useState({
+    email: "",
+    username: "",
+    name: "",
+    age: "",
+    gender: "",
+    bio: ""
+  });
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await fetch(`/current-user/${email}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error - status: ${response.status}`);
+    fetch("/current-user", {
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error("Error fetching user:", err));
+  }, []);
+
+  const handleAdvertiserLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+    fetch("/login/advertiser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password }),
+    })
+      .then((r) => {
+        setSubmitting(false);
+        if (r.ok) {
+          r.json().then((userData) => {
+            setUser({ username: userData.username, email: userData.email });
+            navigate("/welcome/home");
+          });
+        } else {
+          r.json().then((err) => {
+            setErrors({ api: err.errors || ["Signup failed"] });
+          });
         }
+      })
+      .catch(() => {
+        setSubmitting(false);
+        setErrors({ api: ["Something went wrong. Please try again."] });
+      });
+  };
 
-        const data = await response.json();
-        setEmail(data.email);
-        console.log(email);
-        setUsername(data.username);
-        console.log(username);
-      } catch (error) {
-        console.error("Error fetching current user:", error);
+  const handleLocalExpertLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+    fetch("/login/localexpert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password }),
+    })
+      .then((r) => {
+        setSubmitting(false);
+        if (r.ok) {
+          r.json().then((userData) => {
+            setUser({ username: userData.username, email: userData.email });
+            navigate("/welcome/home");
+          });
+        } else {
+          r.json().then((err) => {
+            setErrors({ api: err.errors || ["login failed"] });
+          });
+        }
+      })
+      .catch(() => {
+        setSubmitting(false);
+        setErrors({ api: ["something went wrong. please try again."] });
+      });
+  };
+
+  const handleTravelerLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+    fetch("/login/traveler", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password }),
+    })
+      .then((r) => {
+        setSubmitting(false);
+        if (r.ok) {
+          r.json().then((userData) => {
+            setUser(userData); 
+            navigate("/welcome/home");
+          });
+        } else {
+          r.json().then((err) => {
+            setErrors({ api: err.errors || ["Signup failed"] });
+          });
+        }
+      })
+      .catch(() => {
+        setSubmitting(false);
+        setErrors({ api: ["Something went wrong. Please try again."] });
+      });
+  };
+
+
+  const handleLogout = () => {
+    fetch("/logout", { 
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then((response) => {
+      if (response.status === 204) {
+        setUser(null);
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response);
       }
-    };
-
-    fetchCurrentUser();
-  }, [email, username]);
-
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
+    });
+  };
 
   return (
-    <UserContext.Provider value={{ email, setEmail, username, setUsername }}>
+    <UserContext.Provider value={{ user, setUser, handleAdvertiserLogin, handleLocalExpertLogin, handleTravelerLogin, handleLogout }}>
       {children}
     </UserContext.Provider>
   );

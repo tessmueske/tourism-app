@@ -42,3 +42,4 @@ https://canariaseagota.com/
 # Community calendar
 # Trip planner
 # Friendship capabilities
+# see only posts by (travelers/local experts/advertisers), filter by hashtags

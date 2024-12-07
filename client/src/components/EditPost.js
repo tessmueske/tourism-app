@@ -4,9 +4,9 @@ import { useUserContext } from './UserContext';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import '../index.css'; 
 
-function EditPost({ today, europeanDate }) {
+function EditPost() {
     const [initialValues, setInitialValues] = useState(null);
-    const { username } = useUserContext();
+    const { user } = useUserContext();
     const navigate = useNavigate();
     const { postId } = useParams(); 
 
@@ -23,7 +23,6 @@ function EditPost({ today, europeanDate }) {
           .then((data) => {
             setInitialValues({
                 author: data.author,
-                date: data.date,
                 subject: data.subject,
                 body: data.body,
                 hashtag: data.hashtag,
@@ -71,20 +70,10 @@ function EditPost({ today, europeanDate }) {
               <Field
                 type="text"
                 name="author"
-                value={username}
+                value={user.username}
                 className="inputBox"
                 readOnly
               />
-            </div>
-            <div className="inputContainer">
-              <p>date:</p>
-              <Field
-                type="date"
-                name="date"
-                value={today}
-                className="inputBox"
-              />
-              <p style={{ fontSize: '14px' }}>(in Spanish format): {europeanDate}</p>
             </div>
                   <div>
                     <label htmlFor="subject">subject:</label>

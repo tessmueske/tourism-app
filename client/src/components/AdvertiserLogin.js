@@ -5,44 +5,15 @@ import * as Yup from 'yup';
 import { useUserContext } from "./UserContext";
 import '../index.css'; 
 
-function AdvertiserLogin({ setUser }) {
+function AdvertiserLogin() {
     const navigate = useNavigate();
-    const { setEmail, setUsername } = useUserContext();
+    const { user, setUser, handleAdvertiserLogin } = useUserContext();
 
     const validationSchema = Yup.object().shape({
       email: Yup.string().email("Invalid email format"),
       username: Yup.string().required("Username is required"),
       password: Yup.string().required("Password is required"),
     });
-
-    const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-      fetch("/login/advertiser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      })
-        .then((r) => {
-          setSubmitting(false);
-          if (r.ok) {
-            r.json().then((userData) => {
-              setUser({ username: userData.username, email: userData.email });
-              setEmail(email);
-              setUsername(username);
-              navigate("/welcome/home");
-            });
-          } else {
-            r.json().then((err) => {
-              setErrors({ api: err.errors || ["Signup failed"] });
-            });
-          }
-        })
-        .catch(() => {
-          setSubmitting(false);
-          setErrors({ api: ["Something went wrong. Please try again."] });
-        });
-    };
 
     return (
       <div className="account-center-container">
@@ -52,10 +23,12 @@ function AdvertiserLogin({ setUser }) {
         <br />
   
         <Formik
-          initialValues={{ email: "", username: "", password: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleLogin}
-        >
+        initialValues={{ email: "", username: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { setSubmitting, setErrors }) => {
+          handleAdvertiserLogin(values, { setSubmitting, setErrors });
+        }}
+      >
           {({ isSubmitting, errors }) => (
             <Form>
               <div className="inputContainer">

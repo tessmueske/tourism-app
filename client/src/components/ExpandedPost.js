@@ -6,7 +6,7 @@ import "../communitycard.css";
 
 function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete }) {
     const navigate = useNavigate();
-    const { username } = useUserContext();
+    const { user } = useUserContext();
     const { postId } = useParams(); 
 
     useEffect(() => {
@@ -48,7 +48,7 @@ function ExpandedPost({ handleEdit, setPost, post, pencil, trash, confirmDelete 
             <p>comments:</p>
           <div className="button-group">
             <button onClick={backNavigate} className="button">go back</button>
-            {username === post.author && (
+            {user.username === post.author && (
                 <div className="edit-delete-buttons">
                   <button onClick={() => handleEdit(postId)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
                   <button onClick={() => confirmDelete(postId)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>

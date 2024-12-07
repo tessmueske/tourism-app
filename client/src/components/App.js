@@ -26,32 +26,11 @@ import pencil from '../pencil.png';
 import trash from '../trash.png';
 
 function App() {
-  const [user, setUser] = useState(null);
   const [post, setPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { postId } = useParams(); 
-  const { email } = useUserContext();
-
-  const today = new Date().toISOString().split("T")[0];
-  const europeanDate = new Date().toLocaleDateString('es-ES');
- 
-  useEffect(() => {
-    if (email) { 
-      fetch(`/check_session/${email}`)
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error("Failed to fetch session data");
-        })
-        .then((user) => {
-          console.log(user);
-          setUser(user);
-        })
-        .catch((error) => console.error("Error fetching session:", error));
-    }
-  }, [email]);
+  const { user, setUser } = useUserContext();
 
   const onUpdate = (updatedProfile) => {};
 
@@ -69,6 +48,7 @@ function App() {
       handleDelete(postId);
     }
   };
+
   const handleDelete = (postId) => {
     console.log("Post ID inside handleDelete:", postId);
     fetch(`/community/post/delete/${postId}`, {
@@ -88,29 +68,10 @@ function App() {
       })
       .catch((error) => console.error("Error deleting post:", error));
   };
-  
-  const handleLogout = () => {
-    fetch("/logout", { 
-      method: "DELETE",
-      credentials: "include"
-    })
-    .then((response) => {
-      if (response.status === 204) {
-        setUser(null);
-        localStorage.removeItem("authToken");
-        navigate("/");
-      } else {
-        console.error("Logout failed:", response);
-      }
-    })
-    .catch((error) => {
-      console.error("Logout failed:", error);
-    });
-  };
 
   return (
     <>
-      <NavBar user={user} handleLogout={handleLogout} />
+      <NavBar />
     
       <main>
         <Routes>
@@ -122,19 +83,19 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/signup/advertiser" element={<AdvertiserSignup setUser={setUser} />} />
-              <Route path="/signup/localexpert" element={<LocalExpertSignup setUser={setUser} />} />
-              <Route path="/signup/traveler" element={<TravelerSignup setUser={setUser} />} />
-              <Route path="/login/traveler" element={<TravelerLogin setUser={setUser} />} />
-              <Route path="/login/advertiser" element={<AdvertiserLogin setUser={setUser} />} />
-              <Route path="/login/localexpert" element={<LocalExpertLogin setUser={setUser} />} />
+              <Route path="/signup/advertiser" element={<AdvertiserSignup />} />
+              <Route path="/signup/localexpert" element={<LocalExpertSignup />} />
+              <Route path="/signup/traveler" element={<TravelerSignup />} />
+              <Route path="/login/traveler" element={<TravelerLogin />} />
+              <Route path="/login/advertiser" element={<AdvertiserLogin />} />
+              <Route path="/login/localexpert" element={<LocalExpertLogin />} />
               <Route path="/verification/pending" element={<Pending />} />
             </>
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />} />
-              <Route path="/profile/user/:email" element={<MyProfile email={email}/>} />
-              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} email={email} />} />
+              <Route path="/profile/user/:email" element={<MyProfile />} />
+              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} />} />
               <Route 
                 path="/community/posts/all" 
                 element={
@@ -148,9 +109,9 @@ function App() {
                   setPosts={setPosts} 
                   />
                 }/>
-              <Route path="/community/post/new" element={<NewPost today={today} europeanDate={europeanDate}/>} />
-              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} confirmDelete={confirmDelete} posts={posts} setPosts={setPosts}/>} />
-              <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} today={today} europeanDate={europeanDate}/>} />
+              <Route path="/community/post/new" element={<NewPost />} />
+              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
+              <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} />} />
               <Route path="/profile/user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>
@@ -164,6 +125,7 @@ function App() {
 export default App;
 
 // comment on post actions
-// hashtag/filter functionality
-// see only posts by (travelers/local experts/advertisers)
-// make sure posts sort from most recent to oldest
+// implement hashtags
+// take out date from the editpost component
+// code for back button from thatusers profile
+// add role type on profile

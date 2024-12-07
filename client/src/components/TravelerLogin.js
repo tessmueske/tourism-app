@@ -5,8 +5,8 @@ import { useUserContext } from "./UserContext";
 import * as Yup from 'yup';
 import '../index.css';
 
-function TravelerLogin({ setUser }) {
-  const { setEmail, setUsername } = useUserContext();
+function TravelerLogin() {
+  const { user, setUser, handleTravelerLogin } = useUserContext();
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
@@ -15,35 +15,6 @@ function TravelerLogin({ setUser }) {
     username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
   });
-
-  const handleLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
-    fetch("/login/traveler", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, email, password }),
-    })
-      .then((r) => {
-        setSubmitting(false);
-        if (r.ok) {
-          r.json().then((userData) => {
-            setUser(userData); 
-            setEmail(email);
-            setUsername(username);
-            navigate("/welcome/home");
-          });
-        } else {
-          r.json().then((err) => {
-            setErrors({ api: err.errors || ["Signup failed"] });
-          });
-        }
-      })
-      .catch(() => {
-        setSubmitting(false);
-        setErrors({ api: ["Something went wrong. Please try again."] });
-      });
-  };
 
   return (
     <div className="account-center-container">
@@ -55,7 +26,9 @@ function TravelerLogin({ setUser }) {
       <Formik
         initialValues={{ email: "", username: "", password: "" }}
         validationSchema={validationSchema}
-        onSubmit={handleLogin}
+        onSubmit={(values, { setSubmitting, setErrors }) => {
+          handleTravelerLogin(values, { setSubmitting, setErrors });
+        }}
       >
         {({ isSubmitting, errors }) => (
           <Form>

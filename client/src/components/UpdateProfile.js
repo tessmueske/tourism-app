@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from './UserContext';
 import "../index.css";
 import "../profilecard.css";
 
-function UpdateProfile({ onUpdate, email }) {
+function UpdateProfile({ onUpdate }) {
     const navigate = useNavigate();
-    const [profile, setProfile] = useState(null);
-
-    console.log(email)
+    const { user, setUser } = useUserContext();
 
   useEffect(() => {
-    fetch(`/profile/user/${email}`)
+    fetch(`/profile/user/${user.email}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
@@ -20,25 +19,21 @@ function UpdateProfile({ onUpdate, email }) {
         return response.json();
       })
       .then((data) => {
-        setProfile(data);
+        setUser(data);
       })
       .catch((error) => {
         console.error("Error fetching profile:", error);
       });
-  }, [email]);
-
-  if (!profile) {
-    return <p>error loading profile. please try again later.</p>;
-  }
+  }, [user.email]);
 
   return (
     <div className="profile-display card">
       <Formik
         initialValues={{
-          name: profile.name || "",
-          bio: profile.bio || "",
-          age: profile.age || "",
-          gender: profile.gender || "",
+          name: user.name || "",
+          bio: user.bio || "",
+          age: user.age || "",
+          gender: user.gender || "",
         }}
         validationSchema={Yup.object({
           age: Yup.number()
@@ -46,9 +41,9 @@ function UpdateProfile({ onUpdate, email }) {
             .integer("Age must be an integer"),
         })}
         onSubmit={(values, { setSubmitting, setErrors }) => {
-            const updatedProfile = { ...profile, ...values };
+            const updatedProfile = { ...user, ...values };
           
-            fetch(`/profile/user/update/${email}`, {
+            fetch(`/profile/user/update/${user.email}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -65,7 +60,7 @@ function UpdateProfile({ onUpdate, email }) {
               })
               .then((updatedProfile) => {
                 onUpdate(updatedProfile);
-                navigate(`/profile/user/${email}`); 
+                navigate(`/profile/user/${user.email}`); 
               })
               .catch((error) => {
                 console.error("Error updating profile:", error);

@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 from flask import Flask, request, session, jsonify, render_template
+from flask_session import Session
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
-from datetime import datetime
+from datetime import datetime, date
+from sqlalchemy import cast, Date, extract, or_
 from dotenv import load_dotenv
 import os
 import traceback
@@ -20,35 +22,27 @@ app.secret_key = os.getenv('SECRET_KEY')
 
 bcrypt = Bcrypt()
 mail = Mail(app)
+Session(app)
 CORS(app, supports_credentials=True)
 
 class CurrentUser(Resource):
-    def get(self, email):
-
-        user = (
-            Traveler.query.filter_by(email=email).first() or
-            LocalExpert.query.filter_by(email=email).first() or
-            Advertiser.query.filter_by(email=email).first()
-        )
-
-        if not user:
-            return {"message": "User not logged in"}, 401
-
-        return {
-            "id": user.id,
-            "email": user.email,
-            "username": user.username,
-            "name": user.name,
-            "age": user.age,
-            "gender": user.gender,
-            "bio": user.bio
-        }
+    def get():
+        user = session.get('user')
+        if user:
+            return {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "name": user.name,
+                "age": user.age,
+                "gender": user.gender,
+                "bio": user.bio
+            }
+        else:
+            return {"User not logged in"}, 401
 
 class TravelerLogin(Resource):
     def post(self):
-
-        session.clear()
-
         data = request.get_json()
         user = None
 
@@ -174,30 +168,8 @@ class LocalExpertLogin(Resource):
 
         return {'Error': 'Invalid email, username, or password'}, 401
 
-class CheckSession(Resource):
-    def get(self, email):
-        user = (
-            Traveler.query.filter_by(email=email).first() or
-            LocalExpert.query.filter_by(email=email).first() or
-            Advertiser.query.filter_by(email=email).first()
-        )
-        if not user:
-            return {'error': 'No user logged in'}, 401
-
-        return {
-            "id": user.id,
-            "email": user.email,
-            "username": user.username,
-            "name": user.name,
-            "age": user.age,
-            "gender": user.gender,
-            "bio": user.bio
-        }
-
 class TravelerSignup(Resource):
     def post(self):
-        session.clear()
-
         data = request.get_json()
 
         print(request.data)
@@ -232,7 +204,11 @@ class TravelerSignup(Resource):
             db.session.add(new_user)
             db.session.commit()
             session['user_id'] = new_user.id
-            return new_user.to_dict(), 201
+            return {
+                'id': new_user.id,
+                'username': new_user.username,
+                'email': new_user.email,
+            }
  
         except Exception as e:
             return {"error": f"Failed to create user: {str(e)}"}, 422
@@ -505,22 +481,31 @@ class TheirProfile(Resource):
 
 class Community(Resource):
     def get(self):
-        posts = Post.query.order_by(Post.date.desc()).all()
-        if posts:
-            return [post.to_dict() for post in posts], 200
-        else:
-            return {"error": "No posts found"}, 400
+        try:
+            posts = Post.query.filter(or_(Post.date != None, Post.date == None)).order_by(Post.date.desc()).all()
+
+            formatted_posts = []
+            for post in posts:
+                print([hashtag.name for hashtag in post.hashtags])
+                
+                formatted_posts.append({
+                    'id': post.id,
+                    'author': post.author,
+                    'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+                    'subject': post.subject,
+                    'body': post.body,
+                    'hashtags': [hashtag.name for hashtag in post.hashtags]
+                })
+            return formatted_posts
+
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return {"error": "An error occurred while fetching posts"}, 500
 
     def post(self):
         data = request.get_json()
 
         try:
-            date_str = data.get('date')
-            try:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-            except ValueError:
-                return {"error": "Invalid date format. Expected YYYY-MM-DD."}, 400
-
             subject = data.get('subject')
             body = data.get('body')
             hashtags = data.get('hashtags', [])
@@ -531,7 +516,7 @@ class Community(Resource):
                 hashtag_obj = Hashtag.query.filter_by(name=hashtag).first()
                 if not hashtag_obj:
                     hashtag_obj = Hashtag(name=hashtag)
-                    db.session.add(hashtag_obj) 
+                    db.session.add(hashtag_obj)
                 hashtag_objects.append(hashtag_obj)
 
             username = data.get('author')
@@ -548,16 +533,14 @@ class Community(Resource):
                 post = Post(
                     traveler_id=user.id,
                     author=username,
-                    date=date_obj,
                     subject=subject,
                     body=body,
-                    hashtags=hashtag_objects 
+                    hashtags=hashtag_objects
                 )
             elif isinstance(user, LocalExpert):
                 post = Post(
                     localexpert_id=user.id,
                     author=username,
-                    date=date_obj,
                     subject=subject,
                     body=body,
                     hashtags=hashtag_objects
@@ -566,7 +549,6 @@ class Community(Resource):
                 post = Post(
                     advertiser_id=user.id,
                     author=username,
-                    date=date_obj,
                     subject=subject,
                     body=body,
                     hashtags=hashtag_objects
@@ -578,10 +560,10 @@ class Community(Resource):
             return {
                 'id': post.id,
                 'author': post.author,
-                'date': post.date.strftime('%Y-%m-%d'),
+                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                 'subject': post.subject,
                 'body': post.body,
-                'hashtags': [hashtag.name for hashtag in post.hashtags] 
+                'hashtags': [hashtag.name for hashtag in post.hashtags]
             }, 201
 
         except Exception as e:
@@ -597,7 +579,7 @@ class MyPost(Resource):
         if post:
             return {
                 "author": post.author,
-                'date': post.date.strftime('%Y-%m-%d'),
+                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                 "subject": post.subject,
                 "body": post.body, 
                 "hashtags": [hashtag.to_dict() for hashtag in post.hashtags]
@@ -614,15 +596,12 @@ class MyPost(Resource):
 
         data = request.get_json()
         author = data.get('author')
-        date_str = data.get('date') 
         subject = data.get('subject')
         body = data.get('body')
         hashtag = data.get('hashtag')
 
         try:
             post.author = author
-            if date_str:
-                post.date = datetime.strptime(date_str, '%Y-%m-%d').date()
             post.subject = subject
             post.body = body
             post.hashtag = hashtag
@@ -630,7 +609,7 @@ class MyPost(Resource):
 
             return {
                 "author": post.author,
-                'date': post.date.strftime('%Y-%m-%d'),
+                'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
                 "subject": post.subject,
                 "body": post.body,
                 "hashtag": post.hashtag
@@ -712,7 +691,6 @@ class DeleteProfile(Resource):
 
 api.add_resource(CurrentUser, '/current-user/<string:email>', endpoint='current_user')
 
-api.add_resource(CheckSession, '/check_session/<string:email>')
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
 api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
 api.add_resource(LocalExpertLogin, '/login/localexpert', endpoint='login_localexpert')
@@ -738,7 +716,7 @@ api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
-api.add_resource(DeleteProfile, '/profile/user/delete/<string:email>)', endpoint='user_profile_delete')
+api.add_resource(DeleteProfile, '/profile/user/delete/<string:email>', endpoint='user_profile_delete')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

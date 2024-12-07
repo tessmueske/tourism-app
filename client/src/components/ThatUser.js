@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../index.css";
 import "../profilecard.css"
 
-function ThatUser({ post, user }) {
+function ThatUser({ post }) {
     const { author } = useParams();
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
