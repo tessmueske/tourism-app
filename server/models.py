@@ -48,6 +48,30 @@ post_hashtag = db.Table('post_hashtag',
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
     db.Column('hashtag_id', db.Integer, db.ForeignKey('hashtags.id'), primary_key=True))
 
+post_comment = db.Table('post_comment',
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id'), primary_key=True))
+
+traveler_comment = db.Table('traveler_comment',
+    db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id'), primary_key=True))
+
+localexpert_comment = db.Table('localexpert_comment',
+    db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id'), primary_key=True))
+
+advertiser_comment = db.Table('advertiser_comment',
+    db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id'), primary_key=True))
+
+post_comment
+
+advertiser_comment
+
+localexpert_comment
+
+traveler_comment
+
 class Traveler(db.Model, SerializerMixin):
     __tablename__ = 'travelers'
 
@@ -64,8 +88,9 @@ class Traveler(db.Model, SerializerMixin):
     localexperts = db.relationship('LocalExpert', secondary=traveler_localexpert, back_populates='travelers')
     advertisers = db.relationship('Advertiser', secondary=traveler_advertiser, back_populates='travelers')
     posts = db.relationship('Post', secondary=traveler_post, back_populates='travelers')
+    comments = db.relationship('Comment', secondary=traveler_comment, back_populates='travelers')
 
-    serialize_rules = ('-hashtags.travelers', '-localexperts.travelers', '-advertisers.travelers', '-posts.travelers')
+    serialize_rules = ('-hashtags.travelers', '-localexperts.travelers', '-advertisers.travelers', '-posts.travelers', '-comments.travelers')
 
     @property
     def role(self):
@@ -100,8 +125,9 @@ class LocalExpert(db.Model, SerializerMixin):
     travelers = db.relationship('Traveler', secondary=traveler_localexpert, back_populates='localexperts')
     advertisers = db.relationship('Advertiser', secondary=advertiser_localexpert, back_populates='localexperts')
     posts = db.relationship('Post', secondary=localexpert_post, back_populates='localexperts')
+    comments = db.relationship('Comment', secondary=localexpert_comment, back_populates='localexperts')
 
-    serialize_rules = ('-hashtags.localexperts', '-travelers.localexperts', '-advertisers.localexperts', '-posts.localexperts')
+    serialize_rules = ('-hashtags.localexperts', '-travelers.localexperts', '-advertisers.localexperts', '-posts.localexperts', '-comments.localexperts')
 
     @property
     def role(self):
@@ -136,8 +162,9 @@ class Advertiser(db.Model, SerializerMixin):
     travelers = db.relationship('Traveler', secondary=traveler_advertiser, back_populates='advertisers')
     localexperts = db.relationship('LocalExpert', secondary=advertiser_localexpert, back_populates='advertisers')
     posts = db.relationship('Post', secondary=advertiser_post, back_populates='advertisers')
+    comments = db.relationship('Comment', secondary=advertiser_comment, back_populates='advertisers')    
 
-    serialize_rules = ('-hashtags.advertisers', '-travelers.advertisers', '-localexperts.advertisers', '-posts.advertisers')
+    serialize_rules = ('-hashtags.advertisers', '-travelers.advertisers', '-localexperts.advertisers', '-posts.advertisers', '-comments.advertisers')
 
     @property
     def role(self):
@@ -167,12 +194,32 @@ class Post(db.Model, SerializerMixin):
     localexpert_id = db.Column(db.Integer, db.ForeignKey('localexperts.id'), nullable=True)
     advertiser_id = db.Column(db.Integer, db.ForeignKey('advertisers.id'), nullable=True)
 
-    hashtags = db.relationship('Hashtag', secondary='post_hashtag', back_populates='posts')
+    comments = db.relationship('Comment', secondary=post_comment, back_populates='posts')
+    hashtags = db.relationship('Hashtag', secondary=post_hashtag, back_populates='posts')
     localexperts = db.relationship('LocalExpert', secondary=localexpert_post, back_populates='posts')
     advertisers = db.relationship('Advertiser', secondary=advertiser_post, back_populates='posts')
     travelers = db.relationship('Traveler', secondary=traveler_post, back_populates='posts')
 
-    serialize_rules = ('-hashtags.posts','-travelers.posts', '-localexperts.posts', '-advertisers.posts')
+    serialize_rules = ('-hashtags.posts','-travelers.posts', '-localexperts.posts', '-advertisers.posts', '-comments.posts')
+
+class Comment(db.Model, SerializerMixin):
+    __tablename__ = 'comments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String, nullable=False)
+    date = db.Column(db.DateTime, default=func.now(), nullable=True)
+    text = db.Column(db.String)
+
+    traveler_id = db.Column(db.Integer, db.ForeignKey('travelers.id'), nullable=True)
+    localexpert_id = db.Column(db.Integer, db.ForeignKey('localexperts.id'), nullable=True)
+    advertiser_id = db.Column(db.Integer, db.ForeignKey('advertisers.id'), nullable=True)
+
+    localexperts = db.relationship('LocalExpert', secondary=localexpert_comment, back_populates='comments')
+    advertisers = db.relationship('Advertiser', secondary=advertiser_comment, back_populates='comments')
+    travelers = db.relationship('Traveler', secondary=traveler_comment, back_populates='comments')
+    posts = db.relationship('Post', secondary=post_comment, back_populates='comments')
+
+    serialize_rules = ('-hashtags.comments','-travelers.comments', '-localexperts.comments', '-advertisers.comments', '-posts.comments')
 
 class Hashtag(db.Model, SerializerMixin):
     __tablename__ = 'hashtags'
