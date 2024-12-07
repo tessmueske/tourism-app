@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({
     email: "",
     username: "",
+    role: "",
     name: "",
     age: "",
     gender: "",
@@ -23,19 +24,19 @@ export const UserProvider = ({ children }) => {
       .catch((err) => console.error("Error fetching user:", err));
   }, []);
 
-  const handleAdvertiserLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+  const handleAdvertiserLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
     fetch("/login/advertiser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, role, password }),
     })
       .then((r) => {
         setSubmitting(false);
         if (r.ok) {
           r.json().then((userData) => {
-            setUser({ username: userData.username, email: userData.email });
+            setUser({ username: userData.username, email: userData.email, role: userData.role });
             navigate("/welcome/home");
           });
         } else {
@@ -50,19 +51,19 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  const handleLocalExpertLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+  const handleLocalExpertLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
     fetch("/login/localexpert", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, role, password }),
     })
       .then((r) => {
         setSubmitting(false);
         if (r.ok) {
           r.json().then((userData) => {
-            setUser({ username: userData.username, email: userData.email });
+            setUser({ username: userData.username, email: userData.email, role: userData.role  });
             navigate("/welcome/home");
           });
         } else {
@@ -77,13 +78,13 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  const handleTravelerLogin = ({ username, email, password }, { setSubmitting, setErrors }) => {
+  const handleTravelerLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
     fetch("/login/traveler", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, role, password }),
     })
       .then((r) => {
         setSubmitting(false);

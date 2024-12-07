@@ -126,6 +126,3 @@ export default App;
 
 // comment on post actions
 // implement hashtags
-// take out date from the editpost component
-// code for back button from thatusers profile
-// add role type on profile

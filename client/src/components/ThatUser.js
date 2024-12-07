@@ -8,6 +8,7 @@ function ThatUser({ post }) {
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
         name: "",
+        role: "",
         bio: "",
         age: "",
         gender: "",
@@ -35,12 +36,13 @@ function ThatUser({ post }) {
         <div className="profile-card">
             <p>⋇⊶⊰❣⊱⊷⋇</p>
             <p>welcome to {author}'s profile!</p>
-            <p><strong>name:</strong> {profile.name || "N/A"}</p>
-            <p><strong>age:</strong> {profile.age || "N/A"}</p>
-            <p><strong>gender:</strong> {profile.gender || "N/A"}</p>
-            <p><strong>bio:</strong> {profile.bio || "N/A"}</p>
-            <p><strong>contact email:</strong> {profile.email || "N/A"}</p>
-            <button className="button" onClick={() => navigate(`/community/post/${post.id}`)}>back</button>
+            <p><strong>role: </strong>{profile.role || "not set"}</p>
+            <p><strong>name:</strong> {profile.name || "not set"}</p>
+            <p><strong>age:</strong> {profile.age || "not set"}</p>
+            <p><strong>gender:</strong> {profile.gender || "not set"}</p>
+            <p><strong>bio:</strong> {profile.bio || "not set"}</p>
+            <p><strong>contact email:</strong> {profile.email || "not set"}</p>
+            <button className="button" onClick={() => navigate(`/community/posts/all`)}>back</button>
         </div>
     );
 }

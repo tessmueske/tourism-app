@@ -420,6 +420,7 @@ class MyProfile(Resource):
             return {
                 "username": user.username,
                 "email": user.email,
+                "role": user.role,
                 "name": user.name,
                 "bio": user.bio, 
                 "age": user.age, 
@@ -473,6 +474,7 @@ class TheirProfile(Resource):
 
         return {
             "name": user.name,
+            "role": user.role,
             "bio": user.bio,
             "age": user.age,
             "gender": user.gender,
@@ -482,23 +484,44 @@ class TheirProfile(Resource):
 class Community(Resource):
     def get(self):
         try:
+            # Fetch posts with a condition and order them by date
             posts = Post.query.filter(or_(Post.date != None, Post.date == None)).order_by(Post.date.desc()).all()
 
             formatted_posts = []
             for post in posts:
-                print([hashtag.name for hashtag in post.hashtags])
-                
+                # Check relationships to determine the author and role
+                if post.traveler_id:
+                    traveler = Traveler.query.get(post.traveler_id)
+                    author = traveler.username
+                    role = traveler.role
+                elif post.localexpert_id:
+                    localexpert = LocalExpert.query.get(post.localexpert_id)
+                    author = localexpert.username
+                    role = localexpert.role
+                elif post.advertiser_id:
+                    advertiser = Advertiser.query.get(post.advertiser_id)
+                    author = advertiser.username
+                    role = advertiser.role
+                else:
+                    author = "Unknown"
+                    role = "Unknown"
+
+                # Add formatted post to the list
                 formatted_posts.append({
                     'id': post.id,
-                    'author': post.author,
+                    'author': author,  # Use dynamically determined author
+                    'role': role,
                     'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
                     'subject': post.subject,
                     'body': post.body,
                     'hashtags': [hashtag.name for hashtag in post.hashtags]
                 })
-            return formatted_posts
+
+            # Return the formatted posts
+            return formatted_posts, 200
 
         except Exception as e:
+            # Log the error and return a 500 response
             print(f"Error: {str(e)}")
             return {"error": "An error occurred while fetching posts"}, 500
 
@@ -576,16 +599,31 @@ class Community(Resource):
 class MyPost(Resource):
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first()
-        if post:
-            return {
-                "author": post.author,
-                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-                "subject": post.subject,
-                "body": post.body, 
-                "hashtags": [hashtag.to_dict() for hashtag in post.hashtags]
-            }, 200
-        else:
+        if not post:
             return {"error": "Post not found"}, 404
+
+        author = None
+        role = None
+        if post.traveler_id:
+            author = Traveler.query.get(post.traveler_id)
+            role = "traveler"
+        elif post.localexpert_id:
+            author = LocalExpert.query.get(post.localexpert_id)
+            role = "local expert"
+        elif post.advertiser_id:
+            author = Advertiser.query.get(post.advertiser_id)
+            role = "advertiser"
+
+        if not author:
+            return {"error": "Author not found"}, 404
+        return {
+            "author": author.username if author else None, 
+            "role": role,
+            "date": post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+            "subject": post.subject,
+            "body": post.body,
+            "hashtags": [hashtag.to_dict() for hashtag in post.hashtags]
+        }, 200
 
     def put(self, post_id):
         user_id = session.get('user_id')

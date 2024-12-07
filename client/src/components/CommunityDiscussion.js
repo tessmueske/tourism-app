@@ -51,11 +51,11 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                 </Link>
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
-              <p style={{ fontSize: '10px' }}>
+              <p style={{ fontSize: '12px' }}>
                 posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>
-                  {post.author}{" "}
+                  {post.author}
                 </Link> 
-                on{" "}
+                , {post.role}, on{" "}
                 {post.date
                   ? new Date(post.date).toLocaleString()
                   : "no date available"}

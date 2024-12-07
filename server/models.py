@@ -67,6 +67,10 @@ class Traveler(db.Model, SerializerMixin):
 
     serialize_rules = ('-hashtags.travelers', '-localexperts.travelers', '-advertisers.travelers', '-posts.travelers')
 
+    @property
+    def role(self):
+        return "traveler"
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Password is not a readable attribute.")
@@ -99,6 +103,10 @@ class LocalExpert(db.Model, SerializerMixin):
 
     serialize_rules = ('-hashtags.localexperts', '-travelers.localexperts', '-advertisers.localexperts', '-posts.localexperts')
 
+    @property
+    def role(self):
+        return "local expert"
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError("Password is not a readable attribute.")
@@ -130,6 +138,10 @@ class Advertiser(db.Model, SerializerMixin):
     posts = db.relationship('Post', secondary=advertiser_post, back_populates='advertisers')
 
     serialize_rules = ('-hashtags.advertisers', '-travelers.advertisers', '-localexperts.advertisers', '-posts.advertisers')
+
+    @property
+    def role(self):
+        return "advertiser"
 
     @hybrid_property
     def password_hash(self):
