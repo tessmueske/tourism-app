@@ -7,8 +7,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const navigate = useNavigate();
   const { user, setUser } = useUserContext();
 
-  console.log('posts:', posts);
-  console.log('current username:', user.username);
+  console.log(user.role)
 
   const handleNavigate = () => {
     navigate('/community/post/new');

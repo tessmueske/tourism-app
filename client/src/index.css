@@ -231,3 +231,8 @@ nav a:active, nav button:active {
 .hashtag:hover {
   text-decoration: underline;
 }
+
+.small-textarea {
+  width: 200px;
+  height: 60px; 
+}

@@ -13,6 +13,8 @@ from sqlalchemy import cast, Date, extract, or_
 from dotenv import load_dotenv
 import os
 import traceback
+import logging
+import json
 
 from config import app, db, api
 from models import Traveler, LocalExpert, Advertiser, Post, Hashtag
@@ -586,67 +588,127 @@ class Community(Resource):
             return {'error': error_message}, 500
 
 class MyPost(Resource):
+    #GET post info including comments
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first()
         if not post:
             return {"error": "Post not found"}, 404
 
-        author = None
-        role = None
-        if post.traveler_id:
-            author = Traveler.query.get(post.traveler_id)
-            role = "traveler"
-        elif post.localexpert_id:
-            author = LocalExpert.query.get(post.localexpert_id)
-            role = "local expert"
-        elif post.advertiser_id:
-            author = Advertiser.query.get(post.advertiser_id)
-            role = "advertiser"
+        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
 
-        if not author:
-            return {"error": "Author not found"}, 404
         return {
-            "author": author.username if author else None, 
-            "role": role,
-            "date": post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+            "author": post.author,
             "subject": post.subject,
             "body": post.body,
-            "hashtags": [hashtag.to_dict() for hashtag in post.hashtags],
-            'comments': [comment.to_dict() for comment in post.comments] if post.comments else []
+            "comments": comments
         }, 200
 
     def put(self, post_id):
-        user_id = session.get('user_id')
-        if 'user_id' not in session:
-            return {'error': 'Unauthorized request'}, 401
+        #PUT comment onto a post
+        data = request.get_json()
+        print(f"Request data: {data}")
 
         post = Post.query.filter_by(id=post_id).first()
+        if not post:
+            print(f"Post with ID {post_id} not found.")
+            return {"error": "Post not found"}, 404
+        
+        comment_text = data.get("text")
+        comment_author = data.get("author")
+        print(f"Extracted comment text: {comment_text}, author: {comment_author}")
+        
+        if not comment_text or not comment_author:
+            print("Missing comment text or author.")
+            return {"error": "Missing comment text or author"}, 400
+        
+        new_comment = {
+            "text": comment_text,
+            "author": comment_author,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        print(f"Adding new comment: {new_comment}")
 
+        post.comments.append(new_comment)
+        print(f"Post after adding comment: {post.comments}")
+
+        post.comments = json.dumps(post.comments)
+
+        print(f"Type of comments before commit: {type(post.comments)}")
+        
+        try:
+            db.session.commit()
+            print("Comment added and database commit successful.")
+            return {"message": "Comment added successfully", "comments": post.comments}, 200
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error adding comment: {str(e)}")
+            return {"error": f"Error adding comment: {str(e)}"}, 500
+
+class EditPost(Resource):
+    def put(self, post_id):
+        # This route handles editing a post (e.g., subject, body, hashtags)
         data = request.get_json()
-        author = data.get('author')
+        post = Post.query.filter_by(id=post_id).first()
+        if not post:
+            return {"error": "Post not found"}, 404
+        
         subject = data.get('subject')
         body = data.get('body')
-        hashtag = data.get('hashtag')
+        hashtags = data.get('hashtag')
+
+        if not subject or not body:
+            return {"error": "Subject and body are required to update the post"}, 400
+        
+        post.subject = subject
+        post.body = body
+        post.hashtag = hashtags 
 
         try:
-            post.author = author
-            post.subject = subject
-            post.body = body
-            post.hashtag = hashtag
             db.session.commit()
-
             return {
-                "author": post.author,
-                'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+                "message": "Post updated successfully",
                 "subject": post.subject,
                 "body": post.body,
                 "hashtag": post.hashtag
             }, 200
-
         except Exception as e:
-            db.session.rollback()  
-            print(f"Error updating post: {str(e)}")  
-            return {"error": f"An error occurred: {str(e)}"}, 500
+            db.session.rollback()
+            return {"error": f"Error updating post: {str(e)}"}, 500
+
+    # def get(self, post_id):
+    #     try:
+    #         post = Post.query.filter_by(id=post_id).first()
+    #         if not post:
+    #             return {"error": "Post not found"}, 404
+
+    #         author = None
+    #         role = None
+    #         if post.traveler_id:
+    #             author = Traveler.query.get(post.traveler_id)
+    #             role = "traveler"
+    #         elif post.localexpert_id:
+    #             author = LocalExpert.query.get(post.localexpert_id)
+    #             role = "local expert"
+    #         elif post.advertiser_id:
+    #             author = Advertiser.query.get(post.advertiser_id)
+    #             role = "advertiser"
+
+    #         if not author:
+    #             return {"error": "Author not found"}, 404
+    #         return {
+    #             "author": author.username if author else None, 
+    #             "role": role,
+    #             "date": post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+    #             "subject": post.subject,
+    #             "body": post.body,
+    #             "hashtags": [hashtag.to_dict() for hashtag in post.hashtags],
+    #             'comments': [comment.to_dict() for comment in post.comments] if post.comments else []
+    #         }, 200
+
+        # except Exception as e:
+        #     db.session.rollback()  
+        #     print(f"Error updating post: {str(e)}")  
+        #     return {"error": f"An error occurred: {str(e)}"}, 500
 
     def delete(self, post_id):
         try:
@@ -684,36 +746,7 @@ class MyPost(Resource):
         except Exception as e:
             error_message = str(e)
             print(f"Error deleting post: {error_message}")
-            return {'error': error_message}, 500
-
-class Comment(Resource):
-    def post(self, post_id):
-        data = request.get_json()
-        text = data.get('text')  
-
-        post = db.session.get(Post, post_id)
-        if not post:
-            return {'error': 'Post not found'}, 404
-
-        if post.comments is None:
-            post.comments = []
-
-        user_id = session.get('user_id')
-        if not user_id:
-            return {'error': 'User not authenticated'}, 401
-
-        user = db.session.get(Traveler, user_id) or db.session.get(LocalExpert, user_id) or db.session.get(Advertiser, user_id)
-        
-        new_comment = {
-            'author': user.username,
-            'text': text,
-            'date': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
-        }
-
-        post.comments.append(new_comment)
-        db.session.commit()
-
-        return new_comment, 201
+            return {'error': error_message}, 500    
 
 class Logout(Resource):
     def delete(self):
@@ -767,11 +800,9 @@ api.add_resource(TheirProfile, '/profile/user/author/<string:username>')
 api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
 api.add_resource(Community, '/community/post/new', endpoint='new_post')
 
-api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')
-api.add_resource(MyPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit')
+api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')  # GET for posts, PUT for comments
+api.add_resource(EditPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
 api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_id_delete')
-
-api.add_resource(Comment, '/community/post/<int:post_id>/comments', endpoint='post_comments')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

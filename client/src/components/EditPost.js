@@ -33,8 +33,13 @@ function EditPost() {
       }, [postId]);
 
       const handleSubmit = (values) => {
-        const updatedHashtags = values.hashtag.join(' ');
-        fetch(`/community/post/edit/${postId}`, {
+        let updatedHashtags;
+        if (Array.isArray(values.hashtag)) {
+            updatedHashtags = values.hashtag.join(' ');
+        } else {
+            console.error('Error: values.hashtag is not an array.', values.hashtag);
+            updatedHashtags = values.hashtag || ''; 
+        }        fetch(`/community/post/edit/${postId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

@@ -12,6 +12,8 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const [post, setPostState] = useState(null); 
     const [loading, setLoading] = useState(true); 
 
+    console.log(user.role) 
+
     useEffect(() => {
         console.log("Post ID from useParams:", postId);
     }, [postId]);
@@ -26,8 +28,13 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                 return response.json();
             })
             .then((data) => {
-                setPostState(data); 
-                setLoading(false); 
+                setPostState({
+                    ...data,
+                    comments: data.comments || []
+                });
+                setLoading(false);
+                console.log('Fetched post data:', data);
+                console.log('Fetched comments:', data.comments);
             })
             .catch((error) => {
                 console.error("Error fetching post details:", error);
@@ -38,29 +45,34 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const handleCommentSubmit = (e) => {
         e.preventDefault();
         
-        if (!newComment.trim()) return;  
-
+        if (!newComment.trim()) return;  // Prevent submitting if the comment is empty
+    
         const commentData = {
             text: newComment,
-            author: user.username, 
+            author: user.username,
+            role: user.role,
+            date: new Date().toISOString(),  // Using ISO string for date consistency
         };
-
-        fetch(`/community/post/${postId}/comments`, {
-            method: 'POST',
+        console.log('Comment Data:', commentData);
+    
+        fetch(`/community/post/${postId}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(commentData),
+            body: JSON.stringify(commentData), // Send the comment data to the server
         })
-        .then(response => response.json())
+        .then(response => response.json())  // Parse the JSON response
         .then(data => {
-            setPostState((prevPost) => ({
+            // Ensure comments are always parsed correctly
+            const parsedComments = typeof data.comments === 'string' ? JSON.parse(data.comments) : data.comments;
+            setPostState(prevPost => ({
                 ...prevPost,
-                comments: [...prevPost.comments, data], 
+                comments: parsedComments || [] // Append the new comment to the post
             }));
-            setNewComment(''); 
+            setNewComment(''); // Clear the comment input after submission
         })
-        .catch(error => console.error('Error submitting comment:', error));
+        .catch(error => console.error('Error submitting comment:', error)); // Log any errors
     };
 
     const backNavigate = () => {
@@ -89,12 +101,14 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         </p>
                         <div style={{ fontSize: '12px' }}>
                             <div className='hashtag'>
-                                {post.hashtags.map((hashtag, index) => (
+                            {Array.isArray(post.hashtags) && post.hashtags.length > 0 && (
+                                post.hashtags.map((hashtag, index) => (
                                     <span key={hashtag}>
                                         #{hashtag}
                                         {index < post.hashtags.length - 1 && ", "}
                                     </span>
-                                ))}
+                                ))
+                            )}
                             </div>
                         </div>
                         <div className="button-group">
@@ -111,29 +125,34 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         </div>
                         <p style={{ textDecoration: 'underline' }}>comments:</p>
                         <div>
-                            {post.comments && post.comments.length > 0 ? (
-                            post.comments.map((comment) => (
-                            <div key={comment.id}>
-                            <p>{comment.text}</p>
-                            <p style={{ fontSize: '10px' }}><em>- <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>
-                            {post.author}
-                            </Link> , {post.role}, on{" "}
-                            {post.date
-                            ? new Date(post.date).toLocaleString()
-                            : "no date available"}</em></p>
+                            {Array.isArray(post.comments) && post.comments.length > 0 ? (
+                                post.comments.filter(comment => comment && comment.text).map((comment) => (
+                                    <div key={comment.timestamp}>
+                                        <p>{comment.text}</p>
+                                        <p style={{ fontSize: '10px' }}>
+                                            <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
+                                                {comment.author}
+                                            </Link>, {comment.role}, on{" "}
+                                            {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
+                                            </em>
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p style={{ fontSize: '12px' }}><em>no comments </em></p>
+                            )}
                         </div>
-                        ))
-                    ) : (
-                    <p style={{ fontSize: '12px' }}><em>no comments </em></p>
-                    )}
-                    </div>
                         <form onSubmit={handleCommentSubmit}>
                             <textarea
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                                 placeholder="add a comment..."
+                                className="small-textarea"
                             />
-                            <button type="submit" className='button'>submit comment</button>
+                            <div className="inputContainer">
+                                <p style={{ fontSize: '12px' }}>author: {user.username}, role: {user.role}</p>
+                            </div>
+                            <button type="submit" className="button">submit comment</button>
                         </form>
                         <br />
                         <button onClick={backNavigate} className="button">go back</button>

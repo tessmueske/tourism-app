@@ -124,5 +124,5 @@ function App() {
 
 export default App;
 
-// comment on post actions
+// comment on post actions (comment not saving to database)
 // implement hashtags
