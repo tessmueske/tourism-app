@@ -33,6 +33,8 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       .catch((error) => console.error("error fetching posts:", error));
   }, [setPosts]);
 
+  console.log("After fetch:", user.role)
+
   return (
     <div className="communitycard-displaycard-center">
       <div className="card">

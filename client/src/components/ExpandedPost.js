@@ -83,6 +83,8 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
         return <p>loading post details...</p>;
     }
 
+    console.log("After fetches:", user.role)
+
     return (
         <div className="communitycard-displaycard-center">
             <div className='card'>
@@ -124,6 +126,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                             )}
                         </div>
                         <p style={{ textDecoration: 'underline' }}>comments:</p>
+                        <hr className="post-divider" />
                         <div>
                             {Array.isArray(post.comments) && post.comments.length > 0 ? (
                                 post.comments.filter(comment => comment && comment.text).map((comment) => (
@@ -132,10 +135,11 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                         <p style={{ fontSize: '10px' }}>
                                             <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
-                                            </Link>, {comment.role}, on{" "}
+                                            </Link>, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
                                             </em>
                                         </p>
+                                        <hr className="post-divider" />
                                     </div>
                                 ))
                             ) : (

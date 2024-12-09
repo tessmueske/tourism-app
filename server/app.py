@@ -28,7 +28,7 @@ Session(app)
 CORS(app, supports_credentials=True)
 
 class CurrentUser(Resource):
-    def get():
+    def get(self):
         user = session.get('user')
         if user:
             return {
@@ -41,7 +41,7 @@ class CurrentUser(Resource):
                 "bio": user.bio
             }
         else:
-            return {"User not logged in"}, 401
+            return {"Error": "User not logged in"}, 401
 
 class TravelerLogin(Resource):
     def post(self):
@@ -588,60 +588,71 @@ class Community(Resource):
             return {'error': error_message}, 500
 
 class MyPost(Resource):
+
+    @staticmethod
+    def process_comments(comments_json):
+        comments = json.loads(comments_json) if isinstance(comments_json, str) else comments_json
+        return [
+            {
+                "text": comment.get("text", "No text"),
+                "author": comment.get("author", "Anonymous"),
+                "role": comment.get("role", "Unknown"),
+                "date": comment.get("date", None)
+            }
+            for comment in comments
+        ]
+
     #GET post info including comments
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first()
         if not post:
             return {"error": "Post not found"}, 404
 
-        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
+        print(post)
+
+        comments = self.process_comments(post.comments)
 
         return {
             "author": post.author,
             "subject": post.subject,
             "body": post.body,
+            'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
             "comments": comments
         }, 200
 
     def put(self, post_id):
-        #PUT comment onto a post
+    # PUT comment onto a post
         data = request.get_json()
-        print(f"Request data: {data}")
 
         post = Post.query.filter_by(id=post_id).first()
         if not post:
-            print(f"Post with ID {post_id} not found.")
             return {"error": "Post not found"}, 404
-        
+
         comment_text = data.get("text")
         comment_author = data.get("author")
-        print(f"Extracted comment text: {comment_text}, author: {comment_author}")
-        
+
         if not comment_text or not comment_author:
-            print("Missing comment text or author.")
             return {"error": "Missing comment text or author"}, 400
-        
+
+        # Ensure comments are parsed as a list
+        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
+        if not isinstance(comments, list):
+            comments = []  # Initialize as an empty list if it's not already
+
         new_comment = {
             "text": comment_text,
             "author": comment_author,
-            "timestamp": datetime.utcnow().isoformat()
+            "date": datetime.utcnow().isoformat()
         }
-        print(f"Adding new comment: {new_comment}")
 
-        post.comments.append(new_comment)
-        print(f"Post after adding comment: {post.comments}")
+        comments.append(new_comment)
+        post.comments = json.dumps(comments)  # Save the updated comments as JSON
 
-        post.comments = json.dumps(post.comments)
-
-        print(f"Type of comments before commit: {type(post.comments)}")
-        
         try:
             db.session.commit()
-            print("Comment added and database commit successful.")
-            return {"message": "Comment added successfully", "comments": post.comments}, 200
+            return {"message": "Comment added successfully", "comments": comments}, 200
         except Exception as e:
             db.session.rollback()
-            print(f"Error adding comment: {str(e)}")
             return {"error": f"Error adding comment: {str(e)}"}, 500
 
 class EditPost(Resource):
