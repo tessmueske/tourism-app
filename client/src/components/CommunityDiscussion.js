@@ -64,7 +64,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               <div style={{ fontSize: '12px' }}>
               <div className="hashtag">
                 {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
-                    <span key={hashtag}>#{hashtag}{index < post.hashtags.length - 1 && ", "}</span>
+                    <span key={hashtag}>{hashtag}{index < post.hashtags.length - 1 && ", "}</span>
                 ))}
               </div>
               </div>

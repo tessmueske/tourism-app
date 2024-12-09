@@ -12,10 +12,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const [post, setPostState] = useState(null); 
     const [loading, setLoading] = useState(true); 
 
-    console.log(user.role) 
-
     useEffect(() => {
-        console.log("Post ID from useParams:", postId);
     }, [postId]);
 
     useEffect(() => {    
@@ -53,7 +50,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             role: user.role,
             date: new Date().toISOString(),  // Using ISO string for date consistency
         };
-        console.log('Comment Data:', commentData);
     
         fetch(`/community/post/${postId}`, {
             method: 'PUT',
@@ -83,7 +79,27 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
         return <p>loading post details...</p>;
     }
 
-    console.log("After fetches:", user.role)
+    const handleCommentDelete = (e, comment_id) => {
+        e.preventDefault();
+        console.log("Post ID:", postId);
+        console.log("Comment ID:", comment_id); 
+        fetch(`/posts/${postId}/comments/${comment_id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        })
+        .then(response => response.json())  // Parse the JSON response
+        .then(data => {
+            // Assuming the updated post is returned with the comments after deletion
+            setPostState(prevPost => ({
+                ...prevPost,
+                comments: data.comments || []  // Assuming the response includes the updated comments
+            }));
+        })
+        .catch(error => console.error('Error deleting comment:', error)); // Log any errors
+    };
 
     return (
         <div className="communitycard-displaycard-center">
@@ -96,8 +112,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                             posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>
                             {post.author}
                             </Link> 
-                            , {post.role}, on{" "}
-                            {post.date
+                            , {post.role}, on{" "}{post.date
                             ? new Date(post.date).toLocaleString()
                             : "no date available"}
                         </p>
@@ -106,7 +121,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                             {Array.isArray(post.hashtags) && post.hashtags.length > 0 && (
                                 post.hashtags.map((hashtag, index) => (
                                     <span key={hashtag}>
-                                        #{hashtag}
+                                        {hashtag}
                                         {index < post.hashtags.length - 1 && ", "}
                                     </span>
                                 ))
@@ -132,18 +147,30 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                 post.comments.filter(comment => comment && comment.text).map((comment) => (
                                     <div key={comment.timestamp}>
                                         <p>{comment.text}</p>
+                                        {user.username === comment.author && (
+                                            <div className="edit-delete-buttons">
+                                                <button onClick={(e) => {
+                                                    console.log("Comment object before delete:", comment); // Debugging line
+                                                    handleCommentDelete(e, comment.id);
+                                                }}>
+                                                    <img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} />
+                                                </button>
+                                            </div>
+                                        )}
                                         <p style={{ fontSize: '10px' }}>
                                             <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
-                                            </Link>, on{" "}
+                                            </Link>,{comment.author.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
                                             </em>
+                                        </p>
+                                        <p style={{ fontSize: '10px', fontStyle: 'italic' }}>
                                         </p>
                                         <hr className="post-divider" />
                                     </div>
                                 ))
                             ) : (
-                                <p style={{ fontSize: '12px' }}><em>no comments </em></p>
+                                <p style={{ fontSize: '12px' }}><em>no comments</em></p>
                             )}
                         </div>
                         <form onSubmit={handleCommentSubmit}>
@@ -154,7 +181,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                 className="small-textarea"
                             />
                             <div className="inputContainer">
-                                <p style={{ fontSize: '12px' }}>author: {user.username}, role: {user.role}</p>
+                                <p style={{ fontSize: '12px' }}>author: {user.username}</p>
                             </div>
                             <button type="submit" className="button">submit comment</button>
                         </form>

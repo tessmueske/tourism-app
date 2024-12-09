@@ -9,17 +9,16 @@ function MyProfile() {
     const { user, setUser } = useUserContext();
   
     useEffect(() => {
-        fetch(`/profile/user/${user.email}`, { method: "GET" })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            }
-            throw new Error("Failed to fetch profile data");
-          })
-          .then((data) => setUser(data))
-          .catch((error) => console.error("Error fetching profile:", error));
-      }
-    );
+      fetch(`/profile/user/${user.email}`, { method: "GET" })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Failed to fetch profile data");
+        })
+        .then((data) => setUser(data))
+        .catch((error) => console.error("Error fetching profile:", error));
+  }, [user.email]);
 
       return (
         <div className="profile-card">

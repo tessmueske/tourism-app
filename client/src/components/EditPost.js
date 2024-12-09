@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from './UserContext';
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -10,8 +10,6 @@ function EditPost() {
     const navigate = useNavigate();
     const { postId } = useParams(); 
 
-    console.log(postId)
-
     useEffect(() => {
         fetch(`/community/post/${postId}`)
           .then((response) => {
@@ -21,12 +19,19 @@ function EditPost() {
             return response.json();
           })
           .then((data) => {
-            const hashtags = data.hashtag ? data.hashtag.split(' ') : [];
+            // Ensure hashtags is an array, check the type of `data.hashtags`
+            let hashtags = [];
+            if (Array.isArray(data.hashtags)) {
+                hashtags = data.hashtags;  // If it's already an array, use it directly
+            } else if (typeof data.hashtags === 'string') {
+                hashtags = data.hashtags.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean);  // Split string to array
+            }
+            
             setInitialValues({
                 author: user?.username || '',
                 subject: data.subject,
                 body: data.body,
-                hashtag: hashtags, 
+                hashtag: hashtags,  // Ensure hashtag is always an array
             });
         })
           .catch((error) => console.error("Error fetching post data:", error));
@@ -34,38 +39,47 @@ function EditPost() {
 
       const handleSubmit = (values) => {
         let updatedHashtags;
-        if (Array.isArray(values.hashtag)) {
-            updatedHashtags = values.hashtag.join(' ');
+    
+        if (values.hashtag) {
+            updatedHashtags = values.hashtag.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean);
         } else {
-            console.error('Error: values.hashtag is not an array.', values.hashtag);
-            updatedHashtags = values.hashtag || ''; 
-        }        fetch(`/community/post/edit/${postId}`, {
+            updatedHashtags = [];
+        }
+    
+        console.log("Form values before submit:", values);
+        console.log("Updated hashtags array:", updatedHashtags);
+    
+        fetch(`/community/post/edit/${postId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 ...values,
-                hashtag: updatedHashtags,
+                hashtags: updatedHashtags,  
             }),
         })
-          .then((response) => {
+        .then((response) => {
             if (!response.ok) {
-              throw new Error("Failed to update post");
+                throw new Error("Failed to update post");
             }
-            return response.json();
-          })
-          .then(() => {
+            return response.json(); 
+        })
+        .then((responseData) => {
+            console.log("Response data from backend:", responseData);
             navigate(`/community/post/${postId}`);
-          })
-          .catch((error) => console.error("Error updating post:", error));
-      };
+        })
+        .catch((error) => {
+            console.error("Error updating post:", error);
+        });
+    };
+    
 
-      if (!initialValues) {
+    if (!initialValues) {
         return <p className="communitycard-displaycard-center">loading...</p>;
-      }
+    }
 
-      return (
+    return (
         <div className="communitycard-displaycard-center">
           <div className="card">
             <h2>edit post</h2>
@@ -76,17 +90,17 @@ function EditPost() {
               {({ isSubmitting }) => (
                 <Form>
                     <div className="inputContainer">
-              <p>author:</p>
-              <Field
-                type="text"
-                name="author"
-                value={user.username}
-                className="inputBox"
-                readOnly
-              />
-            </div>
+                      <p>author:</p>
+                      <Field
+                        type="text"
+                        name="author"
+                        value={user.username}
+                        className="inputBox"
+                        readOnly
+                      />
+                    </div>
                   <div>
-                    <label htmlFor="subject">subject:</label>
+                    <label htmlFor="subject">subject (required):</label>
                     <Field name="subject" type="text" />
                     <ErrorMessage name="subject" component="div" className="errorLabel" />
                   </div>
@@ -99,10 +113,14 @@ function EditPost() {
                   </div>
     
                   <div>
-                    <label htmlFor="hashtag">hashtags:</label>
-                    <Field name="hashtag" type="text" />
-                    <ErrorMessage name="hashtag" component="div" className="errorLabel" />
-                  </div>
+                <label htmlFor="hashtag">hashtags #typed #like #this!:</label>
+                <Field 
+                    name="hashtag" 
+                    type="text" 
+                    placeholder="hashtags"
+                />
+                <ErrorMessage name="hashtag" component="div" className="errorLabel" />
+                </div>
                   <br />
     
                   <button type="submit" className="button" disabled={isSubmitting}>
@@ -122,7 +140,7 @@ function EditPost() {
             </Formik>
           </div>
         </div>
-      );
+    );
 }
 
 export default EditPost;

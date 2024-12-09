@@ -15,6 +15,7 @@ import os
 import traceback
 import logging
 import json
+import uuid
 
 from config import app, db, api
 from models import Traveler, LocalExpert, Advertiser, Post, Hashtag
@@ -29,18 +30,19 @@ CORS(app, supports_credentials=True)
 
 class CurrentUser(Resource):
     def get(self):
-        user = session.get('user')
-        if user:
-            return {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,
-                "name": user.name,
-                "age": user.age,
-                "gender": user.gender,
-                "bio": user.bio
-            }
-        else:
+        user_id = session.get('user_id')
+        if user_id:
+            user = Traveler.query.get(user_id) or Advertiser.query.get(user_id) or LocalExpert.query.get(user_id)
+            if user:
+                return {
+                    "id": user.id,
+                    "email": user.email,
+                    "username": user.username,
+                    "name": user.name,
+                    "age": user.age,
+                    "gender": user.gender,
+                    "bio": user.bio
+                }
             return {"Error": "User not logged in"}, 401
 
 class TravelerLogin(Resource):
@@ -66,6 +68,7 @@ class TravelerLogin(Resource):
 
         if traveler and traveler.authenticate(password):
             session['user_id'] = traveler.id
+            session['username'] = traveler.username
             return {
                 'id': traveler.id,
                 'email': traveler.email,
@@ -110,6 +113,7 @@ class AdvertiserLogin(Resource):
 
         if advertiser and advertiser.authenticate(password):
             session['user_id'] = advertiser.id
+            session['username'] = advertiser.username
             return {
                 'id': advertiser.id,
                 'email': advertiser.email,
@@ -152,6 +156,7 @@ class LocalExpertLogin(Resource):
 
         if localexpert and localexpert.authenticate(password):
             session['user_id'] = localexpert.id
+            session['username'] = localexpert.username
             return {
                 'id': localexpert.id,
                 'email': localexpert.email,
@@ -590,17 +595,41 @@ class Community(Resource):
 class MyPost(Resource):
 
     @staticmethod
-    def process_comments(comments_json):
-        comments = json.loads(comments_json) if isinstance(comments_json, str) else comments_json
-        return [
-            {
+    def process_comments(comments):
+        formatted_comments = []
+        for comment in comments:
+            # Extract author details from comment
+            traveler_id = comment.get('traveler_id')
+            localexpert_id = comment.get('localexpert_id')
+            advertiser_id = comment.get('advertiser_id')
+
+            # Determine the author and role of the comment
+            if traveler_id:
+                traveler = Traveler.query.get(traveler_id)
+                author = traveler.username if traveler else "Anonymous"
+                role = traveler.role if traveler else "unknown"
+            elif localexpert_id:
+                localexpert = LocalExpert.query.get(localexpert_id)
+                author = localexpert.username if localexpert else "Anonymous"
+                role = localexpert.role if localexpert else "unknown"
+            elif advertiser_id:
+                advertiser = Advertiser.query.get(advertiser_id)
+                author = advertiser.username if advertiser else "Anonymous"
+                role = advertiser.role if advertiser else "unknown"
+            else:
+                author = "Anonymous"
+                role = "unknown"
+
+            # Add the formatted comment to the list
+            formatted_comments.append({
+                "id": comment.get("id"),
                 "text": comment.get("text", "No text"),
-                "author": comment.get("author", "Anonymous"),
-                "role": comment.get("role", "Unknown"),
+                "author": author,
+                "role": role,
                 "date": comment.get("date", None)
-            }
-            for comment in comments
-        ]
+            })
+
+        return formatted_comments
 
     #GET post info including comments
     def get(self, post_id):
@@ -608,16 +637,41 @@ class MyPost(Resource):
         if not post:
             return {"error": "Post not found"}, 404
 
-        print(post)
+        # Determine the post author and role
+        if post.traveler_id:
+            traveler = Traveler.query.get(post.traveler_id)
+            author = traveler.username if traveler else "Unknown"
+            role = traveler.role if traveler else "unknown"
+        elif post.localexpert_id:
+            localexpert = LocalExpert.query.get(post.localexpert_id)
+            author = localexpert.username if localexpert else "Unknown"
+            role = localexpert.role if localexpert else "unknown"
+        elif post.advertiser_id:
+            advertiser = Advertiser.query.get(post.advertiser_id)
+            author = advertiser.username if advertiser else "Unknown"
+            role = advertiser.role if advertiser else "unknown"
+        else:
+            author = "Unknown"
+            role = "Unknown"
+        # Process comments
+        comments = post.comments
+        if isinstance(comments, str):  # Check if it's stored as a string
+            try:
+                comments = json.loads(comments)  # Deserialize the string into a list
+            except json.JSONDecodeError:
+                comments = []
+        print("Comments found:", comments)
 
-        comments = self.process_comments(post.comments)
+        formatted_comments = self.process_comments(comments)
 
         return {
-            "author": post.author,
+            "author": author,
+            "role": role,
             "subject": post.subject,
             "body": post.body,
             'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-            "comments": comments
+            "hashtags": [hashtag.name for hashtag in post.hashtags],  # Include hashtags here
+            "comments": formatted_comments
         }, 200
 
     def put(self, post_id):
@@ -640,13 +694,14 @@ class MyPost(Resource):
             comments = []  # Initialize as an empty list if it's not already
 
         new_comment = {
+            "id": str(uuid.uuid4()),
             "text": comment_text,
             "author": comment_author,
             "date": datetime.utcnow().isoformat()
         }
 
         comments.append(new_comment)
-        post.comments = json.dumps(comments)  # Save the updated comments as JSON
+        post.comments = json.dumps(comments) 
 
         try:
             db.session.commit()
@@ -655,24 +710,70 @@ class MyPost(Resource):
             db.session.rollback()
             return {"error": f"Error adding comment: {str(e)}"}, 500
 
+class MyComment(Resource):
+    def delete(self, post_id, comment_id):
+        print(f"Deleting comment: {comment_id} from post: {post_id}")
+
+        user = session.get('username')  # Assuming 'username' is stored in the session
+        if not user:
+            return {"error": "User not logged in"}, 401
+
+        post = Post.query.filter_by(id=post_id).first()
+        if not post:
+            return {"error": "Post not found"}, 404
+
+        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
+        if not isinstance(comments, list):
+            return {"error": "Comments data is not valid"}, 500
+
+        print(f"Received comment_id: {comment_id}")
+        print(f"Comments in post: {comments}")
+
+        comment_to_delete = next((comment for comment in comments if comment["id"] == comment_id), None)
+
+        if not comment_to_delete:
+            return {"error": "Comment not found"}, 404
+
+        comments = [comment for comment in comments if comment["id"] != comment_id]
+        post.comments = json.dumps(comments)
+
+        try:
+            db.session.commit()
+            return {"message": "Comment deleted successfully", "comments": comments}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Error deleting comment: {str(e)}"}, 500
+
 class EditPost(Resource):
     def put(self, post_id):
         # This route handles editing a post (e.g., subject, body, hashtags)
         data = request.get_json()
         post = Post.query.filter_by(id=post_id).first()
+        
         if not post:
             return {"error": "Post not found"}, 404
         
         subject = data.get('subject')
         body = data.get('body')
-        hashtags = data.get('hashtag')
+        hashtags = data.get('hashtags', [])
 
+        # Creating hashtag objects
+        hashtag_objects = []
+        for hashtag in hashtags:
+            hashtag_obj = Hashtag.query.filter_by(name=hashtag).first()
+            if not hashtag_obj:
+                hashtag_obj = Hashtag(name=hashtag)
+                db.session.add(hashtag_obj)
+            hashtag_objects.append(hashtag_obj)
+
+        # Validating that subject and body are provided
         if not subject or not body:
             return {"error": "Subject and body are required to update the post"}, 400
         
+        # Update the post with new values
         post.subject = subject
         post.body = body
-        post.hashtag = hashtags 
+        post.hashtags = hashtag_objects  # Assign the list of hashtag objects to post.hashtags
 
         try:
             db.session.commit()
@@ -680,11 +781,13 @@ class EditPost(Resource):
                 "message": "Post updated successfully",
                 "subject": post.subject,
                 "body": post.body,
-                "hashtag": post.hashtag
+                'hashtags': [hashtag.name for hashtag in post.hashtags],  # Return the names of the hashtags
             }, 200
         except Exception as e:
             db.session.rollback()
             return {"error": f"Error updating post: {str(e)}"}, 500
+
+
 
     # def get(self, post_id):
     #     try:
@@ -813,7 +916,9 @@ api.add_resource(Community, '/community/post/new', endpoint='new_post')
 
 api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')  # GET for posts, PUT for comments
 api.add_resource(EditPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
-api.add_resource(MyPost, '/community/post/delete/<int:post_id>', endpoint='post_id_delete')
+api.add_resource(EditPost, '/community/post/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
+
+api.add_resource(MyComment, '/posts/<int:post_id>/comments/<comment_id>', endpoint='comment_delete') #Deleting comments
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 

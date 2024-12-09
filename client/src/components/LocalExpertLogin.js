@@ -54,7 +54,6 @@ function LocalExpertLogin() {
                 />
                 <ErrorMessage name="email" component="div" className="errorLabel" />
               </div>
-                <br />
                 <div className="inputContainer">
                   <p>password</p>
                   <Field

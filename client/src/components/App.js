@@ -110,7 +110,7 @@ function App() {
                   />
                 }/>
               <Route path="/community/post/new" element={<NewPost />} />
-              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} handleDelete={handleDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
+              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
               <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} />} />
               <Route path="/profile/user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
@@ -124,5 +124,6 @@ function App() {
 
 export default App;
 
-// comment on post actions (comment not saving to database)
-// implement hashtags
+//implement hashtags
+//comment author roles
+//author of comment posting correctly - rn it's anonymous

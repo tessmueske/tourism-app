@@ -70,7 +70,7 @@ function NewPost() {
               <Field
                 type="text"
                 name="subject"
-                placeholder="subject..."
+                placeholder="subject...(required)"
                 className="inputBox"
               />
               <ErrorMessage name="subject" component="div" className="errorLabel" />
