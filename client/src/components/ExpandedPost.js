@@ -39,17 +39,44 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             });
     }, [postId]);
 
-    const handleCommentSubmit = (e) => {
+    if (!user || !user.role) {
+        console.error("User data or role is not available");
+        return;
+    }
+
+    console.log(user)
+
+    const getRoleFromAuthor = () => {
+        if (user.role === 'local expert') return 'local expert';
+        if (user.role === 'advertiser') return 'advertiser';
+        if (user.role === 'traveler') return 'traveler';
+        return 'getrolefromauthor';
+    };
+        const handleCommentSubmit = (e) => {
         e.preventDefault();
+
+        if (!user) {
+            console.error("User is not defined");
+            return;
+        }
+
+        console.log("User object before submitting comment:", user);
+        console.log("User role:", user.role);
         
-        if (!newComment.trim()) return;  // Prevent submitting if the comment is empty
+        if (!newComment.trim()) return;  
+
+        const role = getRoleFromAuthor(user.role);
+
+        console.log("Role after getRoleFromAuthor:", role);
     
         const commentData = {
             text: newComment,
             author: user.username,
-            role: user.role,
-            date: new Date().toISOString(),  // Using ISO string for date consistency
+            role: role,
+            date: new Date().toISOString()
         };
+
+        console.log("Data being sent to the server:", commentData);
     
         fetch(`/community/post/${postId}`, {
             method: 'PUT',
@@ -90,15 +117,14 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             },
             credentials: 'include'
         })
-        .then(response => response.json())  // Parse the JSON response
+        .then(response => response.json())
         .then(data => {
-            // Assuming the updated post is returned with the comments after deletion
             setPostState(prevPost => ({
                 ...prevPost,
-                comments: data.comments || []  // Assuming the response includes the updated comments
+                comments: data.comments || [] 
             }));
         })
-        .catch(error => console.error('Error deleting comment:', error)); // Log any errors
+        .catch(error => console.error('Error deleting comment:', error)); 
     };
 
     return (
@@ -160,7 +186,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                         <p style={{ fontSize: '10px' }}>
                                             <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
-                                            </Link>,{comment.author.role}, on{" "}
+                                            </Link>,{""} {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
                                             </em>
                                         </p>

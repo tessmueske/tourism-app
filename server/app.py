@@ -38,11 +38,12 @@ class CurrentUser(Resource):
                     "id": user.id,
                     "email": user.email,
                     "username": user.username,
+                    "role": user.role,
                     "name": user.name,
                     "age": user.age,
                     "gender": user.gender,
                     "bio": user.bio
-                }
+                }, 201
             return {"Error": "User not logged in"}, 401
 
 class TravelerLogin(Resource):
@@ -73,6 +74,7 @@ class TravelerLogin(Resource):
                 'id': traveler.id,
                 'email': traveler.email,
                 'username': traveler.username,
+                "role": traveler.role,
                 "name": traveler.name,
                 "age": traveler.age,
                 "gender": traveler.gender,
@@ -118,6 +120,7 @@ class AdvertiserLogin(Resource):
                 'id': advertiser.id,
                 'email': advertiser.email,
                 'username': advertiser.username,
+                'role': advertiser.role,
                 "name": advertiser.name,
                 "age": advertiser.age,
                 "gender": advertiser.gender,
@@ -161,6 +164,7 @@ class LocalExpertLogin(Resource):
                 'id': localexpert.id,
                 'email': localexpert.email,
                 'username': localexpert.username,
+                "role": localexpert.role,
                 "name": localexpert.name,
                 "age": localexpert.age,
                 "gender": localexpert.gender,
@@ -675,7 +679,7 @@ class MyPost(Resource):
         }, 200
 
     def put(self, post_id):
-    # PUT comment onto a post
+        print("Received JSON data:", request.get_json())
         data = request.get_json()
 
         post = Post.query.filter_by(id=post_id).first()
@@ -683,25 +687,31 @@ class MyPost(Resource):
             return {"error": "Post not found"}, 404
 
         comment_text = data.get("text")
+        comment_role = data.get("role")
         comment_author = data.get("author")
 
-        if not comment_text or not comment_author:
-            return {"error": "Missing comment text or author"}, 400
+        # Check required fields
+        if not comment_text:
+            return {"error": "Missing comment text"}, 400
 
-        # Ensure comments are parsed as a list
+        # Parse existing comments
         comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
         if not isinstance(comments, list):
-            comments = []  # Initialize as an empty list if it's not already
+            comments = []
 
+        # Create the new comment
         new_comment = {
             "id": str(uuid.uuid4()),
             "text": comment_text,
             "author": comment_author,
-            "date": datetime.utcnow().isoformat()
+            "role": comment_role,
+            "date": datetime.utcnow().isoformat(),
         }
 
         comments.append(new_comment)
-        post.comments = json.dumps(comments) 
+        post.comments = json.dumps(comments)
+
+        print(comment_role)
 
         try:
             db.session.commit()
@@ -709,6 +719,7 @@ class MyPost(Resource):
         except Exception as e:
             db.session.rollback()
             return {"error": f"Error adding comment: {str(e)}"}, 500
+
 
 class MyComment(Resource):
     def delete(self, post_id, comment_id):

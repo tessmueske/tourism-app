@@ -19,9 +19,17 @@ export const UserProvider = ({ children }) => {
     fetch("/current-user", {
       credentials: "include",
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("User not logged in");
+        }
+        return response.json();
+      })
       .then((data) => setUser(data))
-      .catch((err) => console.error("Error fetching user:", err));
+      .catch((err) => {
+        console.error("Error fetching user:", err);
+        setUser(null); 
+      });
   }, []);
 
   const handleAdvertiserLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
