@@ -40,7 +40,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       <div className="card">
         <div className="centered-elements">
           <h2>community discussion</h2>
-          <p>keep it nice and respectful, please! click on a post to expand and comment.</p>
+          <p>keep it nice and respectful, please! click on a post to expand and comment. click on a hashtag to see posts related to that subject.</p>
           <button onClick={handleNavigate} className="button">make my own post</button>
         </div>
         {posts && posts.length > 0 ? (
@@ -62,12 +62,18 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                   : "no date available"}
               </p>
               <div style={{ fontSize: '12px' }}>
-              <div className="hashtag">
-                {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
-                    <span key={hashtag}>{hashtag}{index < post.hashtags.length - 1 && ", "}</span>
-                ))}
+                <div className="hashtag">
+                  {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
+                    <span key={hashtag}>
+                      <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
+                        #{hashtag}
+                      </Link>
+                      {index < post.hashtags.length - 1 && ", "}
+                    </span>
+                  ))}
+                </div>
               </div>
-              </div>
+              <br></br>
               {user.username === post.author && (
                 <div className="edit-delete-buttons">
                   <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>

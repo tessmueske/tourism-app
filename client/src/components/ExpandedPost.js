@@ -12,9 +12,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const [post, setPostState] = useState(null); 
     const [loading, setLoading] = useState(true); 
 
-    useEffect(() => {
-    }, [postId]);
-
     useEffect(() => {    
         setLoading(true); 
         fetch(`/community/post/${postId}`)
@@ -38,13 +35,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                 setLoading(false);
             });
     }, [postId]);
-
-    if (!user || !user.role) {
-        console.error("User data or role is not available");
-        return;
-    }
-
-    console.log(user)
 
     const getRoleFromAuthor = () => {
         if (user.role === 'local expert') return 'local expert';
@@ -142,26 +132,24 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                             ? new Date(post.date).toLocaleString()
                             : "no date available"}
                         </p>
-                        <div style={{ fontSize: '12px' }}>
-                            <div className='hashtag'>
-                            {Array.isArray(post.hashtags) && post.hashtags.length > 0 && (
-                                post.hashtags.map((hashtag, index) => (
-                                    <span key={hashtag}>
-                                        {hashtag}
-                                        {index < post.hashtags.length - 1 && ", "}
-                                    </span>
-                                ))
-                            )}
-                            </div>
+                        <div className="hashtag">
+                            {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
+                                <span key={hashtag}>
+                                    <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
+                                        #{hashtag}
+                                    </Link>
+                                    {index < post.hashtags.length - 1 && ", "}
+                                </span>
+                            ))}
                         </div>
                         <div className="button-group">
                             {user.username === post.author && (
                                 <div className="edit-delete-buttons">
                                     <button onClick={() => handleEdit(postId)}>
-                                        <img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} />
+                                        <img src={pencil} alt="Edit" style={{ width: '20px', height: 'auto' }} />
                                     </button>
                                     <button onClick={() => confirmDelete(postId)}>
-                                        <img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} />
+                                        <img src={trash} alt="Delete" style={{ width: '20px', height: 'auto' }} />
                                     </button>
                                 </div>
                             )}
@@ -175,11 +163,8 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                         <p>{comment.text}</p>
                                         {user.username === comment.author && (
                                             <div className="edit-delete-buttons">
-                                                <button onClick={(e) => {
-                                                    console.log("Comment object before delete:", comment); // Debugging line
-                                                    handleCommentDelete(e, comment.id);
-                                                }}>
-                                                    <img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} />
+                                                <button onClick={(e) => handleCommentDelete(e, comment.id)}>
+                                                    <img src={trash} alt="Delete" style={{ width: '20px', height: 'auto' }} />
                                                 </button>
                                             </div>
                                         )}
@@ -189,8 +174,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                             </Link>,{""} {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
                                             </em>
-                                        </p>
-                                        <p style={{ fontSize: '10px', fontStyle: 'italic' }}>
                                         </p>
                                         <hr className="post-divider" />
                                     </div>
@@ -212,10 +195,10 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                             <button type="submit" className="button">submit comment</button>
                         </form>
                         <br />
-                        <button onClick={backNavigate} className="button">go back</button>
+                        <button onClick={backNavigate} className="button">back to all posts</button>
                     </>
                 ) : (
-                    <p>post data is not available right now. sorry!</p>
+                    <p>Loading post...</p>
                 )}
             </div>
         </div>

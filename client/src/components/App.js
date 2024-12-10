@@ -22,6 +22,7 @@ import NewPost from "./NewPost";
 import ExpandedPost from "./ExpandedPost"
 import EditPost from "./EditPost";
 import ThatUser from "./ThatUser";
+import HashtagResult from "./HashtagResult";
 import pencil from '../pencil.png';
 import trash from '../trash.png';
 
@@ -109,6 +110,10 @@ function App() {
                   setPosts={setPosts} 
                   />
                 }/>
+              <Route path="/community/post/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
+                  handleDelete={handleDelete} 
+                  pencil={pencil} 
+                  trash={trash} />} /> 
               <Route path="/community/post/new" element={<NewPost />} />
               <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
               <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} />} />
@@ -124,6 +129,4 @@ function App() {
 
 export default App;
 
-//implement hashtags
-//comment author roles
-//author of comment posting correctly - rn it's anonymous
+//hashtag links on expanded post

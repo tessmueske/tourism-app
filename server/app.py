@@ -873,6 +873,39 @@ class EditPost(Resource):
             print(f"Error deleting post: {error_message}")
             return {'error': error_message}, 500    
 
+class HashtagFilter(Resource):
+    def get(self, keyword):
+        results = Post.query.join(Post.hashtags).filter(Hashtag.name == keyword).all()
+
+        if results:
+            serialized_posts = []
+            for result in results:
+                if result.traveler_id:
+                    traveler = Traveler.query.get(result.traveler_id)
+                    role = traveler.role if traveler else "unknown"
+                elif result.localexpert_id:
+                    localexpert = LocalExpert.query.get(result.localexpert_id)
+                    role = localexpert.role if localexpert else "unknown"
+                elif result.advertiser_id:
+                    advertiser = Advertiser.query.get(result.advertiser_id)
+                    role = advertiser.role if advertiser else "unknown"
+                else:
+                    role = "unknown"
+
+                serialized_posts.append({
+                    'id': result.id,
+                    'author': result.author,
+                    'role': role,
+                    "date": result.date.strftime('%Y-%m-%dT%H:%M:%S') if result.date else None,
+                    'subject': result.subject,
+                    'body': result.body,
+                    'hashtags': [hashtag.name for hashtag in result.hashtags],
+                    'comments': result.comments 
+                })
+            return serialized_posts, 200
+        
+        return {"message": "No posts found for the given hashtag"}, 404
+
 class Logout(Resource):
     def delete(self):
         session.pop('traveler_id', None)
@@ -930,6 +963,8 @@ api.add_resource(EditPost, '/community/post/edit/<int:post_id>', endpoint='post_
 api.add_resource(EditPost, '/community/post/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
 
 api.add_resource(MyComment, '/posts/<int:post_id>/comments/<comment_id>', endpoint='comment_delete') #Deleting comments
+
+api.add_resource(HashtagFilter, '/community/post/filterby/<string:keyword>', endpoint='filterby_hashtag')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
