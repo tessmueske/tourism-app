@@ -20,6 +20,29 @@ function MyProfile() {
         .catch((error) => console.error("Error fetching profile:", error));
   }, [user.email]);
 
+  const handleDeleteProfile = async () => {
+    try {
+        const response = await fetch(`/profile/user/delete/${user.email}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            console.log('Profile deleted successfully');
+            navigate('/'); 
+        } else {
+            const errorData = await response.json();
+            console.error('Error deleting profile:', errorData.error);
+            alert('Failed to delete the profile.');
+        }
+    } catch (error) {
+        console.error('An error occurred while deleting the profile:', error);
+        alert('An error occurred. Please try again later.');
+    }
+};
+
       return (
         <div className="profile-card">
             <p>⋇⊶⊰❣⊱⊷⋇</p>
@@ -40,7 +63,7 @@ function MyProfile() {
                     <br />
                     <button
                         className="button"
-                        onClick={() => navigate(`/profile/user/delete/${user.email}`)}
+                        onClick={(handleDeleteProfile)}
                     >
                         delete my profile
                     </button>

@@ -39,8 +39,10 @@ function EditPost() {
 
       const handleSubmit = (values) => {
         let updatedHashtags;
-    
-        if (values.hashtag) {
+
+        if (Array.isArray(values.hashtag)) {
+            updatedHashtags = values.hashtag;
+        } else if (typeof values.hashtag === 'string') {
             updatedHashtags = values.hashtag.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean);
         } else {
             updatedHashtags = [];

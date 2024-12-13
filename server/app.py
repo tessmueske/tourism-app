@@ -657,16 +657,31 @@ class MyPost(Resource):
         else:
             author = "Unknown"
             role = "Unknown"
+
         # Process comments
         comments = post.comments
-        if isinstance(comments, str):  # Check if it's stored as a string
+        if isinstance(comments, str):
             try:
-                comments = json.loads(comments)  # Deserialize the string into a list
+                comments = json.loads(comments)
             except json.JSONDecodeError:
                 comments = []
         print("Comments found:", comments)
 
-        formatted_comments = self.process_comments(comments)
+        formatted_comments = []
+        for comment in comments:
+            comment_author = comment.get('author', 'Anonymous')  # Default to 'Anonymous'
+            comment_role = comment.get('role', 'unknown')  # Default to 'unknown'
+            if comment_author == 'Anonymous' or comment_role == 'unknown':
+                comment_author = author
+                comment_role = role
+
+            formatted_comments.append({
+                "id": comment['id'],
+                "text": comment['text'],
+                "author": comment_author,
+                "role": comment_role,
+                "date": comment['date']
+            })
 
         return {
             "author": author,
@@ -678,7 +693,7 @@ class MyPost(Resource):
             "comments": formatted_comments
         }, 200
 
-    def put(self, post_id):
+    def put(self, post_id): #Adding a comment
         print("Received JSON data:", request.get_json())
         data = request.get_json()
 
@@ -915,27 +930,36 @@ class Logout(Resource):
         return '', 204
 
 class DeleteProfile(Resource):
-    def delete(self, user_id):
-        user_id = session.get('user_id')
-        print(f"User ID from session: {user_id}")
+    def delete(self, email):
+        if not email:
+            email = session.get('email')
 
-        if not user_id:
+        print(f"User email from session: {email}")
+
+        if not email:
             print("Error: User ID not found in session")
             return {'error': 'Unauthorized request'}, 401
 
-        user = (
-            Traveler.query.filter_by(id=user_id).first() or
-            LocalExpert.query.filter_by(id=user_id).first() or
-            Advertiser.query.filter_by(id=user_id).first()
-        )
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            return '', 204
-        else: 
-            db.session.rollback()  
-            print(f"Error updating post: {str(e)}")  
+        try:
+            user = (
+                Traveler.query.filter_by(email=email).first() or
+                LocalExpert.query.filter_by(email=email).first() or
+                Advertiser.query.filter_by(email=email).first()
+            )
+
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+                session.clear()
+                return '', 204
+            else:
+                return {"error": "User not found"}, 404
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error deleting user: {str(e)}")
             return {"error": f"An error occurred: {str(e)}"}, 500
+
 
 api.add_resource(CurrentUser, '/current-user/<string:email>', endpoint='current_user')
 

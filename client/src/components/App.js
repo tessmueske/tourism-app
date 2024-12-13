@@ -77,6 +77,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/about" element={<About />} />
           
           {!user ? (
             <>
@@ -129,4 +130,4 @@ function App() {
 
 export default App;
 
-//hashtag links on expanded post
+// more research, readme, etc

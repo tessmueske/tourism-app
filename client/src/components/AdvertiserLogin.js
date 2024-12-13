@@ -36,12 +36,11 @@ function AdvertiserLogin() {
                 <Field
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="email"
                   className="inputBox"
                 />
                 <ErrorMessage name="email" component="div" className="errorLabel" />
               </div>
-              <br></br>
               <div className="inputContainer">
                 <p>username</p>
                 <Field
@@ -52,13 +51,12 @@ function AdvertiserLogin() {
                 />
                 <ErrorMessage name="email" component="div" className="errorLabel" />
               </div>
-              <br></br>
               <div className="inputContainer">
                 <p>password</p>
                 <Field
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder="password"
                   className="inputBox"
                 />
                 <ErrorMessage name="password" component="div" className="errorLabel" />

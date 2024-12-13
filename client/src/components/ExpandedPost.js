@@ -12,6 +12,10 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const [post, setPostState] = useState(null); 
     const [loading, setLoading] = useState(true); 
 
+    useEffect(() => {
+        console.log("User from context:", user);
+    }, [user]);
+
     useEffect(() => {    
         setLoading(true); 
         fetch(`/community/post/${postId}`)
@@ -50,12 +54,11 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             return;
         }
 
-        console.log("User object before submitting comment:", user);
         console.log("User role:", user.role);
         
         if (!newComment.trim()) return;  
 
-        const role = getRoleFromAuthor(user.role);
+        const role = user.role || "unknown";
 
         console.log("Role after getRoleFromAuthor:", role);
     

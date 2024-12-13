@@ -67,7 +67,7 @@ function TravelerSignup() {
             name="email" 
             onChange={formik.handleChange}
             value={formik.values.email}
-            placeholder="Email"
+            placeholder="email"
             required
           />
           <br />
@@ -77,7 +77,7 @@ function TravelerSignup() {
             name="username" 
             onChange={formik.handleChange}
             value={formik.values.username}
-            placeholder="Username"
+            placeholder="username"
             required
           />
           <br />
@@ -87,7 +87,7 @@ function TravelerSignup() {
             name="password" 
             onChange={formik.handleChange}
             value={formik.values.password}
-            placeholder="Password"
+            placeholder="password"
             required
           />
           <br />

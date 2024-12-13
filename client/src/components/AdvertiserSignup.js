@@ -65,7 +65,7 @@ function AdvertiserSignup() {
               name="email" 
               onChange={formik.handleChange}
               value={formik.values.email}
-              placeholder="Email"
+              placeholder="email"
               required
             />
             <br />
@@ -85,7 +85,7 @@ function AdvertiserSignup() {
               name="password" 
               onChange={formik.handleChange}
               value={formik.values.password}
-              placeholder="Password"
+              placeholder="password"
               required
             />
             <br />
@@ -96,7 +96,7 @@ function AdvertiserSignup() {
               name="notes" 
               onChange={formik.handleChange}
               value={formik.values.notes}
-              placeholder="Write here..."
+              placeholder="write here..."
               required
             />
             <br></br>

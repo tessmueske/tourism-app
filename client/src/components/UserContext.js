@@ -49,7 +49,8 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            setErrors({ api: err.errors || ["Signup failed"] });
+            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            setErrors({ api: errorMessage });
           });
         }
       })
@@ -76,7 +77,8 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            setErrors({ api: err.errors || ["login failed"] });
+            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            setErrors({ api: errorMessage });
           });
         }
       })
@@ -85,6 +87,33 @@ export const UserProvider = ({ children }) => {
         setErrors({ api: ["something went wrong. please try again."] });
       });
   };
+
+  // const handleTravelerLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
+  //   fetch("/login/traveler", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ username, email, role, password }),
+  //   })
+  //     .then((r) => {
+  //       setSubmitting(false);
+  //       if (r.ok) {
+  //         r.json().then((userData) => {
+  //           setUser(userData); 
+  //           navigate("/welcome/home");
+  //         });
+  //       } else {
+  //         r.json().then((err) => {
+  //           setErrors({ api: err.errors || ["Signup failed"] });
+  //         });
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setSubmitting(false);
+  //       setErrors({ api: ["Something went wrong. Please try again."] });
+  //     });
+  // };
 
   const handleTravelerLogin = ({ username, email, role, password }, { setSubmitting, setErrors }) => {
     fetch("/login/traveler", {
@@ -103,7 +132,8 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            setErrors({ api: err.errors || ["Signup failed"] });
+            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            setErrors({ api: errorMessage });
           });
         }
       })
@@ -111,8 +141,7 @@ export const UserProvider = ({ children }) => {
         setSubmitting(false);
         setErrors({ api: ["Something went wrong. Please try again."] });
       });
-  };
-
+  };  
 
   const handleLogout = () => {
     fetch("/logout", { 

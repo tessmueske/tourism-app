@@ -47,6 +47,9 @@ function NavBar() {
               <Link to="/community/posts/all">community discussion</Link>
             </li>
             <li>
+              <Link to="/about">about us</Link>
+            </li>
+            <li>
               <Link to="/contact">contact us</Link>
             </li>
             <li>
