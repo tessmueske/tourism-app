@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css";
 
 function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts }) {
   const navigate = useNavigate();
-  const { user, setUser } = useUserContext();
-
-  console.log(user.role)
+  const { user } = useUserContext();
 
   const handleNavigate = () => {
     navigate('/community/post/new');
@@ -27,13 +25,10 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
         return response.json();
       })
       .then((data) => {
-        console.log('received post data:', data);
         setPosts(data);
       })
       .catch((error) => console.error("error fetching posts:", error));
   }, [setPosts]);
-
-  console.log("After fetch:", user.role)
 
   return (
     <div className="communitycard-displaycard-center">

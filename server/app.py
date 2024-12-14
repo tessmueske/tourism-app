@@ -406,8 +406,6 @@ class MyProfile(Resource):
             Advertiser.query.filter_by(email=email).first()
         )
 
-        print(email)
-
         if not email:
             return {"error": "Email is required"}, 400
         
@@ -602,29 +600,26 @@ class MyPost(Resource):
     def process_comments(comments):
         formatted_comments = []
         for comment in comments:
-            # Extract author details from comment
             traveler_id = comment.get('traveler_id')
             localexpert_id = comment.get('localexpert_id')
             advertiser_id = comment.get('advertiser_id')
 
-            # Determine the author and role of the comment
             if traveler_id:
                 traveler = Traveler.query.get(traveler_id)
-                author = traveler.username if traveler else "Anonymous"
+                author = traveler.username if traveler else "anonymous"
                 role = traveler.role if traveler else "unknown"
             elif localexpert_id:
                 localexpert = LocalExpert.query.get(localexpert_id)
-                author = localexpert.username if localexpert else "Anonymous"
+                author = localexpert.username if localexpert else "anonymous"
                 role = localexpert.role if localexpert else "unknown"
             elif advertiser_id:
                 advertiser = Advertiser.query.get(advertiser_id)
-                author = advertiser.username if advertiser else "Anonymous"
+                author = advertiser.username if advertiser else "anonymous"
                 role = advertiser.role if advertiser else "unknown"
             else:
-                author = "Anonymous"
+                author = "anonymous"
                 role = "unknown"
 
-            # Add the formatted comment to the list
             formatted_comments.append({
                 "id": comment.get("id"),
                 "text": comment.get("text", "No text"),
@@ -635,43 +630,39 @@ class MyPost(Resource):
 
         return formatted_comments
 
-    #GET post info including comments
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first()
         if not post:
             return {"error": "Post not found"}, 404
 
-        # Determine the post author and role
         if post.traveler_id:
             traveler = Traveler.query.get(post.traveler_id)
-            author = traveler.username if traveler else "Unknown"
+            author = traveler.username if traveler else "unknown"
             role = traveler.role if traveler else "unknown"
         elif post.localexpert_id:
             localexpert = LocalExpert.query.get(post.localexpert_id)
-            author = localexpert.username if localexpert else "Unknown"
+            author = localexpert.username if localexpert else "unknown"
             role = localexpert.role if localexpert else "unknown"
         elif post.advertiser_id:
             advertiser = Advertiser.query.get(post.advertiser_id)
-            author = advertiser.username if advertiser else "Unknown"
+            author = advertiser.username if advertiser else "unknown"
             role = advertiser.role if advertiser else "unknown"
         else:
-            author = "Unknown"
-            role = "Unknown"
+            author = "unknown"
+            role = "unknown"
 
-        # Process comments
         comments = post.comments
         if isinstance(comments, str):
             try:
                 comments = json.loads(comments)
             except json.JSONDecodeError:
                 comments = []
-        print("Comments found:", comments)
 
         formatted_comments = []
         for comment in comments:
-            comment_author = comment.get('author', 'Anonymous')  # Default to 'Anonymous'
-            comment_role = comment.get('role', 'unknown')  # Default to 'unknown'
-            if comment_author == 'Anonymous' or comment_role == 'unknown':
+            comment_author = comment.get('author', 'anonymous')
+            comment_role = comment.get('role', 'unknown') 
+            if comment_author == 'anonymous' or comment_role == 'unknown':
                 comment_author = author
                 comment_role = role
 
@@ -689,12 +680,11 @@ class MyPost(Resource):
             "subject": post.subject,
             "body": post.body,
             'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-            "hashtags": [hashtag.name for hashtag in post.hashtags],  # Include hashtags here
+            "hashtags": [hashtag.name for hashtag in post.hashtags], 
             "comments": formatted_comments
         }, 200
 
-    def put(self, post_id): #Adding a comment
-        print("Received JSON data:", request.get_json())
+    def put(self, post_id):
         data = request.get_json()
 
         post = Post.query.filter_by(id=post_id).first()
@@ -705,16 +695,13 @@ class MyPost(Resource):
         comment_role = data.get("role")
         comment_author = data.get("author")
 
-        # Check required fields
         if not comment_text:
             return {"error": "Missing comment text"}, 400
 
-        # Parse existing comments
         comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
         if not isinstance(comments, list):
             comments = []
 
-        # Create the new comment
         new_comment = {
             "id": str(uuid.uuid4()),
             "text": comment_text,
@@ -726,8 +713,6 @@ class MyPost(Resource):
         comments.append(new_comment)
         post.comments = json.dumps(comments)
 
-        print(comment_role)
-
         try:
             db.session.commit()
             return {"message": "Comment added successfully", "comments": comments}, 200
@@ -738,9 +723,7 @@ class MyPost(Resource):
 
 class MyComment(Resource):
     def delete(self, post_id, comment_id):
-        print(f"Deleting comment: {comment_id} from post: {post_id}")
-
-        user = session.get('username')  # Assuming 'username' is stored in the session
+        user = session.get('username') 
         if not user:
             return {"error": "User not logged in"}, 401
 
@@ -751,9 +734,6 @@ class MyComment(Resource):
         comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
         if not isinstance(comments, list):
             return {"error": "Comments data is not valid"}, 500
-
-        print(f"Received comment_id: {comment_id}")
-        print(f"Comments in post: {comments}")
 
         comment_to_delete = next((comment for comment in comments if comment["id"] == comment_id), None)
 
@@ -772,7 +752,6 @@ class MyComment(Resource):
 
 class EditPost(Resource):
     def put(self, post_id):
-        # This route handles editing a post (e.g., subject, body, hashtags)
         data = request.get_json()
         post = Post.query.filter_by(id=post_id).first()
         
@@ -783,7 +762,6 @@ class EditPost(Resource):
         body = data.get('body')
         hashtags = data.get('hashtags', [])
 
-        # Creating hashtag objects
         hashtag_objects = []
         for hashtag in hashtags:
             hashtag_obj = Hashtag.query.filter_by(name=hashtag).first()
@@ -792,14 +770,12 @@ class EditPost(Resource):
                 db.session.add(hashtag_obj)
             hashtag_objects.append(hashtag_obj)
 
-        # Validating that subject and body are provided
         if not subject or not body:
             return {"error": "Subject and body are required to update the post"}, 400
         
-        # Update the post with new values
         post.subject = subject
         post.body = body
-        post.hashtags = hashtag_objects  # Assign the list of hashtag objects to post.hashtags
+        post.hashtags = hashtag_objects 
 
         try:
             db.session.commit()
@@ -807,57 +783,17 @@ class EditPost(Resource):
                 "message": "Post updated successfully",
                 "subject": post.subject,
                 "body": post.body,
-                'hashtags': [hashtag.name for hashtag in post.hashtags],  # Return the names of the hashtags
+                'hashtags': [hashtag.name for hashtag in post.hashtags], 
             }, 200
         except Exception as e:
             db.session.rollback()
             return {"error": f"Error updating post: {str(e)}"}, 500
-
-
-
-    # def get(self, post_id):
-    #     try:
-    #         post = Post.query.filter_by(id=post_id).first()
-    #         if not post:
-    #             return {"error": "Post not found"}, 404
-
-    #         author = None
-    #         role = None
-    #         if post.traveler_id:
-    #             author = Traveler.query.get(post.traveler_id)
-    #             role = "traveler"
-    #         elif post.localexpert_id:
-    #             author = LocalExpert.query.get(post.localexpert_id)
-    #             role = "local expert"
-    #         elif post.advertiser_id:
-    #             author = Advertiser.query.get(post.advertiser_id)
-    #             role = "advertiser"
-
-    #         if not author:
-    #             return {"error": "Author not found"}, 404
-    #         return {
-    #             "author": author.username if author else None, 
-    #             "role": role,
-    #             "date": post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
-    #             "subject": post.subject,
-    #             "body": post.body,
-    #             "hashtags": [hashtag.to_dict() for hashtag in post.hashtags],
-    #             'comments': [comment.to_dict() for comment in post.comments] if post.comments else []
-    #         }, 200
-
-        # except Exception as e:
-        #     db.session.rollback()  
-        #     print(f"Error updating post: {str(e)}")  
-        #     return {"error": f"An error occurred: {str(e)}"}, 500
 
     def delete(self, post_id):
         try:
             post = Post.query.filter_by(id=post_id).first()
             if not post:
                 return {'error': 'Post not found'}, 404
-
-            print(f"Post found: {post}")
-            print(f"Post author: {post.author}")
 
             user = (
                 Traveler.query.filter_by(username=post.author).first() or
@@ -866,8 +802,6 @@ class EditPost(Resource):
             )
             if not user:
                 return {'error': 'Author of the post not found'}, 404
-
-            print(f"User found: {user}, Type: {type(user)}")
 
             user_type_to_id = {
                 Traveler: post.traveler_id,
@@ -934,10 +868,7 @@ class DeleteProfile(Resource):
         if not email:
             email = session.get('email')
 
-        print(f"User email from session: {email}")
-
         if not email:
-            print("Error: User ID not found in session")
             return {'error': 'Unauthorized request'}, 401
 
         try:

@@ -19,19 +19,18 @@ function EditPost() {
             return response.json();
           })
           .then((data) => {
-            // Ensure hashtags is an array, check the type of `data.hashtags`
             let hashtags = [];
             if (Array.isArray(data.hashtags)) {
-                hashtags = data.hashtags;  // If it's already an array, use it directly
+                hashtags = data.hashtags; 
             } else if (typeof data.hashtags === 'string') {
-                hashtags = data.hashtags.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean);  // Split string to array
+                hashtags = data.hashtags.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean); 
             }
             
             setInitialValues({
                 author: user?.username || '',
                 subject: data.subject,
                 body: data.body,
-                hashtag: hashtags,  // Ensure hashtag is always an array
+                hashtag: hashtags, 
             });
         })
           .catch((error) => console.error("Error fetching post data:", error));
@@ -48,8 +47,6 @@ function EditPost() {
             updatedHashtags = [];
         }
     
-        console.log("Form values before submit:", values);
-        console.log("Updated hashtags array:", updatedHashtags);
     
         fetch(`/community/post/edit/${postId}`, {
             method: "PUT",
@@ -68,7 +65,6 @@ function EditPost() {
             return response.json(); 
         })
         .then((responseData) => {
-            console.log("Response data from backend:", responseData);
             navigate(`/community/post/${postId}`);
         })
         .catch((error) => {

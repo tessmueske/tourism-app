@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { useUserContext } from "./UserContext";
 import NavBar from "./NavBar";
@@ -31,12 +31,11 @@ function App() {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { postId } = useParams(); 
-  const { user, setUser } = useUserContext();
+  const { user } = useUserContext();
 
   const onUpdate = (updatedProfile) => {};
 
   const handleEdit = (postId) => {
-    console.log("Editing post with ID:", postId);
     if (postId) {
       navigate(`/community/post/edit/${postId}`); 
     } else {
@@ -57,7 +56,6 @@ function App() {
     })
       .then((response) => {
         if (response.ok) {
-          console.log("Post deleted successfully");
           alert("Post deleted successfully");
           setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
           if (post && post.id === postId) {
@@ -129,5 +127,3 @@ function App() {
 }
 
 export default App;
-
-// more research, readme, etc

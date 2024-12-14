@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../index.css";
 import "../profilecard.css"
 
-function ThatUser({ post }) {
+function ThatUser() {
     const { author } = useParams();
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
@@ -24,7 +24,6 @@ function ThatUser({ post }) {
                     throw new Error("Failed to fetch profile data");
                 })
                 .then((data) => {
-                    console.log(data);  
                     setProfile(data);   
                 })
                 .catch((error) => console.error("Error fetching profile:", error));

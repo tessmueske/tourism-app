@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useUserContext } from "./UserContext";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../index.css'; 
 import "../post.css";
 
@@ -27,7 +27,6 @@ function NewPost() {
             ...values,
             hashtags: hashtags, 
           };
-          console.log(postData);
           try {
             const response = await fetch('/community/post/new', {
               method: 'POST',
@@ -39,7 +38,6 @@ function NewPost() {
 
             if (response.ok) {
               setSuccessMessage("posted successfully! redirecting to community homepage...");
-              console.log(postData);
               resetForm();
               setTimeout(() => {
                 navigate(`/community/posts/all`); 

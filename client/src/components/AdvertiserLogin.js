@@ -1,13 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import { useUserContext } from "./UserContext";
 import '../index.css'; 
 
 function AdvertiserLogin() {
-    const navigate = useNavigate();
-    const { user, setUser, handleAdvertiserLogin } = useUserContext();
+    const { handleAdvertiserLogin } = useUserContext();
 
     const validationSchema = Yup.object().shape({
       email: Yup.string().email("Invalid email format"),

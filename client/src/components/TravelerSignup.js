@@ -7,7 +7,7 @@ import '../index.css';
 
 function TravelerSignup() {
     const navigate = useNavigate();
-    const { user, setUser } = useUserContext();
+    const { setUser } = useUserContext();
 
     const validationSchema = Yup.object().shape({
       username: Yup.string().required("Username is required"),

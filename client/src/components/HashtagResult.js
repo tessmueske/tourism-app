@@ -9,7 +9,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { user, setUser } = useUserContext();
+    const { user } = useUserContext();
 
     const takeMeBack = () => {
         navigate('/community/posts/all');
@@ -25,7 +25,6 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
             return response.json();
           })
           .then((data) => {
-            console.log(data)
             setPosts(data);
             setLoading(false);
           })

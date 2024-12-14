@@ -1,13 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import { useUserContext } from "./UserContext";
 import '../index.css';
 
 function LocalExpertLogin() {
-  const navigate = useNavigate();
-  const { setUser, handleLocalExpertLogin } = useUserContext();
+  const { handleLocalExpertLogin } = useUserContext();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()

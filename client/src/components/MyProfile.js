@@ -30,7 +30,6 @@ function MyProfile() {
         });
 
         if (response.ok) {
-            console.log('Profile deleted successfully');
             navigate('/'); 
         } else {
             const errorData = await response.json();

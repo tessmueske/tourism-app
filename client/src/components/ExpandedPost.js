@@ -12,10 +12,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     const [post, setPostState] = useState(null); 
     const [loading, setLoading] = useState(true); 
 
-    useEffect(() => {
-        console.log("User from context:", user);
-    }, [user]);
-
     useEffect(() => {    
         setLoading(true); 
         fetch(`/community/post/${postId}`)
@@ -31,8 +27,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                     comments: data.comments || []
                 });
                 setLoading(false);
-                console.log('Fetched post data:', data);
-                console.log('Fetched comments:', data.comments);
             })
             .catch((error) => {
                 console.error("Error fetching post details:", error);
@@ -40,12 +34,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             });
     }, [postId]);
 
-    const getRoleFromAuthor = () => {
-        if (user.role === 'local expert') return 'local expert';
-        if (user.role === 'advertiser') return 'advertiser';
-        if (user.role === 'traveler') return 'traveler';
-        return 'getrolefromauthor';
-    };
         const handleCommentSubmit = (e) => {
         e.preventDefault();
 
@@ -53,14 +41,10 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             console.error("User is not defined");
             return;
         }
-
-        console.log("User role:", user.role);
         
         if (!newComment.trim()) return;  
 
         const role = user.role || "unknown";
-
-        console.log("Role after getRoleFromAuthor:", role);
     
         const commentData = {
             text: newComment,
@@ -68,27 +52,24 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             role: role,
             date: new Date().toISOString()
         };
-
-        console.log("Data being sent to the server:", commentData);
     
         fetch(`/community/post/${postId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(commentData), // Send the comment data to the server
+            body: JSON.stringify(commentData), 
         })
-        .then(response => response.json())  // Parse the JSON response
+        .then(response => response.json()) 
         .then(data => {
-            // Ensure comments are always parsed correctly
             const parsedComments = typeof data.comments === 'string' ? JSON.parse(data.comments) : data.comments;
             setPostState(prevPost => ({
                 ...prevPost,
-                comments: parsedComments || [] // Append the new comment to the post
+                comments: parsedComments || [] 
             }));
-            setNewComment(''); // Clear the comment input after submission
+            setNewComment('');
         })
-        .catch(error => console.error('Error submitting comment:', error)); // Log any errors
+        .catch(error => console.error('Error submitting comment:', error)); 
     };
 
     const backNavigate = () => {
@@ -101,8 +82,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
 
     const handleCommentDelete = (e, comment_id) => {
         e.preventDefault();
-        console.log("Post ID:", postId);
-        console.log("Comment ID:", comment_id); 
         fetch(`/posts/${postId}/comments/${comment_id}`, {
             method: 'DELETE',
             headers: {
@@ -117,7 +96,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                 comments: data.comments || [] 
             }));
         })
-        .catch(error => console.error('Error deleting comment:', error)); 
+        .catch(error => console.error('error deleting comment:', error)); 
     };
 
     return (
