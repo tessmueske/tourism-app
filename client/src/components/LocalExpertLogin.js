@@ -69,8 +69,10 @@ function LocalExpertLogin() {
                 </button>
 
                 {errors.api && (
-                  <p style={{ color: "red" }}>{errors.api.join(", ")}</p>
-                )}
+              <p style={{ color: "red" }}>
+                {Array.isArray(errors.api) ? errors.api.join(", ") : errors.api}
+              </p>
+            )}
               </Form>
             )}
           </Formik>

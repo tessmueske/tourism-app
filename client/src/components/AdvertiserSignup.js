@@ -102,7 +102,7 @@ function AdvertiserSignup() {
             <br></br>
             <br></br>
             <button type="submit" className="button" disabled={formik.isSubmitting}>
-              {formik.isSubmitting ? "submitting..." : "submit for verification"}
+              {formik.isSubmitting ? "submitting...(this may take a while!)" : "submit for verification"}
             </button>
             <br />
             <br></br>

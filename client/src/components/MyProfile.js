@@ -30,6 +30,9 @@ function MyProfile() {
         });
 
         if (response.ok) {
+            localStorage.clear(); 
+            sessionStorage.clear();
+            setUser(null);
             navigate('/'); 
         } else {
             const errorData = await response.json();

@@ -38,7 +38,6 @@ function LocalExpertSignup() {
         body: JSON.stringify({ username, email, password, notes }),
       })
         .then((r) => {
-          console.log("Form data being sent:", { username, email, password, notes });
           if (r.ok) {
               navigate("/verification/pending");
           } else {

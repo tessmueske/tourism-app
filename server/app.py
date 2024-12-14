@@ -49,7 +49,6 @@ class CurrentUser(Resource):
 class TravelerLogin(Resource):
     def post(self):
         data = request.get_json()
-        user = None
 
         email = data.get('email')
         username = data.get('username')
@@ -58,14 +57,10 @@ class TravelerLogin(Resource):
         if not password:
             return {"errors": ["Password is required"]}, 400
 
-        if not (username or email):
-            return {"errors": ["Either username or email is required"]}, 400
+        if not username or not email:
+            return {"errors": ["Both username and email are required"]}, 400
 
-        traveler = None
-        if email:
-            traveler = Traveler.query.filter_by(email=email).first()
-        elif username:
-            traveler = Traveler.query.filter_by(username=username).first()
+        traveler = Traveler.query.filter_by(email=email, username=username).first()
 
         if traveler and traveler.authenticate(password):
             session['user_id'] = traveler.id
@@ -86,34 +81,31 @@ class TravelerLogin(Resource):
 class AdvertiserLogin(Resource):
     def post(self):
         data = request.get_json()
-        user = None
 
         email = data.get('email')
-        password = data.get('password')
         username = data.get('username')
+        password = data.get('password')
 
         errors = []
-        if not (email or username):
-            errors.append("Email or username is required.")
+        if not email:
+            errors.append("Email is required.")
+        if not username:
+            errors.append("Username is required.")
         if not password:
             errors.append("Password is required.")
-        
+
         if errors:
             return {"errors": errors}, 400
 
-        advertiser = None
-        if email:
-            advertiser = Advertiser.query.filter_by(email=email).first()
-        elif username:
-            advertiser = Advertiser.query.filter_by(username=username).first()
+        advertiser = Advertiser.query.filter_by(email=email, username=username).first()
 
         if not advertiser:
-            return {"Error": "Invalid email or username."}, 401
+            return {"error": "Invalid email or username."}, 401
 
         if advertiser.status != 'approved':
-            return {"Error": "Your account has not been approved yet."}, 403
+            return {"error": "Your account has not been approved yet."}, 403
 
-        if advertiser and advertiser.authenticate(password):
+        if advertiser.authenticate(password):
             session['user_id'] = advertiser.id
             session['username'] = advertiser.username
             return {
@@ -127,8 +119,7 @@ class AdvertiserLogin(Resource):
                 "bio": advertiser.bio
             }, 200
 
-        return {'Error': 'Invalid email, username, or password'}, 401
-
+        return {'error': 'Invalid password.'}, 401
 
 class LocalExpertLogin(Resource):
     def post(self):
@@ -142,14 +133,15 @@ class LocalExpertLogin(Resource):
         errors = []
         if not email:
             errors.append("Email is required.")
+        if not username:
+            errors.append("Username is required.")
         if not password:
             errors.append("Password is required.")
         
         if errors:
             return {"errors": errors}, 400
 
-        localexpert = None
-        localexpert = LocalExpert.query.filter((LocalExpert.email == email) | (LocalExpert.username == username)).first()
+        localexpert = LocalExpert.query.filter_by(email=email, username=username).first()
 
         if not localexpert:
             return {"Error": "Invalid email or username."}, 401
@@ -881,7 +873,10 @@ class DeleteProfile(Resource):
             if user:
                 db.session.delete(user)
                 db.session.commit()
+                print(f"Before clearing session: {session.items()}")
                 session.clear()
+                session.modified = True
+                print(f"After clearing session: {session.items()}")
                 return '', 204
             else:
                 return {"error": "User not found"}, 404
