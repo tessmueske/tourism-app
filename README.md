@@ -1,25 +1,62 @@
-################################################################
+## magwa: Helping Solve the Tourism Crisis in the Canary Islands 
+magwa is a traditional word from the canary islands that means disappointment, grief, or sadness.
 
-magwa: helping solve the tourism crisis in the canary islands
+## About the Project
+I started building this project in the autumn of 2024 after learning about the tourism crisis in the Canary Islands. I want to visit special places like this one without contributing to the growing economic and ecological challenges. [Learn more on the application's About page.]
 
-I started building this project in the autumn of 2024, after learning about the tourism crisis in the Canary Islands. I, like many, want to continue to visit special places such as this one, but I don't want to contribute to the growing economic and ecological disasters (you can read more about this on the application's About page).
+## Tech Stack
+- **Frontend**: React with JavaScript, Formik for form validation, React Context for global state management.
+- **Backend**: Python with Flask and SQL, using Flask-Session for account verification and Bcrypt for password hashing.
+- **Integrations**: Formspree for contact forms, Flask-Mail for account verification emails.
+- **Routing**: ReSTful conventions with full CRUD functionality.
 
-I built the frontend using React with Javascript, Formik for validations. I utilized React's Context to set user state globally, allowing the user object to be manipulated in various frontend components. 
+## Features
+- Users can:
+  - Create, edit, and delete accounts.
+  - Create, edit, and delete posts.
+  - Comment on and delete others' posts.
+  - View profiles and filter posts by hashtags.
 
-The backend was built using Python with Flask and SQL. 
+## Sources
+- https://www.euronews.com/my-europe/2024/10/20/thousands-protest-against-over-tourism-in-canary-islands#:~:text=Tourism%20is%20the%20main%20economic,is%20damaging%20the%20environment%20too.&text=Around%2030%2C000%20people%20took%20to,Canary%20Islands%20have%20a%20limit.%22
 
-I integrated Formspree for a contact form, and Flask mail exetension for account verification. Additionally, this project uses Flask's Session to verify account ownership. The application allows users to create, edit, and delete their account; create, edit, and delete posts, and create and delete comments on others' posts. Users are able to see other users' profiles and posts, and filter by hashtags. magwa has five backend models, and over twenty client- and server- side routes. I used Bcrypt for database password hashing to ensure data privacy, and the project follows ReSTful conventions for backend routing with full CRUD functionality. 
+- https://www.theguardian.com/world/2024/apr/20/thousands-protest-canary-islands-unsustainable-tourism
+ 
+- https://www.ine.es/dyngs/Prensa/es/ECV2023.htm
 
-################################################################
+- https://canariaseagota.com/
 
-fhdjksfhjkhjdks
 
-################################################################
+## Future Considerations
+- **Community Calendar**: A shared event planning tool.  
+- **Trip Planner**: An itinerary builder for sustainable travel.  
+- **Friendship Capabilities**: Connect users with similar travel interests.  
+- **In-app Messaging**: Allow users to communicate directly.  
+- **Filtered Views**: View posts by travelers, local experts, or advertisers.
 
-Potential future considerations:
 
-# Community calendar
-# Trip planner
-# Friendship capabilities
-# In-app message capabilities
-# see only posts by (travelers/local experts/advertisers)
+
+
+
+
+# magwa: Helping Solve the Tourism Crisis in the Canary Islands
+
+## About the Project
+I started building this project in the autumn of 2024 after learning about the tourism crisis in the Canary Islands. I want to visit special places like this one without contributing to the growing economic and ecological challenges. [Learn more on the application's About page.]
+
+
+
+## Features
+- Users can:
+  - Create, edit, and delete accounts.
+  - Create, edit, and delete posts.
+  - Comment on and delete others' posts.
+  - View profiles and filter posts by hashtags.
+
+## Sources
+- [Euronews: Canary Islands tourism crisis](https://www.euronews.com/my-europe/2024/10/20/thousands-protest-against-over-tourism-in-canary-islands)
+- [The Guardian: Unsustainable tourism protests](https://www.theguardian.com/world/2024/apr/20/thousands-protest-canary-islands-unsustainable-tourism)
+- [Spanish National Institute of Statistics (INE)](https://www.ine.es/dyngs/Prensa/es/ECV2023.htm)
+- [Canarias Se Agota](https://canariaseagota.com/)
+
+
