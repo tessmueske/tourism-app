@@ -11,42 +11,32 @@ function EditPost() {
     const { postId } = useParams(); 
 
     useEffect(() => {
-        fetch(`/community/post/${postId}`)
+      fetch(`/community/post/${postId}`)
           .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
+              if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
           })
           .then((data) => {
-            let hashtags = [];
-            if (Array.isArray(data.hashtags)) {
-                hashtags = data.hashtags; 
-            } else if (typeof data.hashtags === 'string') {
-                hashtags = data.hashtags.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean); 
-            }
-            
-            setInitialValues({
-                author: user?.username || '',
-                subject: data.subject,
-                body: data.body,
-                hashtag: hashtags, 
-            });
-        })
+              const hashtags = Array.isArray(data.hashtags)
+                  ? data.hashtags
+                  : data.hashtags?.split(' ').map((tag) => tag.trim()).filter(Boolean) || [];
+              
+              setInitialValues({
+                  author: user?.username || '',
+                  subject: data.subject || '',
+                  body: data.body || '',
+                  hashtag: hashtags.join(' '), 
+              });
+          })
           .catch((error) => console.error("Error fetching post data:", error));
-      }, [postId]);
-
-      const handleSubmit = (values) => {
-        let updatedHashtags;
-
-        if (Array.isArray(values.hashtag)) {
-            updatedHashtags = values.hashtag;
-        } else if (typeof values.hashtag === 'string') {
-            updatedHashtags = values.hashtag.split(' ').map((hashtag) => hashtag.trim()).filter(Boolean);
-        } else {
-            updatedHashtags = [];
-        }
+    }, [postId, user]);
     
+    const handleSubmit = (values) => {
+        const updatedHashtags = values.hashtag
+            ? values.hashtag.split(' ').map((tag) => tag.trim()).filter(Boolean)
+            : [];
     
         fetch(`/community/post/edit/${postId}`, {
             method: "PUT",
@@ -55,21 +45,21 @@ function EditPost() {
             },
             body: JSON.stringify({
                 ...values,
-                hashtags: updatedHashtags,  
+                hashtags: updatedHashtags,
             }),
         })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to update post");
-            }
-            return response.json(); 
-        })
-        .then((responseData) => {
-            navigate(`/community/post/${postId}`);
-        })
-        .catch((error) => {
-            console.error("Error updating post:", error);
-        });
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to update post");
+                }
+                return response.json();
+            })
+            .then(() => {
+                navigate(`/community/post/${postId}`);
+            })
+            .catch((error) => {
+                console.error("Error updating post:", error);
+            });
     };
     
 
@@ -111,7 +101,7 @@ function EditPost() {
                   </div>
     
                   <div>
-                <label htmlFor="hashtag">hashtags #typed #like #this!:</label>
+                <label htmlFor="hashtag">hashtags:</label>
                 <Field 
                     name="hashtag" 
                     type="text" 

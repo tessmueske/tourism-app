@@ -17,7 +17,7 @@ function AdvertiserLogin() {
       <div className="account-center-container">
         <h2>advertiser login for magwa</h2>
         <p>⋇⊶⊰❣⊱⊷⋇</p>
-        <p>please sign in with your email, username, and password</p>
+        <p>please sign in with your email, username, and password.</p>
         <br />
   
         <Formik
@@ -66,9 +66,7 @@ function AdvertiserLogin() {
               </button>
   
               {errors.api && (
-              <p style={{ color: "red" }}>
-                {Array.isArray(errors.api) ? errors.api.join(", ") : errors.api}
-              </p>
+              <p>{Array.isArray(errors.api) ? errors.api.join(", ") : errors.api}</p>
             )}
             </Form>
           )}

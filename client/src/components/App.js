@@ -44,13 +44,12 @@ function App() {
   };
 
   const confirmDelete = (postId) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
+    if (window.confirm("sre you sure you want to delete this post?")) {
       handleDelete(postId);
     }
   };
 
   const handleDelete = (postId) => {
-    console.log("Post ID inside handleDelete:", postId);
     fetch(`/community/post/delete/${postId}`, {
       method: "DELETE",
     })
@@ -95,7 +94,7 @@ function App() {
             <>
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="/profile/user/:email" element={<MyProfile />} />
-              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate} />} />
+              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
               <Route 
                 path="/community/posts/all" 
                 element={

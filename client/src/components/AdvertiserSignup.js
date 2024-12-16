@@ -42,12 +42,12 @@ function AdvertiserSignup() {
                 navigate("/verification/pending");
             } else {
               r.json().then((err) => {
-                formik.setErrors({ api: err.errors || ["Signup failed"] }); 
+                formik.setErrors({ api: err.errors || ["signup failed"] }); 
               });
             }
           })
           .catch(() => {
-            formik.setErrors({ api: ["Something went wrong. Please try again."] });
+            formik.setErrors({ api: ["something went wrong. please try again."] });
           });
       };
 

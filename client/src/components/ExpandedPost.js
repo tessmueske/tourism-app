@@ -141,7 +141,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <div>
                             {Array.isArray(post.comments) && post.comments.length > 0 ? (
                                 post.comments.filter(comment => comment && comment.text).map((comment) => (
-                                    <div key={comment.timestamp}>
+                                    <div key={comment.id}>
                                         <p>{comment.text}</p>
                                         {user.username === comment.author && (
                                             <div className="edit-delete-buttons">

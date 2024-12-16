@@ -50,11 +50,11 @@ function MyProfile() {
             <p>⋇⊶⊰❣⊱⊷⋇</p>
             <p>welcome to your profile, {user.username}!</p>
           <p><strong>role: </strong>{user.role || "not set"}</p>
-          <p><strong>name:</strong> {user.name || "N/A"}</p>
-          <p><strong>age:</strong> {user.age || "N/A"}</p>
-          <p><strong>gender:</strong> {user.gender || "N/A"}</p>
-          <p><strong>bio:</strong> {user.bio || "N/A"}</p>
-          <p><strong>contact email:</strong> {user.email || "N/A"}</p>
+          <p><strong>name:</strong> {user.name || "not set"}</p>
+          <p><strong>age:</strong> {user.age || "not set"}</p>
+          <p><strong>gender:</strong> {user.gender || "not set"}</p>
+          <p><strong>bio:</strong> {user.bio || "not set"}</p>
+          <p><strong>contact email:</strong> {user.email || "not set"}</p>
           <button
                         className="button"
                         onClick={() => navigate(`/profile/user/update/${user.email}`)}
