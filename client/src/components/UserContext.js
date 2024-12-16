@@ -49,7 +49,7 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            const errorMessage = err.errors || "invalid credentials or signup failed. have you been approved?";
             setErrors({ api: errorMessage });
           });
         }
@@ -77,7 +77,7 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            const errorMessage = err.errors || "invalid credentials or signup failed. have you been approved?";
             setErrors({ api: errorMessage });
           });
         }
@@ -105,7 +105,7 @@ export const UserProvider = ({ children }) => {
           });
         } else {
           r.json().then((err) => {
-            const errorMessage = err.errors || "Invalid credentials or signup failed.";
+            const errorMessage = err.errors || "invalid credentials or signup failed.";
             setErrors({ api: errorMessage });
           });
         }
