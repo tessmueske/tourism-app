@@ -25,7 +25,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
             return response.json();
           })
           .then((data) => {
-            setPosts(data);
+            setPosts(data.posts);
             setLoading(false);
           })
           .catch((err) => {
@@ -59,10 +59,10 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                         <p style={{ fontSize: "12px" }}>
                         posted by{" "}
                         <Link
-                            to={`/profile/user/author/${post.author}`}
+                            to={`/profile/user/author/${post.username}`}
                             style={{ fontSize: "10px" }}
                         >
-                            {post.author}
+                            {post.username}
                         </Link>
                         , {post.role || "unknown role"}, on{" "}
                         {post.date
@@ -84,7 +84,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                                 {index < post.hashtags.length - 1 && ", "}
                                 </span>
                             ))}
-                        {user.username === post.author && (
+                        {user.username === post.username && (
                             <div className="edit-delete-buttons">
                             <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
                             <button onClick={() => handleDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>

@@ -8,42 +8,6 @@ from datetime import datetime
 
 bcrypt = Bcrypt()
 
-# traveler_advertiser = db.Table('traveler_advertiser',
-#     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-#     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True))
-
-# traveler_localexpert = db.Table('traveler_localexpert',
-#     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-#     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
-
-# advertiser_localexpert = db.Table('advertiser_localexpert',
-#     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
-#     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True))
-
-# traveler_post = db.Table('traveler_post',
-#     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-#     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
-
-# localexpert_post = db.Table('localexpert_post',
-#     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
-#     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
-
-# advertiser_post = db.Table('advertiser_post',
-#     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
-#     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
-
-# traveler_hashtag = db.Table('traveler_hashtag',
-#     db.Column('traveler_id', db.Integer, db.ForeignKey('travelers.id'), primary_key=True),
-#     db.Column('hashtag_id', db.Integer, db.ForeignKey('hashtags.id'), primary_key=True))
-
-# localexpert_hashtag = db.Table('localexpert_hashtag',
-#     db.Column('localexpert_id', db.Integer, db.ForeignKey('localexperts.id'), primary_key=True),
-#     db.Column('hashtag_id', db.Integer, db.ForeignKey('hashtags.id'), primary_key=True))
-
-# advertiser_hashtag = db.Table('advertiser_hashtag',
-#     db.Column('advertiser_id', db.Integer, db.ForeignKey('advertisers.id'), primary_key=True),
-#     db.Column('hashtag_id', db.Integer, db.ForeignKey('hashtags.id'), primary_key=True))
-
 post_hashtag = db.Table('post_hashtag',
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
     db.Column('hashtag_id', db.Integer, db.ForeignKey('hashtags.id'), primary_key=True))
@@ -196,9 +160,3 @@ class Hashtag(db.Model, SerializerMixin):
     posts = db.relationship('Post', secondary=post_hashtag, back_populates='hashtags')
 
     serialize_rules = ('-posts.hashtags', '-localexperts.hashtags', '-travelers.hashtags', '-advertisers.hashtags')
-
-
-# click on hashtag for filtering
-# view all my posts?
-# make sure comments work
-# perfect queries on the backend

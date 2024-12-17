@@ -37,7 +37,6 @@ function NewPost() {
             });
 
             if (response.ok) {
-              console.log(postData);
               setSuccessMessage("posted successfully! redirecting to community homepage...");
               resetForm();
               setTimeout(() => {

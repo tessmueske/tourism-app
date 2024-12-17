@@ -7,8 +7,6 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const navigate = useNavigate();
   const { user } = useUserContext();
 
-  console.log(posts)
-
   const handleNavigate = () => {
     navigate('/community/post/new');
   };
@@ -27,14 +25,11 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
         return response.json();
       })
       .then((data) => {
-        console.log("Fetched posts inside of useEffect:", data);
         setPosts(data.posts);
-        console.log("Posts after setPosts:", posts);
       })
       .catch((error) => console.error("error fetching posts:", error));
   }, [setPosts]);
 
-  console.log("Posts just before rendering:", posts);
 
   return (
     <div className="communitycard-displaycard-center">

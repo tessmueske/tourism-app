@@ -488,16 +488,20 @@ class Community(Resource):
                 if post.traveler_id:
                     traveler = db.session.get(Traveler, post.traveler_id)
                     username = traveler.username if traveler else None
+                    role = traveler.role if traveler else "unknown"
                 elif post.localexpert_id:
                     localexpert = db.session.get(LocalExpert, post.localexpert_id)
                     username = localexpert.username if localexpert else None
+                    role = localexpert.role if localexpert else "unknown"
                 elif post.advertiser_id:
                     advertiser = db.session.get(Advertiser, post.advertiser_id)
                     username = advertiser.username if advertiser else None
+                    role = advertiser.role if advertiser else "unknown"
 
                 post_data.append({
                     'id': post.id,
                     'username': username,
+                    'role': role,
                     'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                     'subject': post.subject,
                     'body': post.body,
@@ -810,18 +814,38 @@ class HashtagFilter(Resource):
     def get(self, keyword):
 
         hashtag = Hashtag.query.filter_by(name=keyword).first()
+        print(hashtag)
         
         posts = hashtag.posts
-        if posts:
-            serialized_posts = [{
+        print(posts)
+
+        serialized_posts = []
+
+        for post in posts:
+            if post.traveler_id:
+                traveler = Traveler.query.get(post.traveler_id)
+                username = traveler.username if traveler else "unknown"
+                role = traveler.role if traveler else "unknown"
+            elif post.localexpert_id:
+                localexpert = LocalExpert.query.get(post.localexpert_id)
+                username = localexpert.username if localexpert else "unknown"
+                role = localexpert.role if localexpert else "unknown"
+            elif post.advertiser_id:
+                advertiser = Advertiser.query.get(post.advertiser_id)
+                author = advertiser.username if advertiser else "unknown"
+                role = advertiser.role if advertiser else "unknown"
+            else:
+                username = "unknown"
+                role = "unknown"
+
+            serialized_posts.append({
                 'id': post.id,
+                'username': username,
+                'role': role,
                 'subject': post.subject,
                 'body': post.body,
-                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-                'traveler_id': post.traveler_id,
-                'localexpert_id': post.localexpert_id,
-                'advertiser_id': post.advertiser_id
-            } for post in posts]
+                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S')
+            })  
             
             print(serialized_posts)
             return {'posts': serialized_posts}, 200
