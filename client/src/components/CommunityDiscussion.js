@@ -7,6 +7,8 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const navigate = useNavigate();
   const { user } = useUserContext();
 
+  console.log(posts)
+
   const handleNavigate = () => {
     navigate('/community/post/new');
   };
@@ -25,10 +27,14 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
         return response.json();
       })
       .then((data) => {
-        setPosts(data);
+        console.log("Fetched posts inside of useEffect:", data);
+        setPosts(data.posts);
+        console.log("Posts after setPosts:", posts);
       })
       .catch((error) => console.error("error fetching posts:", error));
   }, [setPosts]);
+
+  console.log("Posts just before rendering:", posts);
 
   return (
     <div className="communitycard-displaycard-center">
@@ -48,28 +54,26 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
               <p style={{ fontSize: '12px' }}>
-                posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>
-                  {post.author}
+                posted by <Link to={`/profile/user/author/${post.username}`} style={{ fontSize: '10px' }}>
+                  {post.username}
                 </Link> 
                 , {post.role}, on{" "}
                 {post.date
                   ? new Date(post.date).toLocaleString()
                   : "no date available"}
               </p>
-              <div style={{ fontSize: '12px' }}>
-                <div className="hashtag">
+              <div className="hashtag">
                   {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
-                    <span key={hashtag}>
-                      <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
-                        #{hashtag}
-                      </Link>
-                      {index < post.hashtags.length - 1 && ", "}
-                    </span>
+                      <span key={hashtag}>
+                          <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
+                              #{hashtag}
+                          </Link>
+                          {index < post.hashtags.length - 1 && ", "}
+                      </span>
                   ))}
-                </div>
               </div>
               <br></br>
-              {user.username === post.author && (
+              {user.username === post.username && (
                 <div className="edit-delete-buttons">
                   <button onClick={() => handleEdit(post.id)}><img src={pencil} alt="pencil" style={{ width: '20px', height: 'auto' }} /></button>
                   <button onClick={() => confirmDelete(post.id)}><img src={trash} alt="trash" style={{ width: '20px', height: 'auto' }} /></button>
@@ -87,4 +91,4 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   );
 }
 
-export default CommunityDiscussion
+export default CommunityDiscussion;

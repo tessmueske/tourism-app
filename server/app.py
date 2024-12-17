@@ -467,43 +467,51 @@ class TheirProfile(Resource):
         }
 
 class Community(Resource):
+
+    def get_poster_username_and_role(post):
+        if post.traveler:
+            return post.traveler.username, post.traveler.role
+        elif post.localexpert:
+            return post.localexpert.username, post.localexpert.role
+        elif post.advertiser:
+            return post.advertiser.username, post.advertiser.role
+        else:
+            return "unknown", "unknown"
+
     def get(self):
         try:
-            posts = Post.query.filter(or_(Post.date != None, Post.date == None)).order_by(Post.date.desc()).all()
+            posts = Post.query.order_by(Post.date.desc()).all()
 
-            formatted_posts = []
+            post_data = []
             for post in posts:
+                username = None
                 if post.traveler_id:
-                    traveler = Traveler.query.get(post.traveler_id)
-                    author = traveler.username
-                    role = traveler.role
+                    traveler = db.session.get(Traveler, post.traveler_id)
+                    username = traveler.username if traveler else None
                 elif post.localexpert_id:
-                    localexpert = LocalExpert.query.get(post.localexpert_id)
-                    author = localexpert.username
-                    role = localexpert.role
+                    localexpert = db.session.get(LocalExpert, post.localexpert_id)
+                    username = localexpert.username if localexpert else None
                 elif post.advertiser_id:
-                    advertiser = Advertiser.query.get(post.advertiser_id)
-                    author = advertiser.username
-                    role = advertiser.role
-                else:
-                    author = "Unknown"
-                    role = "Unknown"
+                    advertiser = db.session.get(Advertiser, post.advertiser_id)
+                    username = advertiser.username if advertiser else None
 
-                formatted_posts.append({
+                post_data.append({
                     'id': post.id,
-                    'author': author, 
-                    'role': role,
-                    'date': post.date.strftime('%Y-%m-%dT%H:%M:%S') if post.date else None,
+                    'username': username,
+                    'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                     'subject': post.subject,
                     'body': post.body,
                     'hashtags': [hashtag.name for hashtag in post.hashtags]
                 })
-
-            return formatted_posts, 200
+            print(post_data)
+            return {'posts': post_data}, 200
 
         except Exception as e:
-            print(f"Error: {str(e)}")
-            return {"error": "An error occurred while fetching posts"}, 500
+            error_message = str(e)
+            error_trace = traceback.format_exc()
+            print(f"Error fetching posts: {error_message}")
+            print(f"Traceback: {error_trace}")
+            return {'error': error_message}, 500
 
     def post(self):
         data = request.get_json()
@@ -512,8 +520,7 @@ class Community(Resource):
             subject = data.get('subject')
             body = data.get('body')
             hashtags = data.get('hashtags', [])
-            comments = data.get('comments', [])
-
+            
             hashtag_objects = []
             for hashtag in hashtags:
                 hashtag_obj = Hashtag.query.filter_by(name=hashtag).first()
@@ -522,7 +529,7 @@ class Community(Resource):
                     db.session.add(hashtag_obj)
                 hashtag_objects.append(hashtag_obj)
 
-            username = data.get('author')
+            username = data.get('username') 
             user = (
                 Traveler.query.filter_by(username=username).first() or
                 LocalExpert.query.filter_by(username=username).first() or
@@ -535,7 +542,6 @@ class Community(Resource):
             if isinstance(user, Traveler):
                 post = Post(
                     traveler_id=user.id,
-                    author=username,
                     subject=subject,
                     body=body,
                     hashtags=hashtag_objects
@@ -543,7 +549,6 @@ class Community(Resource):
             elif isinstance(user, LocalExpert):
                 post = Post(
                     localexpert_id=user.id,
-                    author=username,
                     subject=subject,
                     body=body,
                     hashtags=hashtag_objects
@@ -551,32 +556,21 @@ class Community(Resource):
             elif isinstance(user, Advertiser):
                 post = Post(
                     advertiser_id=user.id,
-                    author=username,
                     subject=subject,
                     body=body,
                     hashtags=hashtag_objects
                 )
-
-            if comments:
-                for comment_data in comments:
-                    comment = {
-                        'author': comment_data.get('author'),
-                        'text': comment_data.get('text'),
-                        'date': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
-                    }
-                    post.comments.append(comment)
 
             db.session.add(post)
             db.session.commit()
 
             return {
                 'id': post.id,
-                'author': post.author,
+                'username': username, 
                 "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                 'subject': post.subject,
                 'body': post.body,
-                'hashtags': [hashtag.name for hashtag in post.hashtags],
-                'comments': [comment.text for comment in post.comments]
+                'hashtags': [hashtag.name for hashtag in post.hashtags]
             }, 201
 
         except Exception as e:
@@ -783,69 +777,57 @@ class EditPost(Resource):
 
     def delete(self, post_id):
         try:
+            user_username = session.get('username')
+
             post = Post.query.filter_by(id=post_id).first()
             if not post:
                 return {'error': 'Post not found'}, 404
 
-            user = (
-                Traveler.query.filter_by(username=post.author).first() or
-                LocalExpert.query.filter_by(username=post.author).first() or
-                Advertiser.query.filter_by(username=post.author).first()
-            )
+            user = None
+            if post.traveler_id:
+                user = Traveler.query.filter_by(id=post.traveler_id).first()
+            elif post.localexpert_id:
+                user = LocalExpert.query.filter_by(id=post.localexpert_id).first()
+            elif post.advertiser_id:
+                user = Advertiser.query.filter_by(id=post.advertiser_id).first()
+
             if not user:
-                return {'error': 'Author of the post not found'}, 404
+                return {'error': 'User not found'}, 404
 
-            user_type_to_id = {
-                Traveler: post.traveler_id,
-                LocalExpert: post.localexpert_id,
-                Advertiser: post.advertiser_id,
-            }
-
-            for user_type, post_owner_id in user_type_to_id.items():
-                if isinstance(user, user_type) and post_owner_id == user.id:
-                    db.session.delete(post)
-                    db.session.commit()
-                    return '', 204
-
-            return {'error': 'You are not the author of this post'}, 403
+            if user_username == user.username:
+                db.session.delete(post)
+                db.session.commit()
+                return '', 204
+            else:
+                return {'error': 'You are not the author of this post'}, 403
 
         except Exception as e:
             error_message = str(e)
             print(f"Error deleting post: {error_message}")
-            return {'error': error_message}, 500    
+            return {'error': error_message}, 500
 
 class HashtagFilter(Resource):
     def get(self, keyword):
-        results = Post.query.join(Post.hashtags).filter(Hashtag.name == keyword).all()
 
-        if results:
-            serialized_posts = []
-            for result in results:
-                if result.traveler_id:
-                    traveler = Traveler.query.get(result.traveler_id)
-                    role = traveler.role if traveler else "unknown"
-                elif result.localexpert_id:
-                    localexpert = LocalExpert.query.get(result.localexpert_id)
-                    role = localexpert.role if localexpert else "unknown"
-                elif result.advertiser_id:
-                    advertiser = Advertiser.query.get(result.advertiser_id)
-                    role = advertiser.role if advertiser else "unknown"
-                else:
-                    role = "unknown"
-
-                serialized_posts.append({
-                    'id': result.id,
-                    'author': result.author,
-                    'role': role,
-                    "date": result.date.strftime('%Y-%m-%dT%H:%M:%S') if result.date else None,
-                    'subject': result.subject,
-                    'body': result.body,
-                    'hashtags': [hashtag.name for hashtag in result.hashtags],
-                    'comments': result.comments 
-                })
-            return serialized_posts, 200
+        hashtag = Hashtag.query.filter_by(name=keyword).first()
         
-        return {"message": "No posts found for the given hashtag"}, 404
+        posts = hashtag.posts
+        if posts:
+            serialized_posts = [{
+                'id': post.id,
+                'subject': post.subject,
+                'body': post.body,
+                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
+                'traveler_id': post.traveler_id,
+                'localexpert_id': post.localexpert_id,
+                'advertiser_id': post.advertiser_id
+            } for post in posts]
+            
+            print(serialized_posts)
+            return {'posts': serialized_posts}, 200
+       
+        return {'message': 'No posts found for this hashtag'}, 404
+
 
 class Logout(Resource):
     def delete(self):
@@ -905,10 +887,10 @@ api.add_resource(MyProfile, '/profile/user/update/<string:email>')
 
 api.add_resource(TheirProfile, '/profile/user/author/<string:username>')
 
-api.add_resource(Community, '/community/posts/all', endpoint='all_posts')
-api.add_resource(Community, '/community/post/new', endpoint='new_post')
+api.add_resource(Community, '/community/posts/all', endpoint='all_posts') #GET all posts
+api.add_resource(Community, '/community/post/new', endpoint='new_post') #PUT new post
 
-api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')  # GET for posts, PUT for comments
+api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')  # GET for one post, PUT for comments
 api.add_resource(EditPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
 api.add_resource(EditPost, '/community/post/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
 

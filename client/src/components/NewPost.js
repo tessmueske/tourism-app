@@ -15,14 +15,14 @@ function NewPost() {
       <h2>new post</h2>
       <Formik
         initialValues={{
-          author: user.username,
+          username: user.username,
           subject: "",
           body: "",
-          hashtag: "",
+          hashtags: "",
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
-          const hashtagPattern = /#(\w+)/g;
-          const hashtags = [...(values.hashtag.match(hashtagPattern) || [])].map(tag => tag.slice(1));
+          const hashtagsPattern = /#(\w+)/g;
+          const hashtags = [...(values.hashtags.match(hashtagsPattern) || [])].map(tag => tag.slice(1));
           const postData = {
             ...values,
             hashtags: hashtags, 
@@ -37,6 +37,7 @@ function NewPost() {
             });
 
             if (response.ok) {
+              console.log(postData);
               setSuccessMessage("posted successfully! redirecting to community homepage...");
               resetForm();
               setTimeout(() => {
@@ -57,7 +58,7 @@ function NewPost() {
               <p>author:</p>
               <Field
                 type="text"
-                name="author"
+                name="username"
                 value={user.username} 
                 className="inputBox"
                 readOnly
@@ -88,11 +89,11 @@ function NewPost() {
               <p>hashtags #typed #like #this (try #tenerife or #paella!):</p>
               <Field
                 type="text"
-                name="hashtag"
+                name="hashtags"
                 placeholder="add hashtags"
                 className="inputBox"
               />
-              <ErrorMessage name="hashtag" component="div" className="errorLabel" />
+              <ErrorMessage name="hashtags" component="div" className="errorLabel" />
             </div>
             <br></br>
 
