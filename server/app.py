@@ -713,38 +713,7 @@ class MyPost(Resource):
             db.session.rollback()
             return {"error": f"Error creating comment: {str(e)}"}, 500
 
-class MyComment(Resource):
-    def delete(self, post_id, comment_id):
-        user = session.get('username') 
-        if not user:
-            return {"error": "User not logged in"}, 401
-
-        post = Post.query.filter_by(id=post_id).first()
-        if not post:
-            return {"error": "Post not found"}, 404
-
-        comment_to_delete = next((comment for comment in post.comments if comment.id == comment_id), None)
-
-        if not comment_to_delete:
-            return {"error": "Comment not found"}, 404
-
-        try:
-            db.session.delete(comment_to_delete)
-            db.session.commit()
-
-            updated_comments = [{
-                "id": comment.id,
-                "text": comment.text,
-                "date": comment.date.strftime('%Y-%m-%dT%H:%M:%S')
-            } for comment in post.comments]
-
-            return {"comments": updated_comments}, 200
-
-        except Exception as e:
-            db.session.rollback()
-            return {"error": f"Error deleting comment: {str(e)}"}, 500
-
-class EditPost(Resource):
+# class EditPost(Resource):
     def put(self, post_id): #PUTting an edit onto a post
         data = request.get_json()
         post = Post.query.filter_by(id=post_id).first()
@@ -813,6 +782,37 @@ class EditPost(Resource):
             error_message = str(e)
             print(f"Error deleting post: {error_message}")
             return {'error': error_message}, 500
+
+class MyComment(Resource):
+    def delete(self, post_id, comment_id):
+        user = session.get('username') 
+        if not user:
+            return {"error": "User not logged in"}, 401
+
+        post = Post.query.filter_by(id=post_id).first()
+        if not post:
+            return {"error": "Post not found"}, 404
+
+        comment_to_delete = next((comment for comment in post.comments if comment.id == comment_id), None)
+
+        if not comment_to_delete:
+            return {"error": "Comment not found"}, 404
+
+        try:
+            db.session.delete(comment_to_delete)
+            db.session.commit()
+
+            updated_comments = [{
+                "id": comment.id,
+                "text": comment.text,
+                "date": comment.date.strftime('%Y-%m-%dT%H:%M:%S')
+            } for comment in post.comments]
+
+            return {"comments": updated_comments}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Error deleting comment: {str(e)}"}, 500
 
 class HashtagName(Resource):
     def get(self, hashtag_id):
@@ -900,39 +900,38 @@ class DeleteProfile(Resource):
             return {"error": f"An error occurred: {str(e)}"}, 500
 
 
-api.add_resource(CurrentUser, '/current-user', endpoint='current_user')
+api.add_resource(CurrentUser, '/current-user')
 
-api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
-api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
-api.add_resource(LocalExpertLogin, '/login/localexpert', endpoint='login_localexpert')
-api.add_resource(TravelerSignup, '/signup/traveler', endpoint='signup_traveler')
-api.add_resource(LocalExpertSignup, '/signup/localexpert', endpoint='signup_localexpert')
-api.add_resource(AdvertiserSignup, '/signup/advertiser', endpoint='signup_advertiser')
-api.add_resource(VerifyAdvertiser, '/verify/advertiser/<int:advertiser_id>', endpoint='verify_advertiser')
-api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', endpoint='reject_advertiser')
-api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
-api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
+api.add_resource(TravelerLogin, '/login/traveler')
+api.add_resource(AdvertiserLogin, '/login/advertiser')
+api.add_resource(LocalExpertLogin, '/login/localexpert')
+api.add_resource(TravelerSignup, '/signup/traveler')
+api.add_resource(LocalExpertSignup, '/signup/localexpert')
+api.add_resource(AdvertiserSignup, '/signup/advertiser')
+api.add_resource(VerifyAdvertiser, '/verify/advertiser/<int:advertiser_id>')
+api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>')
+api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>')
+api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>')
 
-api.add_resource(MyProfile, '/user/<string:email>', endpoint='user_profile')
-api.add_resource(MyProfile, '/user/update/<string:email>')
+api.add_resource(MyProfile, '/user/<string:email>') #GET a user's profile, #PUT an update onto the profile
+# api.add_resource(MyProfile, '/user/update/<string:email>') #PUT an update onto the profile
 
 api.add_resource(TheirProfile, '/user/<string:username>')
 
-api.add_resource(Community, '/posts', endpoint='all_posts') #GET all posts
-api.add_resource(Community, '/posts/new', endpoint='new_post') #PUT new post
-api.add_resource(MyPost, '/posts/<int:post_id>', endpoint='post_id')  #GET for one post, POST for comments
-api.add_resource(EditPost, '/posts/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
-api.add_resource(EditPost, '/posts/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
+api.add_resource(Community, '/posts') #GET all posts, #POST for making a new post
+api.add_resource(MyPost, '/posts/<int:post_id>')  #GET for one post, POST for comments, PUT for editing posts, DELETE for deleting posts
+# api.add_resource(EditPost, '/posts/edit/<int:post_id>', endpoint='edit_post') #PUT for editing posts
+# api.add_resource(EditPost, '/posts/delete/<int:post_id>', endpoint='delete_post') #DELETE for deleting posts
 
-api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>', endpoint='comment_delete') #Deleting comments
+api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>') #Deleting comments
 
-api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>', endpoint='filter_hashtag') #GET the list of posts associated with one hashtag
+api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>') #GET the list of posts associated with one hashtag
 
-api.add_resource(HashtagName, '/hashtags/<int:hashtag_id>', endpoint='hashtag_name')
+api.add_resource(HashtagName, '/hashtags/<int:hashtag_id>')
 
-api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(Logout, '/logout')
 
-api.add_resource(DeleteProfile, '/user/delete/<string:email>', endpoint='user_profile_delete')
+api.add_resource(DeleteProfile, '/user/delete/<string:email>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

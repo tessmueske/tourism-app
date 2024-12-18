@@ -18,7 +18,6 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
 
       useEffect(() => {
         setLoading(true);
-        // Fetch posts filtered by hashtagId
         fetch(`/posts/filter/${hashtagId}`)
             .then((response) => {
                 if (!response.ok) {
@@ -55,6 +54,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
       <div className="communitycard-displaycard-center">
         <div className="card">
           <div className="centered-elements">
+            <div></div>
             <h3>filtering by '#{hashtagName}'</h3>
             <button onClick={takeMeBack} className="button">
               back to main community page
@@ -95,7 +95,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                         </span>
                       ))
                     ) : (
-                      <span>No hashtags</span>
+                      <span>no hashtags</span>
                     )}
                   </div>
                   {user.username === post.username && (
@@ -117,6 +117,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                     </div>
                   )}
                 </div>
+                <hr className="post-divider" />
               </div>
             ))
           ) : (

@@ -43,7 +43,7 @@ function UpdateProfile({ onUpdate }) {
         onSubmit={(values, { setSubmitting, setErrors }) => {
             const updatedProfile = { ...user, ...values };
           
-            fetch(`/user/update/${user.email}`, {
+            fetch(`/user/${user.email}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",

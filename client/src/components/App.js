@@ -49,7 +49,7 @@ function App() {
   };
 
   const handleDelete = (postId) => {
-    fetch(`/posts/delete/${postId}`, {
+    fetch(`/posts/${postId}`, {
       method: "DELETE",
     })
       .then((response) => {

@@ -12,33 +12,37 @@ function EditPost() {
 
     useEffect(() => {
       fetch(`/posts/${postId}`)
-          .then((response) => {
-              if (!response.ok) {
-                  throw new Error(`HTTP error! Status: ${response.status}`);
-              }
-              return response.json();
-          })
-          .then((data) => {
-              const hashtags = Array.isArray(data.hashtags)
-                  ? data.hashtags
-                  : data.hashtags?.split(' ').map((tag) => tag.trim()).filter(Boolean) || [];
-              
-              setInitialValues({
-                  author: user?.username || '',
-                  subject: data.subject || '',
-                  body: data.body || '',
-                  hashtag: hashtags.join(' '), 
-              });
-          })
-          .catch((error) => console.error("Error fetching post data:", error));
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+    
+          const hashtags = Array.isArray(data.hashtags)
+            ? data.hashtags
+            : data.hashtags?.split(' ').map((tag) => tag.trim()).filter(Boolean) || [];
+          
+          const formattedHashtags = hashtags.map(tag => typeof tag === 'object' ? tag.name || tag.tag : tag);
+    
+          setInitialValues({
+            author: user?.username || '',
+            subject: data.subject || '',
+            body: data.body || '',
+            hashtag: formattedHashtags.join(' '), 
+          });
+        })
+        .catch((error) => console.error("Error fetching post data:", error));
     }, [postId, user]);
+    
     
     const handleSubmit = (values) => {
         const updatedHashtags = values.hashtag
             ? values.hashtag.split(' ').map((tag) => tag.trim()).filter(Boolean)
             : [];
     
-        fetch(`/posts/edit/${postId}`, {
+        fetch(`/posts/${postId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -101,7 +105,7 @@ function EditPost() {
                   </div>
     
                   <div>
-                <label htmlFor="hashtag">hashtags:</label>
+                <label htmlFor="hashtag">hashtags (written just like this, with no # in front of them):</label>
                 <Field 
                     name="hashtag" 
                     type="text" 
