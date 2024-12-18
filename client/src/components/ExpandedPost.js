@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUserContext } from './UserContext';
-import '../index.css'; 
+import "../index.css"; 
 import "../communitycard.css";
 
 function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
@@ -14,7 +14,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
 
     useEffect(() => {    
         setLoading(true); 
-        fetch(`/community/post/${postId}`)
+        fetch(`/community/posts/${postId}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -22,10 +22,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                 return response.json();
             })
             .then((data) => {
-                setPostState({
-                    ...data,
-                    comments: data.comments || []
-                });
+                setPostState(data);  
                 setLoading(false);
             })
             .catch((error) => {
@@ -34,70 +31,77 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             });
     }, [postId]);
 
-        const handleCommentSubmit = (e) => {
+    const handleCommentSubmit = (e) => {
         e.preventDefault();
-
+    
         if (!user) {
             console.error("User is not defined");
             return;
         }
-        
+    
         if (!newComment.trim()) return;  
-
-        const role = user.role || "unknown";
     
         const commentData = {
             text: newComment,
             author: user.username,
-            role: role,
+            post_id: postId,
             date: new Date().toISOString()
         };
     
-        fetch(`/community/post/${postId}`, {
-            method: 'PUT',
+        fetch(`/community/posts/${postId}`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(commentData), 
         })
-        .then(response => response.json()) 
+        .then(response => response.json())
         .then(data => {
-            const parsedComments = typeof data.comments === 'string' ? JSON.parse(data.comments) : data.comments;
-            setPostState(prevPost => ({
-                ...prevPost,
-                comments: parsedComments || [] 
-            }));
+            return fetch(`/community/posts/${postId}`);
+        })
+        .then(response => response.json())
+        .then(updatedPost => {
+            console.log("Updated Post:", updatedPost);
+            setPostState(updatedPost); 
             setNewComment('');
         })
         .catch(error => console.error('Error submitting comment:', error)); 
     };
-
-    const backNavigate = () => {
-        navigate("/community/posts/all");
-    };
-
-    if (loading) {
-        return <p>loading post details...</p>;
-    }
+    
+    
 
     const handleCommentDelete = (e, comment_id) => {
         e.preventDefault();
+        
         fetch(`/posts/${postId}/comments/${comment_id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
+            body: JSON.stringify({ comment_id })
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             setPostState(prevPost => ({
                 ...prevPost,
-                comments: data.comments || [] 
+                comments: prevPost.comments.filter(comment => comment.id !== comment_id)
             }));
         })
-        .catch(error => console.error('error deleting comment:', error)); 
+        .catch(error => console.error('Error deleting comment:', error)); 
     };
+
+    const backNavigate = () => {
+        navigate("/community/posts");
+    };
+
+    if (loading) {
+        return <p>loading post details...</p>;
+    }
+    
+    if (!post) {
+        return <p>post not found</p>;
+    }
 
     return (
         <div className="communitycard-displaycard-center">
@@ -117,7 +121,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <div className="hashtag">
                             {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
                                 <span key={hashtag}>
-                                    <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
+                                    <Link to={`/community/posts/filter/${hashtag}`} style={{ fontSize: '10px' }}>
                                         #{hashtag}
                                     </Link>
                                     {index < post.hashtags.length - 1 && ", "}
@@ -139,8 +143,11 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <p style={{ textDecoration: 'underline' }}>comments:</p>
                         <hr className="post-divider" />
                         <div>
-                            {Array.isArray(post.comments) && post.comments.length > 0 ? (
-                                post.comments.filter(comment => comment && comment.text).map((comment) => (
+                        {post.comments && post.comments.length > 0 ? (
+                            post.comments.map((comment) => {
+                                if (!comment) return null; 
+                                console.log('Rendering comment:', comment); 
+                                return (
                                     <div key={comment.id}>
                                         <p>{comment.text}</p>
                                         {user.username === comment.author && (
@@ -153,16 +160,17 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                         <p style={{ fontSize: '10px' }}>
                                             <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
-                                            </Link>,{""} {comment.role}, on{" "}
+                                            </Link>, {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}
                                             </em>
                                         </p>
                                         <hr className="post-divider" />
                                     </div>
-                                ))
-                            ) : (
-                                <p style={{ fontSize: '12px' }}><em>no comments</em></p>
-                            )}
+                                );
+                            })
+                        ) : (
+                            <p style={{ fontSize: '12px' }}><em>no comments</em></p>
+                        )}
                         </div>
                         <form onSubmit={handleCommentSubmit}>
                             <textarea

@@ -15,10 +15,9 @@ import os
 import traceback
 import logging
 import json
-import uuid
 
 from config import app, db, api
-from models import Traveler, LocalExpert, Advertiser, Post, Hashtag
+from models import Traveler, LocalExpert, Advertiser, Post, Hashtag, Comment
 
 load_dotenv()  
 app.secret_key = os.getenv('SECRET_KEY')
@@ -467,17 +466,6 @@ class TheirProfile(Resource):
         }
 
 class Community(Resource):
-
-    def get_poster_username_and_role(post):
-        if post.traveler:
-            return post.traveler.username, post.traveler.role
-        elif post.localexpert:
-            return post.localexpert.username, post.localexpert.role
-        elif post.advertiser:
-            return post.advertiser.username, post.advertiser.role
-        else:
-            return "unknown", "unknown"
-
     def get(self):
         try:
             posts = Post.query.order_by(Post.date.desc()).all()
@@ -507,7 +495,6 @@ class Community(Resource):
                     'body': post.body,
                     'hashtags': [hashtag.name for hashtag in post.hashtags]
                 })
-            print(post_data)
             return {'posts': post_data}, 200
 
         except Exception as e:
@@ -517,7 +504,7 @@ class Community(Resource):
             print(f"Traceback: {error_trace}")
             return {'error': error_message}, 500
 
-    def post(self):
+    def post(self): #POSTing a post
         data = request.get_json()
 
         try:
@@ -620,10 +607,12 @@ class MyPost(Resource):
 
         return formatted_comments
 
-    def get(self, post_id):
+    def get(self, post_id):  # GET one post INCLUDING the comments
         post = Post.query.filter_by(id=post_id).first()
         if not post:
             return {"error": "Post not found"}, 404
+
+        print("Post comments before formatting:", post.comments)
 
         if post.traveler_id:
             traveler = Traveler.query.get(post.traveler_id)
@@ -641,75 +630,103 @@ class MyPost(Resource):
             author = "unknown"
             role = "unknown"
 
-        comments = post.comments
-        if isinstance(comments, str):
-            try:
-                comments = json.loads(comments)
-            except json.JSONDecodeError:
-                comments = []
-
         formatted_comments = []
-        for comment in comments:
-            comment_author = comment.get('author', 'anonymous')
-            comment_role = comment.get('role', 'unknown') 
-            if comment_author == 'anonymous' or comment_role == 'unknown':
-                comment_author = author
-                comment_role = role
+        for comment in post.comments: 
+            if comment.traveler_id:
+                comment_author = Traveler.query.get(comment.traveler_id).username or "anonymous"
+                comment_role = "traveler"
+            elif comment.localexpert_id:
+                comment_author = LocalExpert.query.get(comment.localexpert_id).username or "anonymous"
+                comment_role = "local expert"
+            elif comment.advertiser_id:
+                comment_author = Advertiser.query.get(comment.advertiser_id).username or "anonymous"
+                comment_role = "advertiser"
+            else:
+                comment_author = "anonymous"
+                comment_role = "unknown"
 
             formatted_comments.append({
-                "id": comment['id'],
-                "text": comment['text'],
+                "id": comment.id,
+                "text": comment.text,
                 "author": comment_author,
                 "role": comment_role,
-                "date": comment['date']
+                "date": comment.date.strftime('%Y-%m-%dT%H:%M:%S')
             })
-
+        print("Formatted Response with Comments:", {
+            "author": author,
+            "role": role,
+            "subject": post.subject,
+            "body": post.body,
+            "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
+            "hashtags": [hashtag.name for hashtag in post.hashtags],
+            "comments": formatted_comments
+        })
         return {
             "author": author,
             "role": role,
             "subject": post.subject,
             "body": post.body,
-            'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-            "hashtags": [hashtag.name for hashtag in post.hashtags], 
+            "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
+            "hashtags": [hashtag.name for hashtag in post.hashtags],
             "comments": formatted_comments
         }, 200
 
-    def put(self, post_id):
+    def post(self, post_id):  # POSTing a comment
         data = request.get_json()
+        print(data)
 
-        post = Post.query.filter_by(id=post_id).first()
-        if not post:
-            return {"error": "Post not found"}, 404
+        text = data.get("text")
+        username = data.get("author")
 
-        comment_text = data.get("text")
-        comment_role = data.get("role")
-        comment_author = data.get("author")
+        user = (
+            Traveler.query.filter_by(username=username).first() or
+            LocalExpert.query.filter_by(username=username).first() or
+            Advertiser.query.filter_by(username=username).first()
+        )
 
-        if not comment_text:
-            return {"error": "Missing comment text"}, 400
+        if not user:
+            return {'error': 'User not found'}, 404
 
-        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
-        if not isinstance(comments, list):
-            comments = []
+        if isinstance(user, Traveler):
+            user_id = user.id
+            traveler_id = user.id
+            localexpert_id = None
+            advertiser_id = None
+        elif isinstance(user, LocalExpert):
+            user_id = user.id
+            traveler_id = None
+            localexpert_id = user.id
+            advertiser_id = None
+        elif isinstance(user, Advertiser):
+            user_id = user.id
+            traveler_id = None
+            localexpert_id = None
+            advertiser_id = user.id
 
-        new_comment = {
-            "id": str(uuid.uuid4()),
-            "text": comment_text,
-            "author": comment_author,
-            "role": comment_role,
-            "date": datetime.utcnow().isoformat(),
-        }
+        if not text:
+            print("Validation failed: Missing comment text.")
+            return {"error": "Comment text is required."}, 400
+        if not post_id:
+            print("Validation failed: Missing post ID.")
+            return {"error": "Post ID is required to associate the comment."}, 400
 
-        comments.append(new_comment)
-        post.comments = json.dumps(comments)
+        new_comment = Comment(
+            text=text,
+            post_id=post_id,
+            traveler_id=traveler_id,
+            localexpert_id=localexpert_id,
+            advertiser_id=advertiser_id,
+            date=datetime.utcnow()  
+        )
 
         try:
+            db.session.add(new_comment)
             db.session.commit()
-            return {"message": "Comment added successfully", "comments": comments}, 200
+            print("New comment created:", new_comment)
+            return {"message": "Comment created successfully!"}, 201
         except Exception as e:
             db.session.rollback()
-            return {"error": f"Error adding comment: {str(e)}"}, 500
-
+            return {"error": f"Error creating comment: {str(e)}"}, 500
 
 class MyComment(Resource):
     def delete(self, post_id, comment_id):
@@ -721,21 +738,23 @@ class MyComment(Resource):
         if not post:
             return {"error": "Post not found"}, 404
 
-        comments = json.loads(post.comments) if isinstance(post.comments, str) else post.comments
-        if not isinstance(comments, list):
-            return {"error": "Comments data is not valid"}, 500
-
-        comment_to_delete = next((comment for comment in comments if comment["id"] == comment_id), None)
+        comment_to_delete = next((comment for comment in post.comments if comment.id == comment_id), None)
 
         if not comment_to_delete:
             return {"error": "Comment not found"}, 404
 
-        comments = [comment for comment in comments if comment["id"] != comment_id]
-        post.comments = json.dumps(comments)
-
         try:
+            db.session.delete(comment_to_delete)
             db.session.commit()
-            return {"message": "Comment deleted successfully", "comments": comments}, 200
+
+            updated_comments = [{
+                "id": comment.id,
+                "text": comment.text,
+                "date": comment.date.strftime('%Y-%m-%dT%H:%M:%S')
+            } for comment in post.comments]
+
+            return {"comments": updated_comments}, 200
+
         except Exception as e:
             db.session.rollback()
             return {"error": f"Error deleting comment: {str(e)}"}, 500
@@ -803,7 +822,7 @@ class EditPost(Resource):
                 db.session.commit()
                 return '', 204
             else:
-                return {'error': 'You are not the author of this post'}, 403
+                return {'error': 'you are not the author of this post'}, 403
 
         except Exception as e:
             error_message = str(e)
@@ -811,17 +830,13 @@ class EditPost(Resource):
             return {'error': error_message}, 500
 
 class HashtagFilter(Resource):
-    def get(self, keyword):
+    def get(self):
 
-        hashtag = Hashtag.query.filter_by(name=keyword).first()
-        print(hashtag)
-        
-        posts = hashtag.posts
-        print(posts)
+        posts_with_hashtag = hashtag.posts
 
         serialized_posts = []
 
-        for post in posts:
+        for post in posts_with_hashtag:
             if post.traveler_id:
                 traveler = Traveler.query.get(post.traveler_id)
                 username = traveler.username if traveler else "unknown"
@@ -834,20 +849,16 @@ class HashtagFilter(Resource):
                 advertiser = Advertiser.query.get(post.advertiser_id)
                 author = advertiser.username if advertiser else "unknown"
                 role = advertiser.role if advertiser else "unknown"
-            else:
-                username = "unknown"
-                role = "unknown"
 
             serialized_posts.append({
-                'id': post.id,
+                'id': posts_with_hashtag.id,
                 'username': username,
                 'role': role,
-                'subject': post.subject,
-                'body': post.body,
-                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S')
+                'subject': posts_with_hashtag.subject,
+                'body': posts_with_hashtag.body,
+                "date": posts_with_hashtag.date.strftime('%Y-%m-%dT%H:%M:%S')
             })  
             
-            print(serialized_posts)
             return {'posts': serialized_posts}, 200
        
         return {'message': 'No posts found for this hashtag'}, 404
@@ -893,7 +904,7 @@ class DeleteProfile(Resource):
             return {"error": f"An error occurred: {str(e)}"}, 500
 
 
-api.add_resource(CurrentUser, '/current-user/<string:email>', endpoint='current_user')
+api.add_resource(CurrentUser, '/current-user', endpoint='current_user')
 
 api.add_resource(TravelerLogin, '/login/traveler', endpoint='login_traveler')
 api.add_resource(AdvertiserLogin, '/login/advertiser', endpoint='login_advertiser')
@@ -911,16 +922,15 @@ api.add_resource(MyProfile, '/profile/user/update/<string:email>')
 
 api.add_resource(TheirProfile, '/profile/user/author/<string:username>')
 
-api.add_resource(Community, '/community/posts/all', endpoint='all_posts') #GET all posts
-api.add_resource(Community, '/community/post/new', endpoint='new_post') #PUT new post
+api.add_resource(Community, '/community/posts', endpoint='all_posts') #GET all posts
+api.add_resource(Community, '/community/posts/new', endpoint='new_post') #PUT new post
+api.add_resource(MyPost, '/community/posts/<int:post_id>', endpoint='post_id')  #GET for one post, POST for comments
+api.add_resource(EditPost, '/community/posts/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
+api.add_resource(EditPost, '/community/posts/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
 
-api.add_resource(MyPost, '/community/post/<int:post_id>', endpoint='post_id')  # GET for one post, PUT for comments
-api.add_resource(EditPost, '/community/post/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
-api.add_resource(EditPost, '/community/post/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
+api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>', endpoint='comment_delete') #Deleting comments
 
-api.add_resource(MyComment, '/posts/<int:post_id>/comments/<comment_id>', endpoint='comment_delete') #Deleting comments
-
-api.add_resource(HashtagFilter, '/community/post/filterby/<string:keyword>', endpoint='filterby_hashtag')
+api.add_resource(HashtagFilter, '/community/posts/filter/<int:hashtag_id>', endpoint='filterby_hashtag') #this is hashtag tenerife with its posts, not posts filtered by. it should be tenerife's id of 1, with its posts. this isn't restful
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
@@ -928,3 +938,6 @@ api.add_resource(DeleteProfile, '/profile/user/delete/<string:email>', endpoint=
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+# creating a new comment - they're saving to the database; how do I populate it onto the frontend?
+# creating a new hashtag - is it saving to the database? then, hashtag --> posts for restful routing

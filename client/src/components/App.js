@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route, useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useUserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Homepage from "./Homepage";
@@ -30,27 +30,26 @@ function App() {
   const [post, setPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
-  const { postId } = useParams(); 
   const { user } = useUserContext();
 
   const onUpdate = (updatedProfile) => {};
 
   const handleEdit = (postId) => {
     if (postId) {
-      navigate(`/community/post/edit/${postId}`); 
+      navigate(`/community/posts/edit/${postId}`); 
     } else {
       console.error('postId is undefined');
     }
   };
 
   const confirmDelete = (postId) => {
-    if (window.confirm("sre you sure you want to delete this post?")) {
+    if (window.confirm("are you sure you want to delete this post?")) {
       handleDelete(postId);
     }
   };
 
   const handleDelete = (postId) => {
-    fetch(`/community/post/delete/${postId}`, {
+    fetch(`/community/posts/delete/${postId}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -96,7 +95,7 @@ function App() {
               <Route path="/profile/user/:email" element={<MyProfile />} />
               <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
               <Route 
-                path="/community/posts/all" 
+                path="/community/posts" 
                 element={
                 <CommunityDiscussion 
                   handleEdit={handleEdit} 
@@ -108,13 +107,13 @@ function App() {
                   setPosts={setPosts} 
                   />
                 }/>
-              <Route path="/community/post/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
+              <Route path="/community/posts/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
                   handleDelete={handleDelete} 
                   pencil={pencil} 
                   trash={trash} />} /> 
-              <Route path="/community/post/new" element={<NewPost />} />
-              <Route path="/community/post/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
-              <Route path="/community/post/edit/:postId" element={<EditPost postId={postId} />} />
+              <Route path="/community/posts/new" element={<NewPost />} />
+              <Route path="/community/posts/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
+              <Route path="/community/posts/edit/:postId" element={<EditPost />} />
               <Route path="/profile/user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>

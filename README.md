@@ -17,6 +17,9 @@ I started building this project in the autumn of 2024 after learning about the t
   - Comment on and delete others' posts.
   - View profiles and filter posts by hashtags.
 
+## How to Use
+Download the backend for the project using pipenv install, pipenv install flask_session, pipenv install dotenv, and pipenv install flask_mail. Download the frontend using npm install.
+
 ## Sources
 - https://www.euronews.com/my-europe/2024/10/20/thousands-protest-against-over-tourism-in-canary-islands#:~:text=Tourism%20is%20the%20main%20economic,is%20damaging%20the%20environment%20too.&text=Around%2030%2C000%20people%20took%20to,Canary%20Islands%20have%20a%20limit.%22
 

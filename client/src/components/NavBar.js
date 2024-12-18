@@ -8,7 +8,7 @@ function NavBar() {
   const { user, handleLogout } = useUserContext();
 
   const confirmLogout = () => {
-    if (window.confirm("Are you sure you want to log out?")) {
+    if (window.confirm("are you sure you want to log out?")) {
       handleLogout();
       navigate("/");
     }
@@ -44,7 +44,7 @@ function NavBar() {
               <Link to={`/profile/user/${user.email}`}>my profile</Link>
             </li>
             <li>
-              <Link to="/community/posts/all">community discussion</Link>
+              <Link to="/community/posts">community discussion</Link>
             </li>
             <li>
               <Link to="/about">about us</Link>

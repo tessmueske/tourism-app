@@ -11,7 +11,7 @@ function EditPost() {
     const { postId } = useParams(); 
 
     useEffect(() => {
-      fetch(`/community/post/${postId}`)
+      fetch(`/community/posts/${postId}`)
           .then((response) => {
               if (!response.ok) {
                   throw new Error(`HTTP error! Status: ${response.status}`);
@@ -38,7 +38,7 @@ function EditPost() {
             ? values.hashtag.split(' ').map((tag) => tag.trim()).filter(Boolean)
             : [];
     
-        fetch(`/community/post/edit/${postId}`, {
+        fetch(`/community/posts/edit/${postId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -55,7 +55,7 @@ function EditPost() {
                 return response.json();
             })
             .then(() => {
-                navigate(`/community/post/${postId}`);
+                navigate(`/community/posts/${postId}`);
             })
             .catch((error) => {
                 console.error("Error updating post:", error);
@@ -119,7 +119,7 @@ function EditPost() {
                   <button
                     type="button"
                     className="button"
-                    onClick={() => navigate(`/community/post/${postId}`)}
+                    onClick={() => navigate(`/community/posts/${postId}`)}
                   >
                     go back
                   </button>

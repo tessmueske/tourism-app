@@ -41,7 +41,7 @@ function ThatUser() {
             <p><strong>gender:</strong> {profile.gender || "not set"}</p>
             <p><strong>bio:</strong> {profile.bio || "not set"}</p>
             <p><strong>contact email:</strong> {profile.email || "not set"}</p>
-            <button className="button" onClick={() => navigate(`/community/posts/all`)}>back</button>
+            <button className="button" onClick={() => navigate(`/community/posts`)}>back</button>
         </div>
     );
 }

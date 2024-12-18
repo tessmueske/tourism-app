@@ -116,18 +116,19 @@ class Post(db.Model, SerializerMixin):
     date = db.Column(db.DateTime, default=func.now(), nullable=True)
     subject = db.Column(db.String)
     body = db.Column(db.String)
-    comments = db.Column(db.JSON, nullable=True, default=[])
 
     traveler_id = db.Column(db.Integer, db.ForeignKey('travelers.id'), nullable=True)
     localexpert_id = db.Column(db.Integer, db.ForeignKey('localexperts.id'), nullable=True)
     advertiser_id = db.Column(db.Integer, db.ForeignKey('advertisers.id'), nullable=True)
 
     hashtags = db.relationship('Hashtag', secondary=post_hashtag, back_populates='posts')
+    comments = db.relationship('Comment', back_populates='post')
+
     localexpert = db.relationship('LocalExpert', back_populates='posts')
     advertiser = db.relationship('Advertiser', back_populates='posts')
     traveler = db.relationship('Traveler', back_populates='posts')
 
-    serialize_rules = ('-hashtags.posts','-traveler.posts', '-localexpert.posts', '-advertiser.posts')
+    serialize_rules = ('-hashtags.posts','-traveler.posts', '-localexpert.posts', '-advertiser.posts', '-comments.posts')
 
 class Comment(db.Model, SerializerMixin):
     __tablename__ = 'comments'
@@ -136,21 +137,17 @@ class Comment(db.Model, SerializerMixin):
     date = db.Column(db.DateTime, default=func.now(), nullable=True)
     text = db.Column(db.String)
 
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id')) 
+    post = db.relationship('Post', back_populates='comments')
+
     traveler_id = db.Column(db.Integer, db.ForeignKey('travelers.id'), nullable=True)
     localexpert_id = db.Column(db.Integer, db.ForeignKey('localexperts.id'), nullable=True)
     advertiser_id = db.Column(db.Integer, db.ForeignKey('advertisers.id'), nullable=True)
 
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    serialize_rules = ('-posts.comments',)
 
-    @property
-    def role(self):
-        if self.traveler_id:
-            return "traveler"
-        elif self.localexpert_id:
-            return "local expert"
-        elif self.advertiser_id:
-            return "advertiser"
-        return "unknown"
+    def __repr__(self):
+        return f"<Comment id={self.id} date={self.date} text={self.text} post_id={self.post_id}>"
 
 class Hashtag(db.Model, SerializerMixin):
     __tablename__ = 'hashtags'

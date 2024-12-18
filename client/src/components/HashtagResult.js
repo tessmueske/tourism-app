@@ -5,19 +5,19 @@ import "../communitycard.css";
 
 function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
     const navigate = useNavigate();
-    const { keyword } = useParams(); 
+    const { hashtagId } = useParams(); 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user } = useUserContext();
 
     const takeMeBack = () => {
-        navigate('/community/posts/all');
+        navigate('/community/posts');
       };
 
     useEffect(() => {
         setLoading(true);
-        fetch(`/community/post/filterby/${keyword}`)
+        fetch(`/community/posts/filter/${hashtagId}`)
           .then((response) => {
             if (!response.ok) {
               throw new Error("Failed to fetch posts");
@@ -32,7 +32,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
             setError(err.message);
             setLoading(false);
           });
-      }, [keyword]);
+      }, [hashtagId]);
     
       if (loading) {
         return <p>loading...</p>;
@@ -46,14 +46,14 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
         <div className="communitycard-displaycard-center">
             <div className="card">
                 <div className="centered-elements">
-                    <h3>filtering by '#{keyword}'</h3>
+                    <h3>filtering by '#{hashtagId}'</h3>
                 <button onClick={takeMeBack} className="button">back to main community page</button>
                 </div>
                 {posts && posts.length > 0 ? (
                     posts.map((post) => (
                     <div key={post.id}>
                         <h3 style={{ fontSize: "20px" }}>
-                        <Link to={`/community/post/${post.id}`}>{post.subject}</Link>
+                        <Link to={`/community/posts/${post.id}`}>{post.subject}</Link>
                         </h3>
                         <p style={{ fontSize: "14px" }}>{post.body}</p>
                         <p style={{ fontSize: "12px" }}>
@@ -76,7 +76,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                             post.hashtags.map((hashtag, index) => (
                                 <span key={hashtag.id || index}>
                                 <Link
-                                    to={`/community/post/filterby/${hashtag}`}
+                                    to={`/community/posts/${hashtagId}`}
                                     style={{ fontSize: "10px" }}
                                 >
                                     #{hashtag}
@@ -96,7 +96,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                     </div>
                     ))
                 ) : (
-                    <p>no posts found for #{keyword}</p>
+                    <p>no posts found for #{hashtagId}</p>
                 )}
                 </div>
             </div>

@@ -1,18 +1,19 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css";
 
 function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts }) {
   const navigate = useNavigate();
+  const { hashtagId } = useParams(); 
   const { user } = useUserContext();
 
   const handleNavigate = () => {
-    navigate('/community/post/new');
+    navigate('/community/posts/new');
   };
 
   useEffect(() => {
-    fetch("/community/posts/all", {
+    fetch("/community/posts", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +44,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
           posts.map((post) => (
             <div key={post.id}>
               <h3 style={{ fontSize: '20px' }}>
-                <Link to={`/community/post/${post.id}`}>
+                <Link to={`/community/posts/${post.id}`}>
                   {post.subject}
                 </Link>
               </h3>
@@ -60,7 +61,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               <div className="hashtag">
                   {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
                       <span key={hashtag}>
-                          <Link to={`/community/post/filterby/${hashtag}`} style={{ fontSize: '10px' }}>
+                          <Link to={`/community/posts/filter/${hashtagId}`} style={{ fontSize: '10px' }}>
                               #{hashtag}
                           </Link>
                           {index < post.hashtags.length - 1 && ", "}
