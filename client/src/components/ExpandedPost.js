@@ -67,8 +67,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
         .catch(error => console.error('Error submitting comment:', error)); 
     };
     
-    
-
     const handleCommentDelete = (e, comment_id) => {
         e.preventDefault();
         
@@ -109,7 +107,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <h2>{post.subject}</h2>
                         <p>{post.body}</p>
                         <p style={{ fontSize: '12px' }}>
-                            posted by <Link to={`/user/author/${post.author}`} style={{ fontSize: '10px' }}>
+                            posted by <Link to={`/user/${post.author}`} style={{ fontSize: '10px' }}>
                             {post.author}
                             </Link> 
                             , {post.role}, on{" "}{post.date
@@ -118,9 +116,9 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         </p>
                         <div className="hashtag">
                             {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
-                                <span key={hashtag}>
-                                    <Link to={`/posts/filter/${hashtag}`} style={{ fontSize: '10px' }}>
-                                        #{hashtag}
+                                <span key={hashtag.id}>
+                                    <Link to={`/posts/filter/${hashtag.id}`} style={{ fontSize: '10px' }}>
+                                        #{hashtag.name}
                                     </Link>
                                     {index < post.hashtags.length - 1 && ", "}
                                 </span>
@@ -150,7 +148,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                         {user.username === comment.author && (
                                             <div className="edit-delete-buttons">
                                                 <button onClick={(e) => handleCommentDelete(e, comment.id)}>
-                                                    <img src={trash} alt="Delete" style={{ width: '20px', height: 'auto' }} />
+                                                    <img src={trash} alt="delete" style={{ width: '20px', height: 'auto' }} />
                                                 </button>
                                             </div>
                                         )}

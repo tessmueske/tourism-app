@@ -493,7 +493,7 @@ class Community(Resource):
                     'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                     'subject': post.subject,
                     'body': post.body,
-                    'hashtags': [hashtag.name for hashtag in post.hashtags]
+                    'hashtags': [{'id': hashtag.id, 'name': hashtag.name} for hashtag in post.hashtags],
                 })
             return {'posts': post_data}, 200
 
@@ -561,7 +561,7 @@ class Community(Resource):
                 "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
                 'subject': post.subject,
                 'body': post.body,
-                'hashtags': [hashtag.name for hashtag in post.hashtags]
+                'hashtags': [{'id': hashtag.id, 'name': hashtag.name} for hashtag in post.hashtags]
             }, 201
 
         except Exception as e:
@@ -656,7 +656,7 @@ class MyPost(Resource):
             "subject": post.subject,
             "body": post.body,
             "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-            "hashtags": [hashtag.name for hashtag in post.hashtags],
+            'hashtags': [{'id': hashtag.id, 'name': hashtag.name} for hashtag in post.hashtags],
             "comments": formatted_comments
         }, 200
 
@@ -814,6 +814,15 @@ class EditPost(Resource):
             print(f"Error deleting post: {error_message}")
             return {'error': error_message}, 500
 
+class HashtagName(Resource):
+    def get(self, hashtag_id):
+        hashtag = Hashtag.query.get(hashtag_id)
+
+        if not hashtag:
+            return {"message": "Hashtag not found"}, 404
+        
+        return {"name": hashtag.name}
+
 class HashtagFilter(Resource):
     def get(self, hashtag_id):
         hashtag = Hashtag.query.get(hashtag_id)
@@ -830,17 +839,16 @@ class HashtagFilter(Resource):
         
         for post in posts_with_hashtag:
             if post.traveler_id:
-                traveler = Traveler.query.get(post.traveler_id)
-                username = traveler.username if traveler else "unknown"
-                role = traveler.role if traveler else "unknown"
+                user = Traveler.query.get(post.traveler_id)
             elif post.localexpert_id:
-                localexpert = LocalExpert.query.get(post.localexpert_id)
-                username = localexpert.username if localexpert else "unknown"
-                role = localexpert.role if localexpert else "unknown"
+                user = LocalExpert.query.get(post.localexpert_id)
             elif post.advertiser_id:
-                advertiser = Advertiser.query.get(post.advertiser_id)
-                username = advertiser.username if advertiser else "unknown"
-                role = advertiser.role if advertiser else "unknown"
+                user = Advertiser.query.get(post.advertiser_id)
+            else:
+                user = None
+
+            username = user.username if user else "unknown"
+            role = user.role if user else "unknown"
             
             serialized_posts.append({
                 'id': post.id,
@@ -848,11 +856,11 @@ class HashtagFilter(Resource):
                 'role': role,
                 'subject': post.subject,
                 'body': post.body,
-                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-                'hashtags': [hashtag.name for hashtag in post.hashtags]  
+                'date': post.date.strftime('%Y-%m-%dT%H:%M:%S'),
+                'hashtags': [{'id': hashtag.id, 'name': hashtag.name} for hashtag in post.hashtags],
             })
 
-        return {'posts': serialized_posts}, 200
+        return {'posts': serialized_posts}
 
 class Logout(Resource):
     def delete(self):
@@ -908,7 +916,7 @@ api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', 
 api.add_resource(MyProfile, '/user/<string:email>', endpoint='user_profile')
 api.add_resource(MyProfile, '/user/update/<string:email>')
 
-api.add_resource(TheirProfile, '/user/author/<string:username>')
+api.add_resource(TheirProfile, '/user/<string:username>')
 
 api.add_resource(Community, '/posts', endpoint='all_posts') #GET all posts
 api.add_resource(Community, '/posts/new', endpoint='new_post') #PUT new post
@@ -918,7 +926,9 @@ api.add_resource(EditPost, '/posts/delete/<int:post_id>', endpoint='post_delete'
 
 api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>', endpoint='comment_delete') #Deleting comments
 
-api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>', endpoint='filterby_hashtag') #this is hashtag tenerife with its posts, not posts filtered by. it should be tenerife's id of 1, with its posts. this isn't restful
+api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>', endpoint='filter_hashtag') #GET the list of posts associated with one hashtag
+
+api.add_resource(HashtagName, '/hashtags/<int:hashtag_id>', endpoint='hashtag_name')
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
@@ -927,5 +937,5 @@ api.add_resource(DeleteProfile, '/user/delete/<string:email>', endpoint='user_pr
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
 
-# creating a new comment - they're saving to the database; how do I populate it onto the frontend?
 # creating a new hashtag - is it saving to the database? then, hashtag --> posts for restful routing
+# visiting someone else's profile

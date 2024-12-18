@@ -41,7 +41,7 @@ function NavBar() {
               <Link to="/welcome/home">home</Link>
             </li>
             <li>
-              <Link to={`/profile/user/${user.email}`}>my profile</Link>
+              <Link to={`/user/${user.email}`}>my profile</Link>
             </li>
             <li>
               <Link to="/posts">community discussion</Link>

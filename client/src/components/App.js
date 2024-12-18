@@ -107,14 +107,14 @@ function App() {
                   setPosts={setPosts} 
                   />
                 }/>
-              <Route path="/posts/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
+              <Route path="/posts/filter/:hashtagId" element={<HashtagResult handleEdit={handleEdit} 
                   handleDelete={handleDelete} 
                   pencil={pencil} 
                   trash={trash} />} /> 
               <Route path="/posts/new" element={<NewPost />} />
               <Route path="/posts/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
               <Route path="/posts/edit/:postId" element={<EditPost />} />
-              <Route path="user/author/:author" element={<ThatUser post={post} user={user} />} />
+              <Route path="/user/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

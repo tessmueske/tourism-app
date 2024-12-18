@@ -5,7 +5,6 @@ import "../communitycard.css";
 
 function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, setPosts }) {
   const navigate = useNavigate();
-  const { hashtagId } = useParams(); 
   const { user } = useUserContext();
 
   const handleNavigate = () => {
@@ -31,6 +30,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
       .catch((error) => console.error("error fetching posts:", error));
   }, [setPosts]);
 
+  console.log(posts)
 
   return (
     <div className="communitycard-displaycard-center">
@@ -50,7 +50,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
               <p style={{ fontSize: '12px' }}>
-                posted by <Link to={`user/author/${post.username}`} style={{ fontSize: '10px' }}>
+                posted by <Link to={`user/${post.username}`} style={{ fontSize: '10px' }}>
                   {post.username}
                 </Link> 
                 , {post.role}, on{" "}
@@ -60,9 +60,9 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </p>
               <div className="hashtag">
                   {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
-                      <span key={hashtag}>
-                          <Link to={`/posts/filter/${hashtagId}`} style={{ fontSize: '10px' }}>
-                              #{hashtag}
+                      <span key={hashtag.id}>
+                          <Link to={`/posts/filter/${hashtag.id}`} style={{ fontSize: '10px' }}>
+                              #{hashtag.name}
                           </Link>
                           {index < post.hashtags.length - 1 && ", "}
                       </span>
