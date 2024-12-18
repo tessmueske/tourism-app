@@ -153,7 +153,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                             </div>
                                         )}
                                         <p style={{ fontSize: '10px' }}>
-                                            <em>- <Link to={`/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
+                                            <em>- <Link to={`/user/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
                                             </Link>, {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}

@@ -50,7 +50,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
               <p style={{ fontSize: '12px' }}>
-                posted by <Link to={`user/${post.username}`} style={{ fontSize: '10px' }}>
+                posted by <Link to={`/user/${post.username}`} style={{ fontSize: '10px' }}>
                   {post.username}
                 </Link> 
                 , {post.role}, on{" "}

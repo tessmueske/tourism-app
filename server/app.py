@@ -936,6 +936,3 @@ api.add_resource(DeleteProfile, '/user/delete/<string:email>', endpoint='user_pr
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-# creating a new hashtag - is it saving to the database? then, hashtag --> posts for restful routing
-# visiting someone else's profile
