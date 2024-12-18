@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useUserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
@@ -22,7 +22,7 @@ function MyProfile() {
 
   const handleDeleteProfile = async () => {
     try {
-        const response = await fetch(`users/delete/${user.email}`, {
+        const response = await fetch(`/user/delete/${user.email}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
