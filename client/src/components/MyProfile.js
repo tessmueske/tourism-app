@@ -9,7 +9,7 @@ function MyProfile() {
     const { user, setUser } = useUserContext();
   
     useEffect(() => {
-      fetch(`/user/${user.email}`, { method: "GET" })
+      fetch(`/users/${user.email}`, { method: "GET" })
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -22,7 +22,7 @@ function MyProfile() {
 
   const handleDeleteProfile = async () => {
     try {
-        const response = await fetch(`user/delete/${user.email}`, {
+        const response = await fetch(`users/delete/${user.email}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

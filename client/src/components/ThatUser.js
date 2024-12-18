@@ -16,7 +16,7 @@ function ThatUser() {
   
     useEffect(() => {
         if (author) {
-            fetch(`/user/author/${author}`, { method: "GET" })
+            fetch(`/users/author/${author}`, { method: "GET" })
                 .then((response) => {
                     if (response.ok) {
                         return response.json();

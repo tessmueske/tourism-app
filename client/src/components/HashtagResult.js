@@ -121,7 +121,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
               </div>
             ))
           ) : (
-            <p>No posts found for #{hashtagId}</p>
+            <p>no posts found for #{hashtagName}</p>
           )}
         </div>
       </div>

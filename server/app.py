@@ -913,21 +913,16 @@ api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>')
 api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>')
 
-api.add_resource(MyProfile, '/user/<string:email>') #GET a user's profile, #PUT an update onto the profile
-# api.add_resource(MyProfile, '/user/update/<string:email>') #PUT an update onto the profile
-
-api.add_resource(TheirProfile, '/user/<string:username>')
-
+api.add_resource(MyProfile, '/users/<string:email>') #GET my profile, #PUT an update onto the profile
+api.add_resource(TheirProfile, '/users/<string:username>') #GET another user's profile
 api.add_resource(Community, '/posts') #GET all posts, #POST for making a new post
 api.add_resource(MyPost, '/posts/<int:post_id>')  #GET for one post, POST for comments, PUT for editing posts, DELETE for deleting posts
-# api.add_resource(EditPost, '/posts/edit/<int:post_id>', endpoint='edit_post') #PUT for editing posts
-# api.add_resource(EditPost, '/posts/delete/<int:post_id>', endpoint='delete_post') #DELETE for deleting posts
 
-api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>') #Deleting comments
+api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>') #DELETE a comment
 
 api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>') #GET the list of posts associated with one hashtag
 
-api.add_resource(HashtagName, '/hashtags/<int:hashtag_id>')
+api.add_resource(HashtagName, '/hashtags/<int:hashtag_id>') #GET a hashtag's name by its ID
 
 api.add_resource(Logout, '/logout')
 
