@@ -36,7 +36,7 @@ function App() {
 
   const handleEdit = (postId) => {
     if (postId) {
-      navigate(`/community/posts/edit/${postId}`); 
+      navigate(`/posts/edit/${postId}`); 
     } else {
       console.error('postId is undefined');
     }
@@ -49,7 +49,7 @@ function App() {
   };
 
   const handleDelete = (postId) => {
-    fetch(`/community/posts/delete/${postId}`, {
+    fetch(`/posts/delete/${postId}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -92,10 +92,10 @@ function App() {
           ) : (
             <>
               <Route path="/welcome/home" element={<Welcome />} />
-              <Route path="/profile/user/:email" element={<MyProfile />} />
-              <Route path="/profile/user/update/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
+              <Route path="user/:email" element={<MyProfile />} />
+              <Route path="user/update/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
               <Route 
-                path="/community/posts" 
+                path="/posts" 
                 element={
                 <CommunityDiscussion 
                   handleEdit={handleEdit} 
@@ -107,14 +107,14 @@ function App() {
                   setPosts={setPosts} 
                   />
                 }/>
-              <Route path="/community/posts/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
+              <Route path="/posts/filterby/:keyword" element={<HashtagResult handleEdit={handleEdit} 
                   handleDelete={handleDelete} 
                   pencil={pencil} 
                   trash={trash} />} /> 
-              <Route path="/community/posts/new" element={<NewPost />} />
-              <Route path="/community/posts/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
-              <Route path="/community/posts/edit/:postId" element={<EditPost />} />
-              <Route path="/profile/user/author/:author" element={<ThatUser post={post} user={user} />} />
+              <Route path="/posts/new" element={<NewPost />} />
+              <Route path="/posts/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
+              <Route path="/posts/edit/:postId" element={<EditPost />} />
+              <Route path="user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

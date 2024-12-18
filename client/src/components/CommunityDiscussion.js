@@ -9,11 +9,11 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const { user } = useUserContext();
 
   const handleNavigate = () => {
-    navigate('/community/posts/new');
+    navigate('/posts/new');
   };
 
   useEffect(() => {
-    fetch("/community/posts", {
+    fetch("/posts", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -44,13 +44,13 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
           posts.map((post) => (
             <div key={post.id}>
               <h3 style={{ fontSize: '20px' }}>
-                <Link to={`/community/posts/${post.id}`}>
+                <Link to={`/posts/${post.id}`}>
                   {post.subject}
                 </Link>
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
               <p style={{ fontSize: '12px' }}>
-                posted by <Link to={`/profile/user/author/${post.username}`} style={{ fontSize: '10px' }}>
+                posted by <Link to={`user/author/${post.username}`} style={{ fontSize: '10px' }}>
                   {post.username}
                 </Link> 
                 , {post.role}, on{" "}
@@ -61,7 +61,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               <div className="hashtag">
                   {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
                       <span key={hashtag}>
-                          <Link to={`/community/posts/filter/${hashtagId}`} style={{ fontSize: '10px' }}>
+                          <Link to={`/posts/filter/${hashtagId}`} style={{ fontSize: '10px' }}>
                               #{hashtag}
                           </Link>
                           {index < post.hashtags.length - 1 && ", "}

@@ -388,7 +388,7 @@ class RejectLocalExpert(Resource):
         except Exception as e:
             return {"error": f"Failed to verify local expert: {str(e)}"}, 422
 
-class MyProfile(Resource):
+class MyProfile(Resource): #GET my profile, PUT edits for my profile
     def get(self, email):
 
         user = (
@@ -446,7 +446,7 @@ class MyProfile(Resource):
         except Exception as e:
             return {"error": f"An error occurred: {str(e)}"}, 500
 
-class TheirProfile(Resource):
+class TheirProfile(Resource): #GET another user's profile info
     def get(self, username):
         user = (
             Traveler.query.filter_by(username=username).first() or
@@ -465,8 +465,8 @@ class TheirProfile(Resource):
             "email": user.email,
         }
 
-class Community(Resource):
-    def get(self):
+class Community(Resource): 
+    def get(self): #GET all of the posts
         try:
             posts = Post.query.order_by(Post.date.desc()).all()
 
@@ -504,7 +504,7 @@ class Community(Resource):
             print(f"Traceback: {error_trace}")
             return {'error': error_message}, 500
 
-    def post(self): #POSTing a post
+    def post(self): #POSTing a new post
         data = request.get_json()
 
         try:
@@ -612,8 +612,6 @@ class MyPost(Resource):
         if not post:
             return {"error": "Post not found"}, 404
 
-        print("Post comments before formatting:", post.comments)
-
         if post.traveler_id:
             traveler = Traveler.query.get(post.traveler_id)
             author = traveler.username if traveler else "unknown"
@@ -652,15 +650,6 @@ class MyPost(Resource):
                 "role": comment_role,
                 "date": comment.date.strftime('%Y-%m-%dT%H:%M:%S')
             })
-        print("Formatted Response with Comments:", {
-            "author": author,
-            "role": role,
-            "subject": post.subject,
-            "body": post.body,
-            "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
-            "hashtags": [hashtag.name for hashtag in post.hashtags],
-            "comments": formatted_comments
-        })
         return {
             "author": author,
             "role": role,
@@ -671,9 +660,8 @@ class MyPost(Resource):
             "comments": formatted_comments
         }, 200
 
-    def post(self, post_id):  # POSTing a comment
+    def post(self, post_id):  # POSTing a comment to a post
         data = request.get_json()
-        print(data)
 
         text = data.get("text")
         username = data.get("author")
@@ -704,10 +692,8 @@ class MyPost(Resource):
             advertiser_id = user.id
 
         if not text:
-            print("Validation failed: Missing comment text.")
             return {"error": "Comment text is required."}, 400
         if not post_id:
-            print("Validation failed: Missing post ID.")
             return {"error": "Post ID is required to associate the comment."}, 400
 
         new_comment = Comment(
@@ -722,7 +708,6 @@ class MyPost(Resource):
         try:
             db.session.add(new_comment)
             db.session.commit()
-            print("New comment created:", new_comment)
             return {"message": "Comment created successfully!"}, 201
         except Exception as e:
             db.session.rollback()
@@ -760,7 +745,7 @@ class MyComment(Resource):
             return {"error": f"Error deleting comment: {str(e)}"}, 500
 
 class EditPost(Resource):
-    def put(self, post_id):
+    def put(self, post_id): #PUTting an edit onto a post
         data = request.get_json()
         post = Post.query.filter_by(id=post_id).first()
         
@@ -830,12 +815,19 @@ class EditPost(Resource):
             return {'error': error_message}, 500
 
 class HashtagFilter(Resource):
-    def get(self):
-
+    def get(self, hashtag_id):
+        hashtag = Hashtag.query.get(hashtag_id)
+        
+        if not hashtag:
+            return {'message': 'Hashtag not found'}, 404
+        
         posts_with_hashtag = hashtag.posts
-
+        
+        if not posts_with_hashtag:
+            return {'message': 'No posts found for this hashtag'}, 404
+        
         serialized_posts = []
-
+        
         for post in posts_with_hashtag:
             if post.traveler_id:
                 traveler = Traveler.query.get(post.traveler_id)
@@ -847,22 +839,20 @@ class HashtagFilter(Resource):
                 role = localexpert.role if localexpert else "unknown"
             elif post.advertiser_id:
                 advertiser = Advertiser.query.get(post.advertiser_id)
-                author = advertiser.username if advertiser else "unknown"
+                username = advertiser.username if advertiser else "unknown"
                 role = advertiser.role if advertiser else "unknown"
-
+            
             serialized_posts.append({
-                'id': posts_with_hashtag.id,
+                'id': post.id,
                 'username': username,
                 'role': role,
-                'subject': posts_with_hashtag.subject,
-                'body': posts_with_hashtag.body,
-                "date": posts_with_hashtag.date.strftime('%Y-%m-%dT%H:%M:%S')
-            })  
-            
-            return {'posts': serialized_posts}, 200
-       
-        return {'message': 'No posts found for this hashtag'}, 404
+                'subject': post.subject,
+                'body': post.body,
+                "date": post.date.strftime('%Y-%m-%dT%H:%M:%S'),
+                'hashtags': [hashtag.name for hashtag in post.hashtags]  
+            })
 
+        return {'posts': serialized_posts}, 200
 
 class Logout(Resource):
     def delete(self):
@@ -890,10 +880,8 @@ class DeleteProfile(Resource):
             if user:
                 db.session.delete(user)
                 db.session.commit()
-                print(f"Before clearing session: {session.items()}")
                 session.clear()
                 session.modified = True
-                print(f"After clearing session: {session.items()}")
                 return '', 204
             else:
                 return {"error": "User not found"}, 404
@@ -917,24 +905,24 @@ api.add_resource(RejectAdvertiser, '/reject/advertiser/<int:advertiser_id>', end
 api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>', endpoint='verify_localexpert')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>', endpoint='reject_localexpert')
 
-api.add_resource(MyProfile, '/profile/user/<string:email>', endpoint='user_profile')
-api.add_resource(MyProfile, '/profile/user/update/<string:email>')
+api.add_resource(MyProfile, '/user/<string:email>', endpoint='user_profile')
+api.add_resource(MyProfile, '/user/update/<string:email>')
 
-api.add_resource(TheirProfile, '/profile/user/author/<string:username>')
+api.add_resource(TheirProfile, '/user/author/<string:username>')
 
-api.add_resource(Community, '/community/posts', endpoint='all_posts') #GET all posts
-api.add_resource(Community, '/community/posts/new', endpoint='new_post') #PUT new post
-api.add_resource(MyPost, '/community/posts/<int:post_id>', endpoint='post_id')  #GET for one post, POST for comments
-api.add_resource(EditPost, '/community/posts/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
-api.add_resource(EditPost, '/community/posts/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
+api.add_resource(Community, '/posts', endpoint='all_posts') #GET all posts
+api.add_resource(Community, '/posts/new', endpoint='new_post') #PUT new post
+api.add_resource(MyPost, '/posts/<int:post_id>', endpoint='post_id')  #GET for one post, POST for comments
+api.add_resource(EditPost, '/posts/edit/<int:post_id>', endpoint='post_id_edit') #PUT for editing posts
+api.add_resource(EditPost, '/posts/delete/<int:post_id>', endpoint='post_delete') #DELETE for deleting posts
 
 api.add_resource(MyComment, '/posts/<int:post_id>/comments/<int:comment_id>', endpoint='comment_delete') #Deleting comments
 
-api.add_resource(HashtagFilter, '/community/posts/filter/<int:hashtag_id>', endpoint='filterby_hashtag') #this is hashtag tenerife with its posts, not posts filtered by. it should be tenerife's id of 1, with its posts. this isn't restful
+api.add_resource(HashtagFilter, '/posts/filter/<int:hashtag_id>', endpoint='filterby_hashtag') #this is hashtag tenerife with its posts, not posts filtered by. it should be tenerife's id of 1, with its posts. this isn't restful
 
 api.add_resource(Logout, '/logout', endpoint='logout')
 
-api.add_resource(DeleteProfile, '/profile/user/delete/<string:email>', endpoint='user_profile_delete')
+api.add_resource(DeleteProfile, '/user/delete/<string:email>', endpoint='user_profile_delete')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

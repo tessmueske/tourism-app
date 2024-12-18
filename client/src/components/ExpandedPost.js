@@ -14,7 +14,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
 
     useEffect(() => {    
         setLoading(true); 
-        fetch(`/community/posts/${postId}`)
+        fetch(`/posts/${postId}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -48,7 +48,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
             date: new Date().toISOString()
         };
     
-        fetch(`/community/posts/${postId}`, {
+        fetch(`/posts/${postId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,11 +57,10 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
         })
         .then(response => response.json())
         .then(data => {
-            return fetch(`/community/posts/${postId}`);
+            return fetch(`/posts/${postId}`);
         })
         .then(response => response.json())
         .then(updatedPost => {
-            console.log("Updated Post:", updatedPost);
             setPostState(updatedPost); 
             setNewComment('');
         })
@@ -82,7 +81,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             setPostState(prevPost => ({
                 ...prevPost,
                 comments: prevPost.comments.filter(comment => comment.id !== comment_id)
@@ -92,7 +90,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
     };
 
     const backNavigate = () => {
-        navigate("/community/posts");
+        navigate("/posts");
     };
 
     if (loading) {
@@ -111,7 +109,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <h2>{post.subject}</h2>
                         <p>{post.body}</p>
                         <p style={{ fontSize: '12px' }}>
-                            posted by <Link to={`/profile/user/author/${post.author}`} style={{ fontSize: '10px' }}>
+                            posted by <Link to={`/user/author/${post.author}`} style={{ fontSize: '10px' }}>
                             {post.author}
                             </Link> 
                             , {post.role}, on{" "}{post.date
@@ -121,7 +119,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <div className="hashtag">
                             {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
                                 <span key={hashtag}>
-                                    <Link to={`/community/posts/filter/${hashtag}`} style={{ fontSize: '10px' }}>
+                                    <Link to={`/posts/filter/${hashtag}`} style={{ fontSize: '10px' }}>
                                         #{hashtag}
                                     </Link>
                                     {index < post.hashtags.length - 1 && ", "}
@@ -146,7 +144,6 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         {post.comments && post.comments.length > 0 ? (
                             post.comments.map((comment) => {
                                 if (!comment) return null; 
-                                console.log('Rendering comment:', comment); 
                                 return (
                                     <div key={comment.id}>
                                         <p>{comment.text}</p>
@@ -158,7 +155,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                             </div>
                                         )}
                                         <p style={{ fontSize: '10px' }}>
-                                            <em>- <Link to={`/profile/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
+                                            <em>- <Link to={`/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
                                             </Link>, {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}

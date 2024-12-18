@@ -57,7 +57,7 @@ function MyProfile() {
           <p><strong>contact email:</strong> {user.email || "not set"}</p>
           <button
                         className="button"
-                        onClick={() => navigate(`/profile/user/update/${user.email}`)}
+                        onClick={() => navigate(`/user/update/${user.email}`)}
                     >
                         edit my profile
                     </button>

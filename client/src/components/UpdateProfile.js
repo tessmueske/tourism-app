@@ -11,7 +11,7 @@ function UpdateProfile({ onUpdate }) {
     const { user, setUser } = useUserContext();
 
   useEffect(() => {
-    fetch(`/profile/user/${user.email}`)
+    fetch(`/user/${user.email}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
@@ -43,7 +43,7 @@ function UpdateProfile({ onUpdate }) {
         onSubmit={(values, { setSubmitting, setErrors }) => {
             const updatedProfile = { ...user, ...values };
           
-            fetch(`/profile/user/update/${user.email}`, {
+            fetch(`/user/update/${user.email}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -60,7 +60,7 @@ function UpdateProfile({ onUpdate }) {
               })
               .then((updatedProfile) => {
                 onUpdate(updatedProfile);
-                navigate(`/profile/user/${user.email}`); 
+                navigate(`/user/${user.email}`); 
               })
               .catch((error) => {
                 console.error("Error updating profile:", error);

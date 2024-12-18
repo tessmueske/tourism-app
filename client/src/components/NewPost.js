@@ -28,7 +28,7 @@ function NewPost() {
             hashtags: hashtags, 
           };
           try {
-            const response = await fetch('/community/posts/new', {
+            const response = await fetch('/posts/new', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ function NewPost() {
               setSuccessMessage("posted successfully! redirecting to community homepage...");
               resetForm();
               setTimeout(() => {
-                navigate(`/community/posts`); 
+                navigate(`/posts`); 
               }, 2000);
             } else {
               console.error("Error creating post");

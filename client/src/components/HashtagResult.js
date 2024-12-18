@@ -12,35 +12,35 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
     const { user } = useUserContext();
 
     const takeMeBack = () => {
-        navigate('/community/posts');
+        navigate('/posts');
       };
 
-    useEffect(() => {
+      useEffect(() => {
         setLoading(true);
-        fetch(`/community/posts/filter/${hashtagId}`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to fetch posts");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            setPosts(data.posts);
-            setLoading(false);
-          })
-          .catch((err) => {
-            setError(err.message);
-            setLoading(false);
-          });
-      }, [hashtagId]);
+        fetch(`/posts/filter/${hashtagId}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch posts");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setPosts(data.posts);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, [hashtagId]);
     
-      if (loading) {
-        return <p>loading...</p>;
-      }
+    if (loading) {
+        return <p>Loading...</p>;
+    }
     
-      if (error) {
-        return <p>error: {error}</p>;
-      }
+    if (error) {
+        return <p>Error: {error}</p>;
+    }
 
       return (
         <div className="communitycard-displaycard-center">
@@ -53,13 +53,13 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                     posts.map((post) => (
                     <div key={post.id}>
                         <h3 style={{ fontSize: "20px" }}>
-                        <Link to={`/community/posts/${post.id}`}>{post.subject}</Link>
+                        <Link to={`/posts/${post.id}`}>{post.subject}</Link>
                         </h3>
                         <p style={{ fontSize: "14px" }}>{post.body}</p>
                         <p style={{ fontSize: "12px" }}>
                         posted by{" "}
                         <Link
-                            to={`/profile/user/author/${post.username}`}
+                            to={`/user/author/${post.username}`}
                             style={{ fontSize: "10px" }}
                         >
                             {post.username}
@@ -76,7 +76,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                             post.hashtags.map((hashtag, index) => (
                                 <span key={hashtag.id || index}>
                                 <Link
-                                    to={`/community/posts/${hashtagId}`}
+                                    to={`/posts/${hashtagId}`}
                                     style={{ fontSize: "10px" }}
                                 >
                                     #{hashtag}
