@@ -114,7 +114,7 @@ class Post(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=func.now(), nullable=True)
-    subject = db.Column(db.String)
+    subject = db.Column(db.String, nullable=False)
     body = db.Column(db.String)
 
     traveler_id = db.Column(db.Integer, db.ForeignKey('travelers.id'), nullable=True)

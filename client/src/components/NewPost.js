@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { useUserContext } from "./UserContext";
-import { useNavigate } from 'react-router-dom';
-import '../index.css'; 
+import { useNavigate } from "react-router-dom";
+import "../index.css"; 
 import "../post.css";
+
+const validationSchema = Yup.object().shape({
+  subject: Yup.string().required("Subject is required"),
+  body: Yup.string().nullable(),
+  hashtags: Yup.string().nullable(),
+});
 
 function NewPost() {
   const { user } = useUserContext();
@@ -20,6 +27,7 @@ function NewPost() {
           body: "",
           hashtags: "",
         }}
+        validationSchema={validationSchema} 
         onSubmit={async (values, { setSubmitting, resetForm }) => {
           const hashtagsPattern = /#(\w+)/g;
           const hashtags = [...(values.hashtags.match(hashtagsPattern) || [])].map(tag => tag.slice(1));
