@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from './UserContext';
 import "../communitycard.css";
 
@@ -10,6 +10,8 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
   const handleNavigate = () => {
     navigate('/posts/new');
   };
+
+  console.log(user)
 
   useEffect(() => {
     fetch("/posts", {
@@ -48,7 +50,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
               </h3>
               <p style={{ fontSize: '14px' }}>{post.body}</p>
               <p style={{ fontSize: '12px' }}>
-                posted by <Link to={`/user/${post.username}`} style={{ fontSize: '10px' }}>
+                posted by <Link to={`/user/author/${post.username}`} style={{ fontSize: '10px' }}>
                   {post.username}
                 </Link> 
                 , {post.role}, on{" "}
@@ -56,6 +58,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                   ? new Date(post.date).toLocaleString()
                   : "no date available"}
               </p>
+
               <div className="hashtag">
                   {post.hashtags && post.hashtags.length > 0 && post.hashtags.map((hashtag, index) => (
                       <span key={hashtag.id}>
@@ -66,6 +69,7 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
                       </span>
                   ))}
               </div>
+              
               <br></br>
               {user.username === post.username && (
                 <div className="edit-delete-buttons">

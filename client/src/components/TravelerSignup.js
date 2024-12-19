@@ -51,8 +51,12 @@ function TravelerSignup() {
         })
         .catch(() => {
           formik.setErrors({ api: ["Something went wrong. Please try again."] });
+        })
+        .finally(() => {
+          formik.setSubmitting(false); 
         });
     };
+    
 
     return (
       <div className="account-center-container">

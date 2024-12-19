@@ -93,7 +93,7 @@ function App() {
             <>
               <Route path="/welcome/home" element={<Welcome />} />
               <Route path="user/:email" element={<MyProfile />} />
-              <Route path="user/update/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
+              <Route path="users/:email" element={<UpdateProfile onUpdate={onUpdate}/>} />
               <Route 
                 path="/posts" 
                 element={
@@ -114,7 +114,7 @@ function App() {
               <Route path="/posts/new" element={<NewPost />} />
               <Route path="/posts/:postId" element={<ExpandedPost post={post} setPost={setPost} handleEdit={handleEdit} confirmDelete={confirmDelete} pencil={pencil} trash={trash} posts={posts} setPosts={setPosts}/>} />
               <Route path="/posts/edit/:postId" element={<EditPost />} />
-              <Route path="/user/:author" element={<ThatUser post={post} user={user} />} />
+              <Route path="/user/author/:author" element={<ThatUser post={post} user={user} />} />
               <Route path="/contact" element={<Contact />} />
             </>
           )}

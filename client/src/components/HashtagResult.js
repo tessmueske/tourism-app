@@ -54,13 +54,17 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
       <div className="communitycard-displaycard-center">
         <div className="card">
           <div className="centered-elements">
-            <div></div>
-            <h3>filtering by '#{hashtagName}'</h3>
+            <h3>filtering by '#{hashtagName || "unknown"}'</h3>
             <button onClick={takeMeBack} className="button">
               back to main community page
             </button>
           </div>
-          {posts && posts.length > 0 ? (
+  
+          {loading ? (
+            <p>loading...</p>
+          ) : error ? (
+            <p>error: {error}</p>
+          ) : posts.length > 0 ? (
             posts.map((post) => (
               <div key={post.id}>
                 <h3 style={{ fontSize: "20px" }}>
@@ -68,7 +72,7 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                 </h3>
                 <p style={{ fontSize: "14px" }}>{post.body}</p>
                 <p style={{ fontSize: "12px" }}>
-                  Posted by{" "}
+                  posted by{" "}
                   <Link
                     to={`/user/author/${post.username}`}
                     style={{ fontSize: "10px" }}
@@ -80,52 +84,33 @@ function HashtagResult({ handleEdit, handleDelete, pencil, trash }){
                     ? new Date(post.date).toLocaleString()
                     : "no date available"}
                 </p>
-                <div style={{ fontSize: "12px" }}>
-                  <div className="hashtag">
-                    {post.hashtags && post.hashtags.length > 0 ? (
-                      post.hashtags.map((hashtag, index) => (
-                        <span key={hashtag.id || index}>
-                          <Link
-                            to={`/posts/${hashtagId}`}
-                            style={{ fontSize: "10px" }}
-                          >
-                            #{hashtag.name}
-                          </Link>
-                          {index < post.hashtags.length - 1 && ", "}
-                        </span>
-                      ))
-                    ) : (
-                      <span>no hashtags</span>
-                    )}
+                {user.username === post.username && (
+                  <div className="edit-delete-buttons">
+                    <button onClick={() => handleEdit(post.id)}>
+                      <img
+                        src={pencil}
+                        alt="Edit"
+                        style={{ width: "20px", height: "auto" }}
+                      />
+                    </button>
+                    <button onClick={() => handleDelete(post.id)}>
+                      <img
+                        src={trash}
+                        alt="Delete"
+                        style={{ width: "20px", height: "auto" }}
+                      />
+                    </button>
                   </div>
-                  {user.username === post.username && (
-                    <div className="edit-delete-buttons">
-                      <button onClick={() => handleEdit(post.id)}>
-                        <img
-                          src={pencil}
-                          alt="pencil"
-                          style={{ width: "20px", height: "auto" }}
-                        />
-                      </button>
-                      <button onClick={() => handleDelete(post.id)}>
-                        <img
-                          src={trash}
-                          alt="trash"
-                          style={{ width: "20px", height: "auto" }}
-                        />
-                      </button>
-                    </div>
-                  )}
-                </div>
+                )}
                 <hr className="post-divider" />
               </div>
             ))
           ) : (
-            <p>no posts found for #{hashtagName}</p>
+            <p>no posts found for #{hashtagName || "unknown"}</p>
           )}
         </div>
       </div>
     );
-  }
+  }  
 
 export default HashtagResult;

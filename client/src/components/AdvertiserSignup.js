@@ -48,6 +48,9 @@ function AdvertiserSignup() {
           })
           .catch(() => {
             formik.setErrors({ api: ["something went wrong. please try again."] });
+          })
+          .finally(() => {
+            formik.setSubmitting(false); 
           });
       };
 
@@ -113,6 +116,6 @@ function AdvertiserSignup() {
           </form>
         </div>
       );
-}
+  }
 
 export default AdvertiserSignup;

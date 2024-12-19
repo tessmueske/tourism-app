@@ -11,7 +11,7 @@ function UpdateProfile({ onUpdate }) {
     const { user, setUser } = useUserContext();
 
   useEffect(() => {
-    fetch(`/user/${user.email}`)
+    fetch(`/users/${user.email}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
@@ -43,7 +43,7 @@ function UpdateProfile({ onUpdate }) {
         onSubmit={(values, { setSubmitting, setErrors }) => {
             const updatedProfile = { ...user, ...values };
           
-            fetch(`/user/${user.email}`, {
+            fetch(`/users/${user.email}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",

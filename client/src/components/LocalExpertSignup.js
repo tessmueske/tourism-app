@@ -48,6 +48,9 @@ function LocalExpertSignup() {
         })
         .catch(() => {
           formik.setErrors({ api: ["Something went wrong. Please try again."] });
+        })
+        .finally(() => {
+          formik.setSubmitting(false); 
         });
     };
 

@@ -16,19 +16,21 @@ export const UserProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    fetch("/current-user", {
-      credentials: "include",
-    })
+    fetch("/current-user", { credentials: "include" })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("User not logged in");
+          console.error("Failed to fetch current user:", response.status);
+          setUser(null); 
+          return;
         }
-        return response.json();
+        response.json().then((data) => {
+          console.log("Fetched user data:", data);
+          setUser(data);
+        });
       })
-      .then((data) => setUser(data))
       .catch((err) => {
         console.error("Error fetching user:", err);
-        setUser(null); 
+        setUser(null);
       });
   }, []);
 
@@ -112,7 +114,7 @@ export const UserProvider = ({ children }) => {
       })
       .catch(() => {
         setSubmitting(false);
-        setErrors({ api: ["Something went wrong. Please try again."] });
+        setErrors({ api: ["something went wrong. please try again."] });
       });
   };  
 

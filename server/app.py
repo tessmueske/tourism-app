@@ -42,8 +42,8 @@ class CurrentUser(Resource):
                     "age": user.age,
                     "gender": user.gender,
                     "bio": user.bio
-                }, 201
-            return {"Error": "User not logged in"}, 401
+                }, 200
+        return {"error": "No user logged in"}, 401
 
 class TravelerLogin(Resource):
     def post(self):
@@ -53,11 +53,16 @@ class TravelerLogin(Resource):
         username = data.get('username')
         password = data.get('password')
 
+        errors = []
+        if not email:
+            errors.append("Email is required.")
+        if not username:
+            errors.append("Username is required.")
         if not password:
-            return {"errors": ["Password is required"]}, 400
+            errors.append("Password is required.")
 
-        if not username or not email:
-            return {"errors": ["Both username and email are required"]}, 400
+        if errors:
+            return {"errors": errors}, 400
 
         traveler = Traveler.query.filter_by(email=email, username=username).first()
 
@@ -186,7 +191,7 @@ class TravelerSignup(Resource):
         user = Traveler.query.filter((Traveler.email == email) | (Traveler.username == username)).first()
 
         if user:
-            return {"errors": ["Email already registered. Please log in."]}, 400
+            return {"errors": ["Email or username already registered. Please log in."]}, 400
         
         new_user = Traveler(
             email=email,
@@ -233,9 +238,9 @@ class LocalExpertSignup(Resource):
 
         if user:
             if user.email == email:
-                errors.append("Email already registered. Please log in.")
+                errors.append("Email or username already registered. Please log in.")
             if user.username == username:
-                errors.append("Username already taken.")
+                errors.append("Email or username already registered.")
             return {"errors": errors}, 400
         
         new_user = LocalExpert(
@@ -295,9 +300,9 @@ class AdvertiserSignup(Resource):
 
         if user:
             if user.email == email:
-                errors.append("Email already registered. Please log in.")
+                errors.append("Email or username already registered. Please log in.")
             if user.username == username:
-                errors.append("Username already taken.")
+                errors.append("Email or username already registered.")
             return {"errors": errors}, 400
         
         new_user = Advertiser(
@@ -713,7 +718,6 @@ class MyPost(Resource):
             db.session.rollback()
             return {"error": f"Error creating comment: {str(e)}"}, 500
 
-# class EditPost(Resource):
     def put(self, post_id): #PUTting an edit onto a post
         data = request.get_json()
         post = Post.query.filter_by(id=post_id).first()
@@ -754,7 +758,8 @@ class MyPost(Resource):
 
     def delete(self, post_id):
         try:
-            user_username = session.get('username')
+            user_username = session.get('username')          
+            print(f"Logged-in username: {user_username}")      
 
             post = Post.query.filter_by(id=post_id).first()
             if not post:
@@ -834,10 +839,12 @@ class HashtagFilter(Resource):
         
         if not posts_with_hashtag:
             return {'message': 'No posts found for this hashtag'}, 404
+
+        sorted_posts = sorted(posts_with_hashtag, key=lambda post: post.date, reverse=True)
         
         serialized_posts = []
         
-        for post in posts_with_hashtag:
+        for post in sorted_posts:
             if post.traveler_id:
                 user = Traveler.query.get(post.traveler_id)
             elif post.localexpert_id:
@@ -914,7 +921,9 @@ api.add_resource(VerifyLocalExpert, '/verify/localexpert/<int:localexpert_id>')
 api.add_resource(RejectLocalExpert, '/reject/localexpert/<int:localexpert_id>')
 
 api.add_resource(MyProfile, '/users/<string:email>') #GET my profile, #PUT an update onto the profile
-api.add_resource(TheirProfile, '/users/<string:username>') #GET another user's profile
+
+api.add_resource(TheirProfile, '/users/author/<string:username>') #GET another user's profile
+
 api.add_resource(Community, '/posts') #GET all posts, #POST for making a new post
 api.add_resource(MyPost, '/posts/<int:post_id>')  #GET for one post, POST for comments, PUT for editing posts, DELETE for deleting posts
 

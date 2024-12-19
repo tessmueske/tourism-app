@@ -107,7 +107,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                         <h2>{post.subject}</h2>
                         <p>{post.body}</p>
                         <p style={{ fontSize: '12px' }}>
-                            posted by <Link to={`/user/${post.author}`} style={{ fontSize: '10px' }}>
+                            posted by <Link to={`/user/author/${post.author}`} style={{ fontSize: '10px' }}>
                             {post.author}
                             </Link> 
                             , {post.role}, on{" "}{post.date
@@ -153,7 +153,7 @@ function ExpandedPost({ handleEdit, pencil, trash, confirmDelete }) {
                                             </div>
                                         )}
                                         <p style={{ fontSize: '10px' }}>
-                                            <em>- <Link to={`/user/${comment.author}`} style={{ fontSize: '10px' }}>
+                                            <em>- <Link to={`/user/author/${comment.author}`} style={{ fontSize: '10px' }}>
                                                 {comment.author}
                                             </Link>, {comment.role}, on{" "}
                                             {comment.date ? new Date(comment.date).toLocaleString() : "no date available"}

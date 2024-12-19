@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from './UserContext';
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from 'yup';
 import '../index.css'; 
 
 function EditPost() {
@@ -19,13 +20,12 @@ function EditPost() {
           return response.json();
         })
         .then((data) => {
-    
           const hashtags = Array.isArray(data.hashtags)
             ? data.hashtags
             : data.hashtags?.split(' ').map((tag) => tag.trim()).filter(Boolean) || [];
           
           const formattedHashtags = hashtags.map(tag => typeof tag === 'object' ? tag.name || tag.tag : tag);
-    
+
           setInitialValues({
             author: user?.username || '',
             subject: data.subject || '',
@@ -35,13 +35,18 @@ function EditPost() {
         })
         .catch((error) => console.error("Error fetching post data:", error));
     }, [postId, user]);
-    
-    
+
+    const validationSchema = Yup.object().shape({
+      subject: Yup.string().required("Subject is required"),
+      body: Yup.string().nullable(),
+      hashtag: Yup.string().nullable(),
+    });
+
     const handleSubmit = (values) => {
         const updatedHashtags = values.hashtag
             ? values.hashtag.split(' ').map((tag) => tag.trim()).filter(Boolean)
             : [];
-    
+
         fetch(`/posts/${postId}`, {
             method: "PUT",
             headers: {
@@ -65,7 +70,6 @@ function EditPost() {
                 console.error("Error updating post:", error);
             });
     };
-    
 
     if (!initialValues) {
         return <p className="communitycard-displaycard-center">loading...</p>;
@@ -77,6 +81,8 @@ function EditPost() {
             <h2>edit post</h2>
             <Formik
               initialValues={initialValues}
+              enableReinitialize
+              validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (
@@ -97,24 +103,24 @@ function EditPost() {
                     <ErrorMessage name="subject" component="div" className="errorLabel" />
                   </div>
                   <br></br>
-    
+
                   <div>
                     <label htmlFor="body">body:</label>
                     <Field name="body" as="textarea" />
                     <ErrorMessage name="body" component="div" className="errorLabel" />
                   </div>
-    
+
                   <div>
-                <label htmlFor="hashtag">hashtags (written just like this, with no # in front of them):</label>
-                <Field 
-                    name="hashtag" 
-                    type="text" 
-                    placeholder="hashtags"
-                />
-                <ErrorMessage name="hashtag" component="div" className="errorLabel" />
-                </div>
+                    <label htmlFor="hashtag">hashtags (written just like this, with no # in front of them):</label>
+                    <Field 
+                        name="hashtag" 
+                        type="text" 
+                        placeholder="hashtags"
+                    />
+                    <ErrorMessage name="hashtag" component="div" className="errorLabel" />
+                  </div>
                   <br />
-    
+
                   <button type="submit" className="button" disabled={isSubmitting}>
                     save changes
                   </button>

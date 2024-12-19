@@ -24,6 +24,7 @@ function ThatUser() {
                     throw new Error("Failed to fetch profile data");
                 })
                 .then((data) => {
+                    console.log(data);
                     setProfile(data);   
                 })
                 .catch((error) => console.error("Error fetching profile:", error));

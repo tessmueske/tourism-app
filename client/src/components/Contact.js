@@ -18,12 +18,34 @@ function Contact() {
       message: "",
     },
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: (values, { setSubmitting, resetForm }) => {
+      fetch('https://formspree.io/f/movqlnak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert("Your message has been sent!");
+            resetForm(); 
+          } else {
+            alert("There was an error. Please try again.");
+          }
+        })
+        .catch((error) => {
+          console.error('Error submitting form:', error);
+          alert("There was an error. Please try again.");
+        })
+        .finally(() => {
+          setSubmitting(false); 
+        });
     },
   });
 
   return (
-    <div className='center-container'>
+    <div className="center-container">
       <h1>we want to hear from you.</h1>
       <p>
         do you have suggestions for improvement? a new idea? something you don't like? 
@@ -32,15 +54,13 @@ function Contact() {
       <p>fill out the form below and we'll be in touch!</p>
 
       <form
-        action="https://formspree.io/f/movqlnak"
-        method="POST"
+        method="POST" 
         className="contact-form"
         onSubmit={formik.handleSubmit} 
       >
         <div>
           <label htmlFor="name">name</label>
-          <br></br>
-          <br></br>
+          <br />
           <input
             type="text"
             id="name"
@@ -53,12 +73,10 @@ function Contact() {
             <div className="error">{formik.errors.name}</div>
           )}
         </div>
-        <br></br>
 
         <div>
           <label htmlFor="email">email</label>
-          <br></br>
-          <br></br>
+          <br />
           <input
             type="email"
             id="email"
@@ -71,12 +89,10 @@ function Contact() {
             <div className="error">{formik.errors.email}</div>
           )}
         </div>
-        <br></br>
 
         <div>
           <label htmlFor="message">message</label>
-          <br></br>
-          <br></br>
+          <br />
           <textarea
             id="message"
             name="message"
@@ -89,9 +105,8 @@ function Contact() {
             <div className="error">{formik.errors.message}</div>
           )}
         </div>
-        <br></br>
 
-        <button type="submit" className="submit-button">
+        <button type="submit" className="submit-button" disabled={formik.isSubmitting}>
           submit
         </button>
       </form>
