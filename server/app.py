@@ -577,41 +577,6 @@ class Community(Resource):
             return {'error': error_message}, 500
 
 class MyPost(Resource):
-
-    @staticmethod
-    def process_comments(comments):
-        formatted_comments = []
-        for comment in comments:
-            traveler_id = comment.get('traveler_id')
-            localexpert_id = comment.get('localexpert_id')
-            advertiser_id = comment.get('advertiser_id')
-
-            if traveler_id:
-                traveler = Traveler.query.get(traveler_id)
-                author = traveler.username if traveler else "anonymous"
-                role = traveler.role if traveler else "unknown"
-            elif localexpert_id:
-                localexpert = LocalExpert.query.get(localexpert_id)
-                author = localexpert.username if localexpert else "anonymous"
-                role = localexpert.role if localexpert else "unknown"
-            elif advertiser_id:
-                advertiser = Advertiser.query.get(advertiser_id)
-                author = advertiser.username if advertiser else "anonymous"
-                role = advertiser.role if advertiser else "unknown"
-            else:
-                author = "anonymous"
-                role = "unknown"
-
-            formatted_comments.append({
-                "id": comment.get("id"),
-                "text": comment.get("text", "No text"),
-                "author": author,
-                "role": role,
-                "date": comment.get("date", None)
-            })
-
-        return formatted_comments
-
     def get(self, post_id):  # GET one post INCLUDING the comments
         post = Post.query.filter_by(id=post_id).first()
         if not post:

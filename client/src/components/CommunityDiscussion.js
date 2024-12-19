@@ -11,8 +11,6 @@ function CommunityDiscussion({ handleEdit, pencil, trash, confirmDelete, posts, 
     navigate('/posts/new');
   };
 
-  console.log(user)
-
   useEffect(() => {
     fetch("/posts", {
       method: "GET",

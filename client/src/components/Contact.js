@@ -7,9 +7,15 @@ function Contact() {
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
-    email: Yup.string().email("Invalid email format").required("Email is required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email format"
+      )
+      .required("Email is required"),
     message: Yup.string().required("Message is required"),
-  });
+  });  
 
   const formik = useFormik({
     initialValues: {
@@ -27,10 +33,12 @@ function Contact() {
         body: JSON.stringify(values),
       })
         .then((response) => {
+          console.log(values);
           if (response.ok) {
             alert("Your message has been sent!");
             resetForm(); 
           } else {
+            console.error('Server error:', values);
             alert("There was an error. Please try again.");
           }
         })
