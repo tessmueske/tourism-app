@@ -108,14 +108,6 @@ cd tourism-app
 
    The React app will start on [http://localhost:3000](http://localhost:3000) and connect to the backend.
 
----
-
-### **4. Development Notes**
-
-* The backend runs on port **5555** by default; the frontend runs on **3000**.
-* Make sure both are running for full functionality.
-* The backend `.env` file is for **local development only** — do not commit secrets.
-
 
 ## Future Considerations
 - **Community Calendar**: A shared event planning tool.  
